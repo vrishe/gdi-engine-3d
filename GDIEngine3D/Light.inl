@@ -1,7 +1,7 @@
 #pragma once
 
 // ============================================================================
-// Partial implementation of CLight class:
+// CLight partial implementation:
 
 inline void CLight::InitDefaultValues(CLight *obj)
 {

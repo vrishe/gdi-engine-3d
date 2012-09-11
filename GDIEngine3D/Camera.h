@@ -17,7 +17,7 @@ private:
 protected:
 	PROJECTION_TYPE projectionType;
 
-	float			hFOV;		// FOV это угол. в радианах
+	float			hFOV;		// FOV is an angle measured in radians
 	float			vFOV;
 	float			fDist;
 	float			nearClip;

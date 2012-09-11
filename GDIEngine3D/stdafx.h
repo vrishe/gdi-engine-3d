@@ -1,7 +1,5 @@
-// stdafx.h: включаемый файл дл€ стандартных системных включаемых файлов
-// или включаемых файлов дл€ конкретного проекта, которые часто используютс€, но
-// не часто измен€ютс€
-//
+// stdafx.h: header file which is used for listing of standard headers or those not 
+//			 changes it's contents in a frequent manner
 
 #pragma once
 
@@ -26,4 +24,4 @@
 #include <map>
 
 // Custom Library headers:
-#include "Math3D.h"
+#include "Math.h"

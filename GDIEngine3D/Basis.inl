@@ -1,7 +1,7 @@
 #pragma once
 
 // ============================================================================
-// Partial implementation of _tagEdge3D struct:
+// _tagEdge3D partial implementation:
 
 inline _tagEdge3D& _tagEdge3D::operator+= (const UINT& p) 
 {
@@ -18,7 +18,7 @@ inline bool _tagEdge3D::operator!= (const _tagEdge3D &b) const { return !operato
 inline bool _tagEdge3D::isContianingVertex(size_t vi) const { return first == vi || second == vi; }
 
 // ============================================================================
-// Partial implementation of _tagPoly3D struct:
+// _tagPoly3D partial implementation:
 
 inline _tagPoly3D& _tagPoly3D::operator+= (const UINT& p) 
 {
@@ -44,13 +44,14 @@ inline bool _tagPoly3D::isContainingEdge(const EDGE3D &e)
 }
 
 // ============================================================================
-// Implementation of _tagColor3D struct:
+// _tagColor3D implementation:
+
 inline _tagColor3D::_tagColor3D(unsigned char r, unsigned char g, unsigned char b) { Red = r; Green = g; Blue = b; }
 inline bool _tagColor3D::operator==(const float &b) const { return ( Red == b && Green == b && Blue == b); }
 inline bool _tagColor3D::operator!=(const float &b) const { return ( Red != b || Green != b || Blue != b); }
 
-// ============================================================================
-// Partial implementation of CObject class:
+// ===========================================================================
+// CObject partial implementation:
 
 inline void CObject::InitDefaultValues(CObject *obj)
 {
@@ -208,25 +209,3 @@ inline VECTOR3D CObject::getScale() { return worldScale; }
 inline void CObject::setForwardLookDirection(const VECTOR3D &v) { fWd = v; }
 inline void CObject::setRightLookDirection(const VECTOR3D &v) { rWd = v; }
 inline void CObject::setUpLookDirection(const VECTOR3D &v) { uWd = v; }
-
-// ============================================================================
-// Partial implementation of CMesh class:
-
-inline void CMesh::getVerticesTransformed(LPVECTOR3D v)
-{
-	CopyMemory(v, cache.data(), cache.size() * sizeof(VECTOR3D));
-}
-
-inline size_t		CMesh::getMeshID()					{ return _mTypeID; }
-inline size_t		CMesh::getVerticesCount()			{ return vertices.size(); }
-inline size_t		CMesh::getEdgesCount()				{ return edges.size(); }
-inline size_t		CMesh::getPolygonsCount()			{ return polygons.size(); }
-inline LPVECTOR3D	CMesh::getVerticesRaw()				{ return vertices.data(); }
-inline LPEDGE3D		CMesh::getEdgesRaw()				{ return edges.data(); }
-inline LPPOLY3D		CMesh::getPolygonsRaw()				{ return polygons.data(); }
-inline VERT_LIST	CMesh::getVertices()				{ return vertices; }
-inline EDGE_LIST	CMesh::getEdges()					{ return edges; }
-inline POLY_LIST	CMesh::getPolygons()				{ return polygons; }
-inline POLY3D		CMesh::getPolygon(int i)			{ return polygons[i]; }
-
-inline void			CMesh::setMeshID(size_t mTypeID)	{ _mTypeID = mTypeID; }
