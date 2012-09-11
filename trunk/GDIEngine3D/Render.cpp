@@ -3,7 +3,7 @@
 #include "Render.h"
 
 // ============================================================================
-// CViewport implementation
+// CViewport implementation:
 
 CAMERA3D CViewport::camDefault = CAMERA3D();
 
@@ -126,8 +126,6 @@ VOID CViewport::setHeight(UINT vpHeight)
 }
 
 inline bool ZBufSort(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY3D, UINT> &b) {
-	//float s1  =  / 3;
-	//float s2  =  / 3;
 	return (a.first.first.z + a.first.second.z + a.first.third.z) 
 			> (b.first.first.z + b.first.second.z + b.first.third.z);
 }
@@ -137,14 +135,14 @@ BOOL CViewport::Render(HDC hDCScreen) {
 
 	if (bResult)
 	{
-		HANDLE				procHeap		= GetProcessHeap();
+		HANDLE				procHeap				= GetProcessHeap();
 
 		HPEN				hPenCurrent, 
 							hPenOld;
 		HBRUSH				hBrCurrent,
 							hBrOld;
 
-		RECT				clientRect		= {0, 0, getWidth(), getHeight()};
+		RECT				clientRect				= {0, 0, getWidth(), getHeight()};
 		UINT_PTR			sceneObjCount,
 							sceneLightCount,
 							scenePolyCount,
@@ -176,8 +174,12 @@ BOOL CViewport::Render(HDC hDCScreen) {
 
 		sceneObjCount	= Scene->getObjectClassCount(CLS_MESH);
 
-		if ( rMode != RM_WIREFRAME ) {
-			scenePolyCount			= Scene->getPolygonsCount();
+		if ( rMode != RM_WIREFRAME ) 
+		{
+			scenePolyCount = 0;
+			for (UINT_PTR i = 0; i < sceneObjCount; i++) 
+				scenePolyCount += ((LPMESH3D)Scene->getObject(CLS_MESH, i))->getPolygonsCount();
+
 			sceneLightCount			= Scene->getObjectClassCount(CLS_LIGHT);
 			scenePolyColorBuffer	= new COLORREF[scenePolyCount];
 			sceneLightedPolyCount	= 0;
@@ -194,18 +196,19 @@ BOOL CViewport::Render(HDC hDCScreen) {
 		// Drawing objects
 		for ( UINT i = 0; i < sceneObjCount; i++ ) 
 		{
-			objToRender				= (LPMESH3D)Scene->getObject(CLS_MESH, i);	
-			objVertCount			= objToRender->getVerticesCount();
-			objVertBuffer			= (LPVECTOR3D)HeapAlloc(
-											procHeap, 
-											HEAP_ZERO_MEMORY, 
-											sizeof(VECTOR3D) * objVertCount
-										);
+			objToRender		= (LPMESH3D)Scene->getObject(CLS_MESH, i);	
+			objVertCount	= objToRender->getVerticesCount();
+			objVertBuffer	= (LPVECTOR3D)HeapAlloc(
+				procHeap, 
+				HEAP_ZERO_MEMORY, 
+				sizeof(VECTOR3D) * objVertCount
+				);
 
 			objToRender->getVerticesTransformed(objVertBuffer);
 
 			// calculate lighting here
-			if ( rMode != RM_WIREFRAME ) {
+			if ( rMode != RM_WIREFRAME ) 
+			{
 				objPolyBuffer		= objToRender->getPolygonsRaw();
 				objPolyCount		= objToRender->getPolygonsCount();
 				UINT_PTR lightTo	= sceneLightedPolyCount + objPolyCount; // number of polygons to light
@@ -294,7 +297,6 @@ BOOL CViewport::Render(HDC hDCScreen) {
 						objVertBuffer[j]
 					);
 			}
-
 
 			if ( rMode != RM_WIREFRAME ) 
 			{
@@ -473,7 +475,8 @@ VOID SetViewportDefaultView(LPVIEWPORT vp, VIEW_TYPE vt)
 }
 
 // ============================================================================
-// ÑRenderPool Implementation
+// ÑRenderPool Implementation:
+
 DWORD WINAPI ÑRenderPool::Render(LPVOID renderInfo)
 {
 	clock_t		time;

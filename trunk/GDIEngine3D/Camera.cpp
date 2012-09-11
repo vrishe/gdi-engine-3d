@@ -3,7 +3,7 @@
 #include "Camera.h"
 
 // ============================================================================
-// Implementation of CCamera class:
+// CCamera partial implementation:
 
 void CCamera::InitDefaultValues(CCamera *cam)
 {

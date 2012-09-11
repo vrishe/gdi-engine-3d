@@ -2,6 +2,8 @@
 
 #include "Camera.h"
 #include "Light.h"
+#include "Mesh.h"
+#include "Scene.h"
 
 // Custom error codes
 #define E_POOL_NOT_INITIALIZED		0x10000000
@@ -29,7 +31,6 @@ enum RENDER_MODE {
 #define MAX_VIEWPORT_COUNT	6
 #define CLOCKS_PER_FRAME	50
 #define THREAD_WAIT_TIMEOUT	5000
-//#define VIEWPORT_CLASS_NAME	_T("RenderPool Viewport Class")
 
 typedef struct tagTHREAD_CONTROLS {
 	EVENT doRender;
@@ -37,11 +38,15 @@ typedef struct tagTHREAD_CONTROLS {
 	EVENT jobDone;
 } THREAD_CONTROLS, *LPTHREAD_CONTROLS;
 
-// first- index of a polygon in mesh, second - index of a mesh in scene
+// first - index of a polygon in mesh, second - index of a mesh in scene
 typedef vector <pair<DIRECTPOLY3D, UINT>> SCENEPOLY;
 typedef vector <VECTOR3D> SCENEVERT;
 
 #define DEFAULT_CAMERA_ID	UINT_MAX
+
+// ============================================================================
+// CViewport provides an interface for picture plane that recieves 2D projection 
+// of a 3D space through camera's eye.
 
 class CViewport {
 private:
@@ -93,6 +98,12 @@ enum VIEW_TYPE {
 
 VOID SetViewportDefaultView(LPVIEWPORT vp, VIEW_TYPE vt);
 
+// ============================================================================
+// CRenderPool provides centralized viewport-n-rendering management. That means 
+// it controls multithreaded rendering process which is implemented in
+// barrier computtation manner
+
+// TODO: Fetch these constants to an interface-styled customisation (lowest priority)
 #define FRAME_STROKE_COLORREF	RGB(250, 170, 65)
 #define FRAME_STROKE_WIDTH		3
 #define FRAME_FONT_COLOR		RGB(50, 50, 50)

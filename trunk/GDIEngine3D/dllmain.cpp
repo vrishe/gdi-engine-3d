@@ -1,4 +1,5 @@
-// dllmain.cpp: определяет точку входа для приложения DLL.
+// dllmain.cpp: implements an entry point of GDIEngine3D.dll
+
 #include "stdafx.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,

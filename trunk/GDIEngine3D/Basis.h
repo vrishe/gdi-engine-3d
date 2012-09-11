@@ -1,10 +1,23 @@
+// Basis.h: Contains declaration of basic data types such as: edge, polygon and object from the 
+//			geometric point of view. Also here is declared mesh and scene data types.
+
 #pragma once
+
+#define BLACK 0
+
+// Macro-definitions for simple single-colored component extraction from COLORREF bit field 
+#define RED(c)		(BYTE)(c)
+#define GREEN(c)	(BYTE)(c>>8)
+#define BLUE(c)		(BYTE)(c>>16)
 
 using namespace std;
 
 // ============================================================================
-// Supporting structures
+// Supporting structures: Edge, Polygon (/w normal vector) and Color
+// Also here is declared IColorable interface that allows you to define 
+// a type for an object that has it's own color.
 
+typedef vector<VECTOR3D> VERT_LIST, *LPVERT_LIST;
 typedef struct _tagEdge3D {
 	size_t first;
 	size_t second;
@@ -17,6 +30,7 @@ typedef struct _tagEdge3D {
 	bool operator!=(const _tagEdge3D &b) const;
 	bool isContianingVertex(size_t vi) const;
 } EDGE3D, *LPEDGE3D;
+typedef vector<EDGE3D> EDGE_LIST, *LPEDGE_LIST;
 
 typedef struct _tagNormalPolygon {
 	VECTOR3D first;
@@ -27,8 +41,6 @@ typedef struct _tagNormalPolygon {
 
 	VECTOR3D Normal(size_t startVert);
 } DIRECTPOLY3D, *LPDIRECTPOLY3D;
-
-typedef vector<VECTOR3D> VERT_LIST, *LPVERT_LIST;
 
 typedef struct _tagPoly3D {
 	size_t first;
@@ -46,6 +58,7 @@ typedef struct _tagPoly3D {
 	bool isContainingEdge (const EDGE3D &e);
 	bool isContainingVertex (size_t vi);
 } POLY3D, *LPPOLY3D;
+typedef vector<POLY3D> POLY_LIST, *LPPOLY_LIST;
 
 typedef struct _tagColor3D
 {
@@ -71,18 +84,11 @@ public:
 	inline COLORREF getColor() { return color; }
 };
 
-#define BLACK 0
-
-// This is for simple colorref color extraction 
-#define RED(c)		(BYTE)(c)
-#define GREEN(c)	(BYTE)(c>>8)
-#define BLUE(c)		(BYTE)(c>>16)
-
 // ============================================================================
-// Object class that represents current object's in-space position
+// Object class provides important model positioning data such as:
+// it's Decart space coordinates and it's LCS position relative to WCS 
 
 #define MAX_OBJECT_NAME_LEN	256
-// #define OBJECTS_NUM			4
 
 enum CLASS_ID {
 	CLS_OBJECT,
@@ -112,11 +118,12 @@ protected:
 
 	// Position
 	VECTOR3D		pos;
-	// Orientation
-	VECTOR3D		fWd;
-	VECTOR3D		rWd;
-	VECTOR3D		uWd;
-	VECTOR3D		world;
+
+	// Orientation orts
+	VECTOR3D		fWd;		// Forward
+	VECTOR3D		rWd;		// Rightward
+	VECTOR3D		uWd;		// Upward
+	VECTOR3D		world;		// World orts-in-one
 
 	// Scaling
 	VECTOR3D		worldScale;
@@ -124,7 +131,7 @@ protected:
 
 	CONSTRAINTS		moveConst;
 
-	void PitchYawRoll();
+	//void PitchYawRoll();
 
 public:
 	CObject(CLASS_ID clsID = CLS_OBJECT);
@@ -217,139 +224,9 @@ public:
 	void setName(LPTSTR objName, size_t srcSize);
 };
 typedef CObject OBJECT3D, *LPOBJECT3D;
-
-// ============================================================================
-// Class CMesh
-
-typedef vector<EDGE3D> EDGE_LIST, *LPEDGE_LIST;
-typedef vector<POLY3D> POLY_LIST, *LPPOLY_LIST;
-
-class CMesh : public CObject, public IColorable {
-private:
-	size_t			_mTypeID;
-
-protected:
-	VERT_LIST		vertices;	// list of vertexes
-	VERT_LIST		cache;		// list of transformed vertices
-	EDGE_LIST		edges;		// list of edges
-	POLY_LIST		polygons;	// list of polygons
-
-	COLORREF		color;
-
-	void flushVertices();
-	size_t findVertex(const VECTOR3D &v);	// returns a vertex position
-	size_t findEdge(const EDGE3D &e);
-	size_t findPolygon(const POLY3D &p);	// returns a Polygon_ position
-
-public:
-	CMesh(size_t meshTypeId);
-	CMesh(COLORREF c, size_t meshTypeId);
-	CMesh(const VECTOR3D &pt,
-		float p, 
-		float y, 
-		float r, 
-		size_t meshTypeId
-		);
-	CMesh(const VECTOR3D &pt,
-		float p, 
-		float y, 
-		float r, 
-		COLORREF c,
-		size_t meshTypeId
-		);
-	CMesh(float	pX, 
-		float pY, 
-		float pZ, 
-		float p, 
-		float y, 
-		float r, 
-		size_t meshTypeId
-		);
-	CMesh(float	pX, 
-		float pY, 
-		float pZ, 
-		float p, 
-		float y, 
-		float r, 
-		COLORREF c,
-		size_t meshTypeId
-		);
-
-	// getters
-	size_t			getMeshID();
-	size_t			getVerticesCount();
-	size_t			getEdgesCount();
-	size_t			getPolygonsCount();
-	LPVECTOR3D		getVerticesRaw();
-	LPEDGE3D		getEdgesRaw();
-	LPPOLY3D		getPolygonsRaw();
-	VERT_LIST		getVertices();
-	EDGE_LIST		getEdges();
-	POLY_LIST		getPolygons();
-
-	POLY3D			getPolygon(int);
-
-	void			getBuffersRaw(LPVECTOR3D *vs, LPEDGE3D *es, LPPOLY3D *ps);
-	void			getBuffers(LPVERT_LIST vs, LPEDGE_LIST es, LPPOLY_LIST ps);
-	void			getVerticesTransformed(LPVECTOR3D v);
-
-	void			setMeshID(size_t);
-
-	void			addVertices(const LPVECTOR3D vs, UINT vsCount);
-	bool			delVertices();
-	
-	void			addEdges(const LPEDGE3D es, UINT esCount);
-	bool			delEdges(EDGE3D);
-
-	void			addPolygons(const LPPOLY3D ps, UINT psCount);
-	bool			delPolygon(POLY3D);
-
-	void			Transform();
-};
-typedef CMesh MESH3D, *LPMESH3D;
-
-// ============================================================================
-// World class which represents real world enumerations and sets the WCS
-
-typedef vector<LPOBJECT3D> OBJECTS_LIST;
-typedef map<CLASS_ID, OBJECTS_LIST> CONTENT;
-typedef pair<CLASS_ID, OBJECTS_LIST> CONTENT_CLASS;
-
-class CScene {
-private:
-	CONTENT		objects;
-	COLORREF	ambientColor;
-
-public:
-	CScene();
-	~CScene();
-
-	bool AddObject(const LPOBJECT3D lpObject);
-	bool DeleteObject(CLASS_ID clsID, size_t objIndex); 
-	bool DeleteObject(size_t objID);
-	bool DeleteObject(const LPOBJECT3D lpObject);
-	void Clear();
-
-	bool findObjectIndex(const LPOBJECT3D lpObject, size_t *objIndex = NULL);
-	bool findObjectIndex(
-				size_t objID, 
-				CLASS_ID *objClsID	= NULL, 
-				size_t *objIndex	= NULL
-			);
-
-	bool		getFirstObject(CLASS_ID *objID);
-	LPOBJECT3D	getFirstObject();
-	LPOBJECT3D	getObject(CLASS_ID objID, size_t objIndex);
-	LPOBJECT3D	getObject(size_t objID);
-	size_t		getPolygonsCount();
-	size_t		getVerticesCount();
-	COLORREF	getAmbientColor();
-
-	VOID		setAmbientColor(COLORREF color);
-
-	size_t getObjectClassCount(CLASS_ID clsID);
-};
-typedef CScene SCENE3D, *LPSCENE3D;
+typedef std::vector<LPOBJECT3D> OBJECTS_LIST;
+typedef std::map<CLASS_ID, OBJECTS_LIST> CONTENT;
+typedef std::pair<CLASS_ID, OBJECTS_LIST> CONTENT_CLASS;
 
 #include "Basis.inl"
 

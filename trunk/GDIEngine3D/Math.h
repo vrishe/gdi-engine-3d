@@ -72,4 +72,4 @@ extern inline void Matrix3DRotateAxis(const VECTOR3D &axis, float angle, MATRIX3
 extern inline void Matrix3DTransformCoord(const MATRIX3D &T, const VECTOR3D &in, VECTOR3D &out);
 extern inline void Matrix3DTransformNormal(const MATRIX3D &T, const VECTOR3D &in,	VECTOR3D &out);
 
-#include "Math3D.inl"
+#include "Math.inl"

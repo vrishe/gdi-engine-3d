@@ -1,3 +1,6 @@
+// GDIEngine3D.h: Contains declarations that describe the interface functions 
+//				  and necessary data structures of GDIEngine3D.dll
+
 #pragma once
 
 #ifdef GDIENGINE3D_EXPORTS

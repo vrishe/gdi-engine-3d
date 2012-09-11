@@ -1,7 +1,7 @@
 #pragma once
 
 // ============================================================================
-// Partial implementation of CCamera class
+// CCamera partial implementation:
 
 inline PROJECTION_TYPE	CCamera::getProjectionType()	{ return projectionType; }
 inline float			CCamera::getHFov()				{ return hFOV; }

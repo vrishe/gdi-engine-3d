@@ -1,8 +1,5 @@
-// stdafx.cpp: исходный файл, содержащий только стандартные включаемые модули
-// GDIEngine3D.pch будет предкомпилированным заголовком
-// stdafx.obj будет содержать предварительно откомпилированные сведения о типе
+// stdafx.cpp: source file, which contains standard include modules only
+// GDIEngine3D.pch will be the precompiled header
+// stdafx.obj will contain precompiled type information only
 
 #include "stdafx.h"
-
-// TODO: Установите ссылки на любые требующиеся дополнительные заголовки в файле STDAFX.H
-// , а не в данном файле
