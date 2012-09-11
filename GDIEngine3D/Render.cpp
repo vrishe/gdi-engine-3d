@@ -125,7 +125,9 @@ VOID CViewport::setHeight(UINT vpHeight)
 	setSize(szVp);
 }
 
-inline bool ZBufSort(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY3D, UINT> &b) {
+// Is used as predicate for std::sort algorithm; provides a > b comparison
+bool ZDepthComparator(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY3D, UINT> &b) 
+{
 	return (a.first.first.z + a.first.second.z + a.first.third.z) 
 			> (b.first.first.z + b.first.second.z + b.first.third.z);
 }
@@ -360,7 +362,7 @@ BOOL CViewport::Render(HDC hDCScreen) {
 
 		if ( rMode != RM_WIREFRAME ) 
 		{
-			sort(scenePolyBuffer.begin(), scenePolyBuffer.end(), ZBufSort);
+			sort(scenePolyBuffer.begin(), scenePolyBuffer.end(), ZDepthComparator);
 
 			scenePolyCount	= scenePolyBuffer.size();
 			for (UINT i = 0; i < scenePolyCount; i++ ) 
