@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Файлы исходного кода">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Заголовочные файлы">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Заголовочные файлы\GDIEngine3D">
+      <UniqueIdentifier>{2452d09a-7fa9-4b6d-9cd2-8cdbc5272d86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\GDIEngine3D">
+      <UniqueIdentifier>{35c84c79-4492-4a3d-a675-e76fe62b4717}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="Basis.h">
+      <Filter>Заголовочные файлы\GDIEngine3D</Filter>
+    </ClInclude>
+    <ClInclude Include="GDIEngine3D.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Заголовочные файлы\GDIEngine3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Заголовочные файлы\GDIEngine3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Заголовочные файлы\GDIEngine3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Math3D.h">
+      <Filter>Заголовочные файлы\GDIEngine3D</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="Basis.cpp">
+      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </ClCompile>
+    <ClCompile Include="GDIEngine3D.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Basis.inl">
+      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </None>
+    <None Include="Light.inl">
+      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </None>
+    <None Include="Camera.inl">
+      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </None>
+    <None Include="Math3D.inl">
+      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </None>
+  </ItemGroup>
+</Project>
