@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <deque>
 #include <map>
 
 // Custom Library headers:
