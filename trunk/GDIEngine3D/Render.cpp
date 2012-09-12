@@ -133,7 +133,7 @@ bool ZDepthComparator(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY
 }
 
 BOOL CViewport::Render(HDC hDCScreen) {
-	BOOL				bResult			= hDCScreen!= NULL && Scene != NULL && camOutput != NULL;
+	BOOL bResult = hDCScreen!= NULL && Scene != NULL && camOutput != NULL;
 
 	if (bResult)
 	{
