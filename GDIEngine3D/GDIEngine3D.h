@@ -11,8 +11,6 @@
 #define GDIENGINE3D_USERAPI __declspec(dllimport)
 #endif
 
-#include "Render.h"
-
 typedef HANDLE HRENDERPOOL3D;
 
 #ifdef __cplusplus

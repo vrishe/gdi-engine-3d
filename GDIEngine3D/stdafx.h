@@ -1,5 +1,5 @@
 // stdafx.h: header file which is used for listing of standard headers or those not 
-//			 changes it's contents in a frequent manner
+//			 changes it's contents in a frequently manner
 
 #pragma once
 
@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <deque>
+#include <list>
 #include <map>
 
 // Custom Library headers:
