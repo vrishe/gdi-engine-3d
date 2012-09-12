@@ -3,14 +3,16 @@
 #include "stdafx.h"
 #include "GDIEngine3D.h"
 
+#include "Render.h"
+
 // ============================================================================
 // Internal mechanism, that allows to control library interface workflow safety
 extern HANDLE				hProcessHeap;
-extern std::deque<LPVOID>	utilizedMemory;
+extern std::list<LPVOID>	utilizedMemory;
 
-BOOL ObjectIsUsed(HANDLE obj, std::deque<LPVOID>::iterator &Where)
+BOOL ObjectIsUsed(HANDLE obj, std::list<LPVOID>::iterator &Where)
 {
-	for (std::deque<LPVOID>::iterator cur = utilizedMemory.begin(), end = utilizedMemory.end(); cur != end; cur++)
+	for (std::list<LPVOID>::iterator cur = utilizedMemory.begin(), end = utilizedMemory.end(); cur != end; cur++)
 	{
 		if (*cur == obj) 
 		{
@@ -33,8 +35,7 @@ HRENDERPOOL3D WINAPI CreateRenderPool3D()
 	{
 		utilizedMemory.push_back(obj);
 		
-		*obj = RENDER_POOL();
-		return (HRENDERPOOL3D)obj;
+		return (HRENDERPOOL3D)new(obj) RENDER_POOL; // This line depends of arguments, so it's not intended to be placed inside of the template creation func.
 	}
 
 	return NULL;
@@ -42,7 +43,8 @@ HRENDERPOOL3D WINAPI CreateRenderPool3D()
 
 BOOL WINAPI ReleaseRenderPool3D(HRENDERPOOL3D hRp3D)
 {
-	std::deque<LPVOID>::iterator finder;
+	// Whole function is intended to be a template release func.
+	std::list<LPVOID>::iterator finder;
 	if (hRp3D != NULL && ObjectIsUsed(hRp3D, finder)) 
 	{
 		utilizedMemory.erase(finder);
@@ -52,4 +54,6 @@ BOOL WINAPI ReleaseRenderPool3D(HRENDERPOOL3D hRp3D)
 
 	return FALSE;
 }
+
+// TODO: Implement the most useful interface functions, such as: CreateLight, CreateCamera, RenderWorld(CRenderPool based) and so on 
 

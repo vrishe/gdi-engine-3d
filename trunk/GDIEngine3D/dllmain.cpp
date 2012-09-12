@@ -3,7 +3,7 @@
 #include "stdafx.h"
 
 extern HANDLE				hProcessHeap	= NULL;
-extern std::deque<LPVOID>	utilizedMemory	= std::deque<LPVOID>();
+extern std::list<LPVOID>	utilizedMemory	= std::list<LPVOID>();
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -23,7 +23,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	case DLL_PROCESS_DETACH:
 		if (hProcessHeap != NULL)
 		{
-			for (std::deque<LPVOID>::iterator cur = utilizedMemory.begin(), end = utilizedMemory.end(); cur != end; cur++)
+			for (std::list<LPVOID>::iterator cur = utilizedMemory.begin(), end = utilizedMemory.end(); cur != end; cur++)
 			{
 				HeapFree(hProcessHeap, 0, *cur);
 			}
