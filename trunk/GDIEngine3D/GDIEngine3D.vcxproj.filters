@@ -19,6 +19,12 @@
     <Filter Include="Файлы исходного кода\GDIEngine3D">
       <UniqueIdentifier>{35c84c79-4492-4a3d-a675-e76fe62b4717}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Заголовочные файлы\ThreadSafety">
+      <UniqueIdentifier>{c3fc797a-9bd2-4639-9b95-a124d9bf1b4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\ThreadSafety">
+      <UniqueIdentifier>{8e2b7eb7-4b56-41fa-b6bc-fc7b4180204e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -51,6 +57,9 @@
     <ClInclude Include="Math.h">
       <Filter>Заголовочные файлы\GDIEngine3D</Filter>
     </ClInclude>
+    <ClInclude Include="thread_safety.h">
+      <Filter>Заголовочные файлы\ThreadSafety</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -80,6 +89,9 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Файлы исходного кода\GDIEngine3D</Filter>
     </ClCompile>
+    <ClCompile Include="thread_safety.cpp">
+      <Filter>Файлы исходного кода\ThreadSafety</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basis.inl">
@@ -99,6 +111,9 @@
     </None>
     <None Include="Scene.inl">
       <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </None>
+    <None Include="thread_safety.inl">
+      <Filter>Файлы исходного кода\ThreadSafety</Filter>
     </None>
   </ItemGroup>
 </Project>

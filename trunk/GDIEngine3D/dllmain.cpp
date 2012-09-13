@@ -1,9 +1,10 @@
 // dllmain.cpp: implements an entry point of GDIEngine3D.dll
 
 #include "stdafx.h"
+#include "thread_safety.h"
 
-extern HANDLE				hProcessHeap	= NULL;
-extern std::list<LPVOID>	utilizedMemory	= std::list<LPVOID>();
+extern HANDLE					hProcessHeap	= NULL;
+extern OBJECT_DESCRIPTION_LIST	utilizedMemory	= OBJECT_DESCRIPTION_LIST();
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
