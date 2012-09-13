@@ -3,12 +3,13 @@
 #include "stdafx.h"
 #include "GDIEngine3D.h"
 
+#include "thread_safety.h"
 #include "Render.h"
 
 // ============================================================================
 // Internal mechanism, that allows to control library interface workflow safety
-extern HANDLE				hProcessHeap;
-extern std::list<LPVOID>	utilizedMemory;
+extern HANDLE					hProcessHeap;
+extern OBJECT_DESCRIPTION_LIST	utilizedMemory;
 
 BOOL ObjectIsUsed(HANDLE obj, std::list<LPVOID>::iterator &Where)
 {
