@@ -19,10 +19,10 @@
     <Filter Include="Файлы исходного кода\GDIEngine3D">
       <UniqueIdentifier>{35c84c79-4492-4a3d-a675-e76fe62b4717}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Заголовочные файлы\ThreadSafety">
+    <Filter Include="Заголовочные файлы\Service_internals">
       <UniqueIdentifier>{c3fc797a-9bd2-4639-9b95-a124d9bf1b4a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Файлы исходного кода\ThreadSafety">
+    <Filter Include="Файлы исходного кода\Service_internals">
       <UniqueIdentifier>{8e2b7eb7-4b56-41fa-b6bc-fc7b4180204e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -58,7 +58,10 @@
       <Filter>Заголовочные файлы\GDIEngine3D</Filter>
     </ClInclude>
     <ClInclude Include="thread_safety.h">
-      <Filter>Заголовочные файлы\ThreadSafety</Filter>
+      <Filter>Заголовочные файлы\Service_internals</Filter>
+    </ClInclude>
+    <ClInclude Include="IUnknown.h">
+      <Filter>Заголовочные файлы\Service_internals</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -90,7 +93,7 @@
       <Filter>Файлы исходного кода\GDIEngine3D</Filter>
     </ClCompile>
     <ClCompile Include="thread_safety.cpp">
-      <Filter>Файлы исходного кода\ThreadSafety</Filter>
+      <Filter>Файлы исходного кода\Service_internals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -113,7 +116,10 @@
       <Filter>Файлы исходного кода\GDIEngine3D</Filter>
     </None>
     <None Include="thread_safety.inl">
-      <Filter>Файлы исходного кода\ThreadSafety</Filter>
+      <Filter>Файлы исходного кода\Service_internals</Filter>
+    </None>
+    <None Include="IUnknown.inl">
+      <Filter>Файлы исходного кода\Service_internals</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -84,6 +84,8 @@ public:
 	inline COLORREF getColor() { return color; }
 };
 
+#include "IUnknown.h"
+
 // ============================================================================
 // Object class provides important model positioning data such as:
 // it's Decart space coordinates and it's LCS position relative to WCS 
@@ -104,7 +106,7 @@ enum CONSTRAINTS {
 	C_ZY	= 3
 };
 
-class CObject {
+class CObject : public IUnknown {
 private: 	
 	CLASS_ID		ClassID;
 	size_t			ID;

@@ -113,6 +113,11 @@ VECTOR3D _tagPoly3D::Normal(const LPVECTOR3D vs, size_t startVert) {
 	return ans;
 }
 
+// ============================================================================
+// _tagColor3D partial implementation:
+
+inline _tagColor3D::_tagColor3D(unsigned char r, unsigned char g, unsigned char b) { Red = r; Green = g; Blue = b; }
+
 // ===========================================================================
 // CObject partial implementation:
 
