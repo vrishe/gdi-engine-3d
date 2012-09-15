@@ -5,16 +5,6 @@
 // ============================================================================
 // CCamera partial implementation:
 
-void CCamera::InitDefaultValues(CCamera *cam)
-{
-	cam->projectionType	= PT_PARALLEL;
-	cam->hFOV			= (float)M_PI_2;
-	cam->vFOV			= (float)M_PI_2;
-	cam->nearClip		= 1.0F;
-	cam->farClip		= 1000.0F;
-	cam->fDist			= 499.5F; // (farClip - nearClip) / 2
-}
-
 CCamera::CCamera() 
 	: CObject(CLS_CAMERA) 
 { 

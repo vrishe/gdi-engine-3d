@@ -48,7 +48,7 @@ typedef vector <VECTOR3D> SCENEVERT;
 // CViewport provides an interface for picture plane that recieves 2D projection 
 // of a 3D space through camera's eye.
 
-class CViewport {
+class CViewport : public IUnknown {
 private:
 	static CAMERA3D	camDefault;
 
@@ -124,7 +124,7 @@ typedef struct tagTHREAD_DATA {
 
 typedef vector<LPTHREAD_DATA> LPVIEWPORTS_LIST;
 typedef vector<EVENT> LPEVENTS_LIST;
-class ÑRenderPool {
+class ÑRenderPool : public IUnknown {
 private:
 	LPSCENE3D			Scene;
 	LPVIEWPORTS_LIST	Viewports;

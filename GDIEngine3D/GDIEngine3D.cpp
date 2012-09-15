@@ -7,53 +7,54 @@
 #include "Render.h"
 
 // ============================================================================
-// Internal mechanism, that allows to control library interface workflow safety
-extern HANDLE					hProcessHeap;
-extern OBJECT_DESCRIPTION_LIST	utilizedMemory;
+// CMutualAccessor partial implementation
 
-BOOL ObjectIsUsed(HANDLE obj, std::list<LPVOID>::iterator &Where)
+template <class T>
+class CMutualAccessor : public IMutualAccessible
 {
-	for (std::list<LPVOID>::iterator cur = utilizedMemory.begin(), end = utilizedMemory.end(); cur != end; cur++)
-	{
-		if (*cur == obj) 
-		{
-			Where = cur;
-			return TRUE;
-		}
-	}
+public:
+	CMutualAccessor() : IMutualAccessible(new T()) { };
+	~CMutualAccessor() 
+	{ 
+		delete (T*)IMutualAccessible::Lock(); 
+	};
 
-	return FALSE;
-}
+	inline T& Lock() 
+	{ 
+		return *(T*)IMutualAccessible::Lock(); 
+	};
+};
+
+#define _NEW_LPOBJECT_VAR(type_name, var_name) \
+	CMutualAccessor<type_name> *var_name = new CMutualAccessor<type_name>()
+
+#define _RETURN_HANDLE(handle_type_name, var_name) \
+	return (handle_type_name)var_name
+
+#define _IS_HANDLE_VALID(type_name, handle_name)											\
+	handle_name != NULL																		\
+	&& thread_safety::AccessorExists((LPMUTUAL_ACCESSIBLE)handle_name)						\
+	&& typeid(*((LPMUTUAL_ACCESSIBLE)handle_name)) == typeid(CMutualAccessor<type_name>)
+
+#define _RETURN_REMOVE_RESULT(handle_name) \
+	return thread_safety::RemoveAccessor((LPMUTUAL_ACCESSIBLE)handle_name)
+
+void accessor_cleanup(LPMUTUAL_ACCESSIBLE lpAcObj) { delete lpAcObj; }
 
 // ============================================================================
 // CRenderPool library interface implementation
 
 HRENDERPOOL3D WINAPI CreateRenderPool3D()
 {
-	LPRENDER_POOL obj = (LPRENDER_POOL)HeapAlloc(hProcessHeap, HEAP_ZERO_MEMORY, sizeof(RENDER_POOL));
-	
-	if (obj != NULL)
-	{
-		utilizedMemory.push_back(obj);
-		
-		return (HRENDERPOOL3D)new(obj) RENDER_POOL; // This line depends of arguments, so it's not intended to be placed inside of the template creation func.
-	}
-
-	return NULL;
+	_NEW_LPOBJECT_VAR(RENDER_POOL, lpRpAcsr);
+	thread_safety::AddAccessor(lpRpAcsr);
+	_RETURN_HANDLE(HRENDERPOOL3D, lpRpAcsr);
 }
 
 BOOL WINAPI ReleaseRenderPool3D(HRENDERPOOL3D hRp3D)
 {
-	// Whole function is intended to be a template release func.
-	std::list<LPVOID>::iterator finder;
-	if (hRp3D != NULL && ObjectIsUsed(hRp3D, finder)) 
-	{
-		utilizedMemory.erase(finder);
-		((LPRENDER_POOL)hRp3D)->~ÑRenderPool();
-		return HeapFree(hProcessHeap, 0, hRp3D);
-	}
-
-	return FALSE;
+	if (!_IS_HANDLE_VALID(RENDER_POOL, hRp3D)) return FALSE;
+	_RETURN_REMOVE_RESULT(hRp3D);
 }
 
 // TODO: Implement the most useful interface functions, such as: CreateLight, CreateCamera, RenderWorld(CRenderPool based) and so on 

@@ -3,8 +3,7 @@
 #include "stdafx.h"
 #include "thread_safety.h"
 
-extern HANDLE					hProcessHeap	= NULL;
-extern OBJECT_DESCRIPTION_LIST	utilizedMemory	= OBJECT_DESCRIPTION_LIST();
+void accessor_cleanup(LPMUTUAL_ACCESSIBLE lpAcObj);
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -14,7 +13,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		hProcessHeap = GetProcessHeap();
+		return thread_safety::InitializeHandles();
 		break;
 
 	case DLL_THREAD_ATTACH:
@@ -22,13 +21,9 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		break;
 
 	case DLL_PROCESS_DETACH:
-		if (hProcessHeap != NULL)
-		{
-			for (std::list<LPVOID>::iterator cur = utilizedMemory.begin(), end = utilizedMemory.end(); cur != end; cur++)
-			{
-				HeapFree(hProcessHeap, 0, *cur);
-			}
-		}
+		// Cleanup here
+		thread_safety::ForeachAccessor(accessor_cleanup);
+		thread_safety::ReleaseHandles();
 		break;
 	}
 	return TRUE;

@@ -172,6 +172,7 @@
     <ClInclude Include="Basis.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GDIEngine3D.h" />
+    <ClInclude Include="IUnknown.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Mesh.h" />
@@ -214,6 +215,7 @@
   <ItemGroup>
     <None Include="Basis.inl" />
     <None Include="Camera.inl" />
+    <None Include="IUnknown.inl" />
     <None Include="Light.inl" />
     <None Include="Math.inl" />
     <None Include="Mesh.inl" />

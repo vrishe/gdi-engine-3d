@@ -2,25 +2,40 @@
 
 #pragma once
 
-typedef struct _tagObjectDescriptor {
+#include "IUnknown.h"
+
+// ============================================================================
+// IMutualAccessible template declaration
+
+class IMutualAccessible
+{
 private:
-	LPVOID _lpObjPtr;
-	HANDLE _hObjMutex;
-	DWORD  _threadOwnerID;
+	HANDLE		hMutex;
+	LPUNKNOWN	lpObj;
+
+protected:
+	IMutualAccessible(LPUNKNOWN lpUnknwnObj);
 
 public:
-	_tagObjectDescriptor(LPVOID lpObj, DWORD dwThreadOwnderID);
+	virtual ~IMutualAccessible();
 
-	LPVOID Lock(); // Returns object address only when mutex is released and not abandoned, otherwise - NULL
-	BOOL Unlock(); // Releases the mutex object
+	LPUNKNOWN	Lock();
+	BOOL		Unlock();
+};
+typedef IMutualAccessible *LPMUTUAL_ACCESSIBLE;
 
-	BOOL Equals(const _tagObjectDescriptor &obj);
+namespace thread_safety
+{
+	typedef std::list<LPMUTUAL_ACCESSIBLE> ACCESSORS_LIST;
+	
+	bool InitializeHandles();
+	bool ReleaseHandles();
 
-	LPVOID operator*();
+	bool AccessorExists(LPMUTUAL_ACCESSIBLE obj);
+	bool AddAccessor(LPMUTUAL_ACCESSIBLE obj);
+	bool RemoveAccessor(LPMUTUAL_ACCESSIBLE obj);
 
-	bool operator==(const _tagObjectDescriptor &obj); // Compares whole descriptor object; Equals(const _tagObjectDescriptor &obj) must be wrapped here
-} OBJECT_DESCRIPTOR, *LPOBJECT_DESCRIPTOR;
-
-typedef std::list<LPOBJECT_DESCRIPTOR> OBJECT_DESCRIPTION_LIST;
+	void ForeachAccessor(void (*_foreach_func)(LPMUTUAL_ACCESSIBLE));
+}
 
 #include "thread_safety.inl"

@@ -6,7 +6,7 @@
 // ============================================================================
 // CScene class declaration
 
-class CScene {
+class CScene : public IUnknown {
 private:
 	CONTENT		objects;
 	COLORREF	ambientColor;

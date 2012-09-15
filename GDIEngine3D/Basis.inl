@@ -44,9 +44,8 @@ inline bool _tagPoly3D::isContainingEdge(const EDGE3D &e)
 }
 
 // ============================================================================
-// _tagColor3D implementation:
+// _tagColor3D partial implementation:
 
-inline _tagColor3D::_tagColor3D(unsigned char r, unsigned char g, unsigned char b) { Red = r; Green = g; Blue = b; }
 inline bool _tagColor3D::operator==(const float &b) const { return ( Red == b && Green == b && Blue == b); }
 inline bool _tagColor3D::operator!=(const float &b) const { return ( Red != b || Green != b || Blue != b); }
 
