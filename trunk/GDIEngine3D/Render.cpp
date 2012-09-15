@@ -573,8 +573,20 @@ DWORD WINAPI ÑRenderPool::Render(LPVOID renderInfo)
 
 BOOL ÑRenderPool::assignScene(LPSCENE3D lpScene)
 {
-	BOOL bResult = lpScene != NULL;
-	if ( bResult ) Scene = lpScene;
+	BOOL bResult;
+	if ( bResult  = lpScene != NULL )
+	{
+		Scene = lpScene;
+		for (LPVIEWPORTS_LIST::iterator 
+				cur = Viewports.begin(), 
+				end = Viewports.end(); 
+			cur != end;
+			cur++
+				)
+		{
+			(*cur)->Viewport->setScene(Scene);
+		}
+	}
 	return bResult;
 }
 
@@ -621,7 +633,7 @@ DWORD ÑRenderPool::addViewport(HDC hDCScreen, UINT vpWidth, UINT vpHeight, VIEW_
 	return S_OK;
 }
 
-BOOL ÑRenderPool::delViewport(UINT vpIndex)
+BOOL ÑRenderPool::delViewport(UINT_PTR vpIndex)
 {
 	BOOL bResult = vpIndex < Viewports.size();
 	if ( bResult ) 
@@ -639,7 +651,7 @@ BOOL ÑRenderPool::delViewport(UINT vpIndex)
 	return bResult;
 }
 
-LPVIEWPORT ÑRenderPool::getViewport(UINT vpIndex)
+LPVIEWPORT ÑRenderPool::getViewport(UINT_PTR vpIndex)
 {
 	if ( vpIndex < Viewports.size() ) return Viewports[vpIndex]->Viewport;
 	return NULL;
@@ -667,7 +679,7 @@ UINT_PTR ÑRenderPool::getActiveViewportIndex()
 
 UINT_PTR ÑRenderPool::getViewportCount() { return Viewports.size(); }
 
-VOID ÑRenderPool::setActiveViewport(UINT vpActiveIndex)
+VOID ÑRenderPool::setActiveViewport(UINT_PTR vpActiveIndex)
 {
 	size_t vpCount = Viewports.size();
 	BOOL bResult = vpActiveIndex < vpCount;

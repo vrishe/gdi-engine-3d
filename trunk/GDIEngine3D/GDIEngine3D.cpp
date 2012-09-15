@@ -39,6 +39,9 @@ public:
 #define _RETURN_REMOVE_RESULT(handle_name) \
 	return thread_safety::RemoveAccessor((LPMUTUAL_ACCESSIBLE)handle_name)
 
+#define _HANDLE_CAST(type_name, handle_name) \
+	((CMutualAccessor<type_name>*)handle_name)
+
 void accessor_cleanup(LPMUTUAL_ACCESSIBLE lpAcObj) { delete lpAcObj; }
 
 // ============================================================================
@@ -55,6 +58,16 @@ BOOL WINAPI ReleaseRenderPool3D(HRENDERPOOL3D hRp3D)
 {
 	if (!_IS_HANDLE_VALID(RENDER_POOL, hRp3D)) return FALSE;
 	_RETURN_REMOVE_RESULT(hRp3D);
+}
+
+BOOL WINAPI RenderPoolAssignScene3D(HRENDERPOOL3D hRp3D, HSCENE3D hScn3D)
+{
+	if (!(_IS_HANDLE_VALID(RENDER_POOL, hRp3D) 
+		&& _IS_HANDLE_VALID(SCENE3D, hScn3D))) return FALSE;
+
+	return _HANDLE_CAST(RENDER_POOL, hRp3D)->Lock().assignScene(
+		&_HANDLE_CAST(SCENE3D, hScn3D)->Lock()
+		);
 }
 
 // TODO: Implement the most useful interface functions, such as: CreateLight, CreateCamera, RenderWorld(CRenderPool based) and so on 
