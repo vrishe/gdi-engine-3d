@@ -133,21 +133,21 @@ private:
 	EVENT				renderEvent;
 
 	static DWORD WINAPI Render(LPVOID renderInfo);
-	UINT				findViewport(DWORD vpID);
+
 public:
 	ÑRenderPool();
 	~ÑRenderPool();
 
 	BOOL		assignScene(LPSCENE3D lpScene);
 	DWORD		addViewport(HDC hDCScreen, UINT vpWidth, UINT vpHeight, VIEW_TYPE vpVType, RENDER_MODE vpRMode);
-	BOOL		delViewport(UINT vpIndex);
+	BOOL		delViewport(UINT_PTR vpIndex);
 
-	LPVIEWPORT	getViewport(UINT vpIndex);
+	LPVIEWPORT	getViewport(UINT_PTR vpIndex);
 	LPVIEWPORT	getActiveViewport();
 	UINT_PTR	getActiveViewportIndex();
 	UINT_PTR	getViewportCount();
 	
-	VOID		setActiveViewport(UINT vpIndex);
+	VOID		setActiveViewport(UINT_PTR vpIndex);
 
 	DWORD		RenderWorld();
 };
