@@ -3,15 +3,20 @@
 #pragma once
 
 // ============================================================================
-// IMutualAccessible partial implementation
+// CMutualAccessible partial implementation
 
-inline LPUNKNOWN IMutualAccessible::Lock()
+inline LPUNKNOWN CMutualAccessible::Lock()
 {
 	WaitForSingleObject(hMutex, INFINITE);
 	return lpObj;
 }
 
-inline BOOL IMutualAccessible::Unlock()
+inline BOOL CMutualAccessible::Unlock()
 {
 	return ReleaseMutex(hMutex);
+}
+
+inline const type_info& CMutualAccessible::getObjectTypeInfo() const
+{
+	return typeid(*lpObj);
 }
