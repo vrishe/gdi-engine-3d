@@ -4,21 +4,21 @@
 #include "thread_safety.h"
 
 // ============================================================================
-// IMutualAccessible partial implementation
+// CMutualAccessible partial implementation
 
-IMutualAccessible::IMutualAccessible(LPUNKNOWN lpUnknwnObj) : lpObj(lpUnknwnObj)
+CMutualAccessible::CMutualAccessible(LPUNKNOWN lpUnknwnObj) : lpObj(lpUnknwnObj)
 {
 	if (lpObj == NULL) throw std::invalid_argument(
-		std::string(typeid(*this).name()).append("::IMutualAccessible: lpUnknwnObj is NULL.").c_str()
+		std::string(typeid(*this).name()).append("::CMutualAccessible: lpUnknwnObj is NULL.").c_str()
 		);
 
 	hMutex = CreateMutex(NULL, FALSE, NULL);
 	if (hMutex == NULL) throw std::bad_exception(
-		std::string(typeid(*this).name()).append("::IMutualAccessible: CreateMutex failed.").c_str()
+		std::string(typeid(*this).name()).append("::CMutualAccessible: CreateMutex failed.").c_str()
 		);
 }
 
-IMutualAccessible::~IMutualAccessible()
+CMutualAccessible::~CMutualAccessible()
 {
 	Lock();
 	CloseHandle(hMutex);
@@ -29,92 +29,87 @@ IMutualAccessible::~IMutualAccessible()
 
 #if (defined _DEBUG)
 #define _INITIALIZATION_CHECK \
-	if ( hLibMutex != NULL ) throw std::bad_exception("thread_safety is not initialized properly!")
+	if ( hModuleMutex != NULL ) throw std::bad_exception("thread_safety is not initialized properly!")
 #else
 #define _INITIALIZATION_CHECK
 #endif
-
-#define _OBJECT_EXISTS(obj_name) \
-	std::find(alLibObjects.begin(), alLibObjects.end(), obj_name) != alLibObjects.end()
-
-#define _LOCK_LIBRARY	WaitForSingleObject(hLibMutex, INFINITE)
-#define _UNLOCK_LIBRARY ReleaseMutex(hLibMutex); 
 
 namespace thread_safety
 {
 	namespace 
 	{
-		HANDLE			hLibMutex		= NULL; 
-		ACCESSORS_LIST	alLibObjects;
+		HANDLE			hModuleMutex		= NULL; 
+		ACCESSORS_LIST	alModuleObjects;
 	}
 
-	bool InitializeHandles()
+	BOOL InitializeHandles()
 	{
-		return (hLibMutex = CreateMutex(NULL, FALSE, _T("GDIEngine3D_Library"))) != NULL;
+		return (hModuleMutex = CreateMutex(NULL, FALSE, _T("GDIEngine3D_Library"))) != NULL;
 	}
 
-	bool ReleaseHandles()
-	{
-		_INITIALIZATION_CHECK;
-
-		_LOCK_LIBRARY;
-		return CloseHandle(hLibMutex) != 0;
-	}
-
-	bool AccessorExists(LPMUTUAL_ACCESSIBLE obj)
+	BOOL ReleaseHandles()
 	{
 		_INITIALIZATION_CHECK;
 
-		_LOCK_LIBRARY;
-		bool bResult = _OBJECT_EXISTS(obj);
-		_UNLOCK_LIBRARY;
-
-		return bResult;
+		return CloseHandle(hModuleMutex) != 0;
 	}
 
-	bool AddAccessor(LPMUTUAL_ACCESSIBLE obj)
+	DWORD thread_safety::LockModule(DWORD dwMilliseconds)
 	{
 		_INITIALIZATION_CHECK;
 
-		bool bResult;
-		_LOCK_LIBRARY;
-		if (bResult = (obj != NULL && !(_OBJECT_EXISTS(obj)))) alLibObjects.push_back(obj);
-		_UNLOCK_LIBRARY;
+		return WaitForSingleObject(hModuleMutex, dwMilliseconds);
+	}
+
+	BOOL thread_safety::UnlockModule()
+	{
+		_INITIALIZATION_CHECK;
+
+		return ReleaseMutex(hModuleMutex);
+	}
+	
+	BOOL AccessorExists(LPMUTUAL_ACCESSIBLE obj)
+	{
+		_INITIALIZATION_CHECK;
+
+		return std::find(alModuleObjects.begin(), alModuleObjects.end(), obj) != alModuleObjects.end();
+	}
+
+	BOOL AddAccessor(LPMUTUAL_ACCESSIBLE obj)
+	{
+		_INITIALIZATION_CHECK;
+
+		if (obj == NULL || AccessorExists(obj)) return FALSE;
 		
-		return bResult;		
+		alModuleObjects.push_back(obj);
+		return TRUE;
 	}
 
-	bool RemoveAccessor(LPMUTUAL_ACCESSIBLE obj)
+	BOOL RemoveAccessor(LPMUTUAL_ACCESSIBLE obj)
 	{
 		_INITIALIZATION_CHECK;
 
-		bool bResult;
-		_LOCK_LIBRARY;
-		size_t libObjectsCount = alLibObjects.size();
-		alLibObjects.remove(obj);
-		bResult = alLibObjects.size() != libObjectsCount;		
-		_UNLOCK_LIBRARY;
-		
-		return bResult;				
+		size_t libObjectsCount = alModuleObjects.size();
+		alModuleObjects.remove(obj);
+
+		return alModuleObjects.size() != libObjectsCount;					
 	}
 
-	void ForeachAccessor(void (*_foreach_func)(LPMUTUAL_ACCESSIBLE))
+	VOID ForeachAccessor(VOID (*_foreach_func)(LPMUTUAL_ACCESSIBLE))
 	{
 		_INITIALIZATION_CHECK;
 
 		if (_foreach_func == NULL) return;
 
-		_LOCK_LIBRARY;
 		for ( thread_safety::ACCESSORS_LIST::iterator 
-				cur = thread_safety::alLibObjects.begin(), 
-				end = thread_safety::alLibObjects.end(); 
+				cur = thread_safety::alModuleObjects.begin(), 
+				end = thread_safety::alModuleObjects.end(); 
 			  cur != end;
 			  cur++
 			)
 		{
 			_foreach_func(*cur);
 		}
-		_UNLOCK_LIBRARY;
 	}
 }
 

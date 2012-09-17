@@ -5,37 +5,40 @@
 #include "IUnknown.h"
 
 // ============================================================================
-// IMutualAccessible template declaration
+// CMutualAccessible template declaration
 
-class IMutualAccessible
+class CMutualAccessible
 {
 private:
 	HANDLE		hMutex;
 	LPUNKNOWN	lpObj;
 
-protected:
-	IMutualAccessible(LPUNKNOWN lpUnknwnObj);
-
 public:
-	virtual ~IMutualAccessible();
+	CMutualAccessible(LPUNKNOWN lpUnknwnObj);
+	virtual ~CMutualAccessible();
 
 	LPUNKNOWN	Lock();
 	BOOL		Unlock();
+
+	const type_info& getObjectTypeInfo() const;
 };
-typedef IMutualAccessible *LPMUTUAL_ACCESSIBLE;
+typedef CMutualAccessible MUTUAL_ACCESSIBLE, *LPMUTUAL_ACCESSIBLE;
 
 namespace thread_safety
 {
 	typedef std::list<LPMUTUAL_ACCESSIBLE> ACCESSORS_LIST;
 	
-	bool InitializeHandles();
-	bool ReleaseHandles();
+	BOOL InitializeHandles();
+	BOOL ReleaseHandles();
 
-	bool AccessorExists(LPMUTUAL_ACCESSIBLE obj);
-	bool AddAccessor(LPMUTUAL_ACCESSIBLE obj);
-	bool RemoveAccessor(LPMUTUAL_ACCESSIBLE obj);
+	DWORD LockModule(DWORD dwMilliseconds);
+	BOOL UnlockModule();
 
-	void ForeachAccessor(void (*_foreach_func)(LPMUTUAL_ACCESSIBLE));
+	BOOL AccessorExists(LPMUTUAL_ACCESSIBLE obj);
+	BOOL AddAccessor(LPMUTUAL_ACCESSIBLE obj);
+	BOOL RemoveAccessor(LPMUTUAL_ACCESSIBLE obj);
+
+	VOID ForeachAccessor(VOID (*_foreach_func)(LPMUTUAL_ACCESSIBLE));
 }
 
 #include "thread_safety.inl"
