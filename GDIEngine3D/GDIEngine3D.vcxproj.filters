@@ -115,9 +115,6 @@
     <None Include="Scene.inl">
       <Filter>Файлы исходного кода\GDIEngine3D</Filter>
     </None>
-    <None Include="thread_safety.inl">
-      <Filter>Файлы исходного кода\Service_internals</Filter>
-    </None>
     <None Include="IUnknown.inl">
       <Filter>Файлы исходного кода\Service_internals</Filter>
     </None>
