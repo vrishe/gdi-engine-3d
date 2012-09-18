@@ -13,6 +13,7 @@
 
 typedef HANDLE HRENDERPOOL3D;
 typedef HANDLE HSCENE3D;
+typedef HANDLE HOBJECT3D;
 
 #ifdef __cplusplus
 extern "C" {
