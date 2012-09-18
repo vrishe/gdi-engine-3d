@@ -220,7 +220,6 @@
     <None Include="Math.inl" />
     <None Include="Mesh.inl" />
     <None Include="Scene.inl" />
-    <None Include="thread_safety.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

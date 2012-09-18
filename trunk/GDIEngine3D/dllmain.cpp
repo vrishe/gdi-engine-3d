@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "thread_safety.h"
 
-void accessor_cleanup(LPMUTUAL_ACCESSIBLE lpAcObj);
+void accessor_cleanup(LPUNKNOWN lpObject);
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -22,7 +22,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 	case DLL_PROCESS_DETACH:
 		// Cleanup here
-		thread_safety::ForeachAccessor(accessor_cleanup);
+		thread_safety::ForeachObjectRegistered(accessor_cleanup);
 		thread_safety::ReleaseHandles();
 		break;
 	}

@@ -7,38 +7,20 @@
 // ============================================================================
 // CMutualAccessible template declaration
 
-class CMutualAccessible
-{
-private:
-	HANDLE		hMutex;
-	LPUNKNOWN	lpObj;
-
-public:
-	CMutualAccessible(LPUNKNOWN lpUnknwnObj);
-	virtual ~CMutualAccessible();
-
-	LPUNKNOWN	Lock();
-	BOOL		Unlock();
-
-	const type_info& getObjectTypeInfo() const;
-};
-typedef CMutualAccessible MUTUAL_ACCESSIBLE, *LPMUTUAL_ACCESSIBLE;
-
 namespace thread_safety
 {
-	typedef std::list<LPMUTUAL_ACCESSIBLE> ACCESSORS_LIST;
-	
-	BOOL InitializeHandles();
-	BOOL ReleaseHandles();
+	BOOL	InitializeHandles();
+	BOOL	ReleaseHandles();
 
-	DWORD LockModule(DWORD dwMilliseconds);
-	BOOL UnlockModule();
+	DWORD	LockModule(DWORD dwMilliseconds);
+	BOOL	UnlockModule();
 
-	BOOL AccessorExists(LPMUTUAL_ACCESSIBLE obj);
-	BOOL AddAccessor(LPMUTUAL_ACCESSIBLE obj);
-	BOOL RemoveAccessor(LPMUTUAL_ACCESSIBLE obj);
+	size_t		RegisterObject(LPUNKNOWN lpObj);
+	LPUNKNOWN	DeregisterObject(size_t uIndex);
+	BOOL		IsObjectRegistered(size_t uIndex, const type_info &typeID);
 
-	VOID ForeachAccessor(VOID (*_foreach_func)(LPMUTUAL_ACCESSIBLE));
+	BOOL	LockObjectRegistered(size_t uIndex, LPUNKNOWN &lpObject);
+	BOOL	UnlockObjectRegistered(size_t uIndex, LPUNKNOWN &lpObject);
+
+	VOID ForeachObjectRegistered(VOID (*_foreach_func)(LPUNKNOWN));
 }
-
-#include "thread_safety.inl"
