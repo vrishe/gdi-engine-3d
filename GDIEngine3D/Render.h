@@ -1,22 +1,15 @@
+
 #pragma once
 
 #include "Camera.h"
 #include "Light.h"
 #include "Mesh.h"
 #include "Scene.h"
-
-// Necessary Viewport class definitions
-enum RENDER_MODE {
-	RM_WIREFRAME	= 0x01,
-	RM_SHADED		= 0x02,
-	RM_SHADEDWF		= 0x03
-};
+#include "SharedDef.h"
 
 // first - index of a polygon in mesh, second - index of a mesh in scene
 typedef vector <pair<DIRECTPOLY3D, UINT>> SCENEPOLY;
 typedef vector <VECTOR3D> SCENEVERT;
-
-#define DEFAULT_CAMERA_ID	UINT_MAX
 
 // ============================================================================
 // CViewport provides an interface for picture plane that recieves 2D projection 
@@ -30,34 +23,27 @@ private:
 
 	RENDER_MODE		rMode;
 
+	static void InitValues(CViewport *obj, const SIZE &szVp, RENDER_MODE rMode);
+
 public:
 	CViewport();
+	CViewport(UINT uVpWidth, UINT uVpHeight, RENDER_MODE rMode);
+	CViewport(const SIZE &szVp, RENDER_MODE rMode);
 	~CViewport();
 	
 	RENDER_MODE	getRenderMode()			const;
 	UINT		getWidth()				const;
 	UINT		getHeight()				const;
-	VOID		getSize(SIZE &vpSize)	const;
+	VOID		getSize(SIZE &szVp)		const;
 
 	VOID		setRenderMode(RENDER_MODE renderMode);
-	VOID		setWidth(UINT vpWidth);
-	VOID		setHeight(UINT vpHeight);
-	VOID		setSize(const SIZE &vpSize);
+	VOID		setWidth(UINT uVpWidth);
+	VOID		setHeight(UINT uVpHeight);
+	VOID		setSize(const SIZE &szVp);
 
 	BOOL Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const;
 };
 typedef CViewport VIEWPORT, *LPVIEWPORT;
-
-#define VIEW_DISTANCE_DEFAULT	250
-enum VIEW_TYPE {
-		VIEW_LEFT			= 1,
-		VIEW_RIGHT			= 2,
-		VIEW_FRONT			= 3,
-		VIEW_BACK			= 4,
-		VIEW_TOP			= 5,
-		VIEW_BOTTOM			= 6,
-		VIEW_PERSPECTIVE	= 7
-};
 
 VOID SetViewportDefaultView(LPVIEWPORT vp, VIEW_TYPE vt);
 
@@ -117,26 +103,30 @@ public:
 	~ÑRenderPool();
 
 	DWORD addViewport(
-		LPCAMERA3D lpCamera,
-		HDC hDCScreen, 
-		UINT vpWidth, 
-		UINT vpHeight, 
-		RENDER_MODE vpRMode
+		LPCAMERA3D	lpCamera,
+		HDC			hDCScreen,
+		UINT		uVpWidth,
+		UINT		uVpHeight,
+		RENDER_MODE rMode
 		);
+	BOOL delViewport(DWORD dwVpID);
 	BOOL delViewport(size_t uVpIndex);
 
-	size_t getViewportCount();
+	LPVIEWPORT getViewport(DWORD dwVpID)	const;
+	LPVIEWPORT getViewport(size_t uVpIndex)	const;
 
-	size_t getViewportIndex(DWORD dwVpID);
-	DWORD  getViewportID(size_t uVpIndex);
+	size_t getViewportCount() const;
 
-	size_t getActiveViewportIndex();
-	DWORD  getActiveViewportID();
+	size_t getViewportIndex(DWORD dwVpID) const;
+	DWORD  getViewportID(size_t uVpIndex) const;
+
+	size_t getActiveViewportIndex() const;
+	DWORD  getActiveViewportID()	const;
 
 	VOID setActiveViewport(size_t uVpIndex);
 	VOID setActiveViewport(DWORD dwVpID);
 
-	DWORD RenderWorld(LPSCENE3D lpScene);
+	DWORD RenderWorld(LPSCENE3D lpScene) const;
 };
 typedef ÑRenderPool RENDER_POOL, *LPRENDER_POOL;
 

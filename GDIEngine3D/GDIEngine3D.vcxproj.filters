@@ -63,6 +63,9 @@
     <ClInclude Include="IUnknown.h">
       <Filter>Заголовочные файлы\Service_internals</Filter>
     </ClInclude>
+    <ClInclude Include="SharedDef.h">
+      <Filter>Заголовочные файлы\GDIEngine3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

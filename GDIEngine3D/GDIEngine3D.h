@@ -7,15 +7,21 @@
 
 #ifdef GDIENGINE3D_EXPORTS
 #define GDIENGINE3D_USERAPI __declspec(dllexport)
+
+#include "SharedDef.h"
 #else
 #define GDIENGINE3D_USERAPI __declspec(dllimport)
+
+#include <SharedDef.h>
 #endif
 
 typedef HANDLE HGDIENGINE3DOBJ;
 
-typedef HGDIENGINE3DOBJ HRENDERPOOL;
-typedef HGDIENGINE3DOBJ HSCENE;
-typedef HGDIENGINE3DOBJ HOBJECT3D;
+DECLARE_HANDLE(HSCENE);
+DECLARE_HANDLE(HCAMERA);
+DECLARE_HANDLE(HOBJECT3D);
+DECLARE_HANDLE(HVIEWPORT);
+DECLARE_HANDLE(HRENDERPOOL);
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +40,23 @@ GDIENGINE3D_USERAPI
 	HRENDERPOOL WINAPI RenderPoolCreate();
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI RenderPoolRemoveViewport(HRENDERPOOL hRenderPool, HSCENE hScn3D);
+	DWORD WINAPI RenderPoolViewportAdd(
+		HRENDERPOOL hRenderPool,
+		HCAMERA		hCamera, 
+		HDC			hDCScreen,
+		UINT		uVpWidth,
+		UINT		uVpHeight,
+		RENDER_MODE rMode
+		);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI RenderPoolViewportRemoveByIndex(HRENDERPOOL hRenderPool, UINT_PTR uViewportIndex);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI RenderPoolViewportRemoveByID(HRENDERPOOL hRenderPool, DWORD wdViewportID);
+
+GDIENGINE3D_USERAPI
+	UINT_PTR WINAPI RenderPoolViewportGetCount(HRENDERPOOL hRenderPool);
 
 // ============================================================================
 // CScene library interface implementation
