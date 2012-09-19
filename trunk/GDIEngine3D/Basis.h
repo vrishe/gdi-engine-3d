@@ -84,6 +84,10 @@ public:
 	inline COLORREF getColor() { return color; }
 };
 
+typedef std::basic_string<TCHAR> tstring;
+
+#define __foreach(iter_type, iterator, container) for (iter_type iterator = container.begin(), end = container.end(); iterator != end; iterator++)
+
 #include "IUnknown.h"
 
 // ============================================================================
@@ -93,17 +97,17 @@ public:
 #define MAX_OBJECT_NAME_LEN	256
 
 enum CLASS_ID {
-	CLS_OBJECT,
-	CLS_MESH,
-	CLS_CAMERA,
+	CLS_OBJECT	,
+	CLS_MESH	,
+	CLS_CAMERA	,
 	CLS_LIGHT
 };
 
 enum CONSTRAINTS {
-	C_FREE	= 0,
-	C_XY	= 1,	
-	C_ZX	= 2,
-	C_ZY	= 3
+	C_FREE	,
+	C_XY	,	
+	C_ZX	,
+	C_ZY
 };
 
 class CObject : public IUnknown {
@@ -116,22 +120,22 @@ private:
 	static void InitDefaultValues(CObject *obj);
 
 protected:
-	LPTSTR			Name;
+	tstring	Name;
 
 	// Position
-	VECTOR3D		pos;
+	VECTOR3D pos;
 
 	// Orientation orts
-	VECTOR3D		fWd;		// Forward
-	VECTOR3D		rWd;		// Rightward
-	VECTOR3D		uWd;		// Upward
-	VECTOR3D		world;		// World orts-in-one
+	VECTOR3D fWd;		// Forward
+	VECTOR3D rWd;		// Rightward
+	VECTOR3D uWd;		// Upward
+	VECTOR3D world;		// World orts-in-one
 
 	// Scaling
-	VECTOR3D		worldScale;
-	VECTOR3D		localScale;
+	VECTOR3D	worldScale;
+	VECTOR3D	localScale;
 
-	CONSTRAINTS		moveConst;
+	CONSTRAINTS	moveConst;
 
 	//void PitchYawRoll();
 
@@ -222,8 +226,8 @@ public:
 	void setRightLookDirection(const VECTOR3D &);
 	void setUpLookDirection(const VECTOR3D &);
 
-	void getName(LPTSTR objName, size_t bufSize);
-	void setName(LPTSTR objName, size_t srcSize);
+	tstring getName() const;
+	void setName(const tstring &objName);
 };
 typedef CObject OBJECT3D, *LPOBJECT3D;
 typedef std::vector<LPOBJECT3D> OBJECTS_LIST;

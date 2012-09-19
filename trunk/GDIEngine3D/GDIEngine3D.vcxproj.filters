@@ -118,5 +118,8 @@
     <None Include="IUnknown.inl">
       <Filter>Файлы исходного кода\Service_internals</Filter>
     </None>
+    <None Include="Render.inl">
+      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </None>
   </ItemGroup>
 </Project>
