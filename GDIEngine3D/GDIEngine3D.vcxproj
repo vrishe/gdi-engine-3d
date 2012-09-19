@@ -219,6 +219,7 @@
     <None Include="Light.inl" />
     <None Include="Math.inl" />
     <None Include="Mesh.inl" />
+    <None Include="Render.inl" />
     <None Include="Scene.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

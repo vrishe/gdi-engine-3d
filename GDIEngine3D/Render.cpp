@@ -3,17 +3,12 @@
 #include "Render.h"
 
 // ============================================================================
-// CViewport implementation:
-
-CAMERA3D CViewport::camDefault = CAMERA3D();
+// CViewport class partial implementation:
 
 CViewport::CViewport() 
 {
 	SIZE szVp = {1, 1};
 	setSize(szVp);
-
-	Scene		= NULL;
-	camOutput	= &camDefault;
 	
 	rMode		= RM_WIREFRAME;
 }
@@ -24,66 +19,6 @@ CViewport::~CViewport()
 	DeleteObject(hBmpOutput);
 	DeleteDC(hDCOutput);
 }
-
-LPSCENE3D CViewport::getScene() const { return Scene; }
-
-UINT_PTR CViewport::getCameraObjectID() const
-{
-	if ( 
-		Scene != NULL 
-		&& camOutput != NULL 
-	) return camOutput == &camDefault ? 
-			DEFAULT_CAMERA_ID : camOutput->objID();
-
-	return camDefault.objID();
-}
-
-LPCAMERA3D CViewport::getCamera() const { return camOutput; }
-
-RENDER_MODE CViewport::getRenderMode() const { return rMode; }
-
-UINT CViewport::getWidth() const { return GetDeviceCaps(hDCOutput, HORZRES); }
-UINT CViewport::getHeight() const { return GetDeviceCaps(hDCOutput, VERTRES); }
-VOID CViewport::getSize(SIZE &vpSize) const
-{
-	vpSize.cx = getWidth();
-	vpSize.cy = getHeight();
-}
-
-BOOL CViewport::setScene(LPSCENE3D lpSceneHost)
-{
-	BOOL bResult = lpSceneHost	!= NULL;
-	if ( bResult ) Scene = lpSceneHost;
-	return bResult;
-}
-
-BOOL CViewport::setCameraByObjectID(UINT uCameraObjectID) 
-{
-	LPOBJECT3D	scObj;
-	BOOL bResult = Scene != NULL;
-
-	if ( bResult )
-	{
-		camOutput = &camDefault;
-		if ( uCameraObjectID != DEFAULT_CAMERA_ID )
-		{
-			scObj = Scene->getObject(uCameraObjectID);
-			bResult = scObj->clsID() == CLS_CAMERA;
-			if ( bResult ) camOutput = (LPCAMERA3D)scObj;		
-		}
-	}
-	return bResult;
-}
-
-BOOL CViewport::setCamera(const LPCAMERA3D cam)
-{
-	BOOL bResult = TRUE;
-
-	if ( bResult ) camOutput = cam;
-	return bResult;
-}
-
-VOID CViewport::setRenderMode(RENDER_MODE renderMode) { rMode = renderMode; }
 
 VOID CViewport::setSize(const SIZE &vpSize)
 {
@@ -114,16 +49,6 @@ VOID CViewport::setSize(const SIZE &vpSize)
 		ReleaseDC(NULL, hDCScr);
 	}
 }
-VOID CViewport::setWidth(UINT vpWidth)
-{
-	SIZE szVp = { vpWidth, getHeight() };
-	setSize(szVp);
-}
-VOID CViewport::setHeight(UINT vpHeight)
-{
-	SIZE szVp = { getWidth(), vpHeight };
-	setSize(szVp);
-}
 
 // Is used as predicate for std::sort algorithm; provides a > b comparison
 bool ZDepthComparator(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY3D, UINT> &b) 
@@ -132,8 +57,9 @@ bool ZDepthComparator(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY
 			> (b.first.first.z + b.first.second.z + b.first.third.z);
 }
 
-BOOL CViewport::Render(HDC hDCScreen) {
-	BOOL bResult = hDCScreen!= NULL && Scene != NULL && camOutput != NULL;
+BOOL CViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const 
+{
+	BOOL bResult = hDCScreen!= NULL && lpScene != NULL && lpCamera != NULL;
 
 	if (bResult)
 	{
@@ -145,7 +71,7 @@ BOOL CViewport::Render(HDC hDCScreen) {
 							hBrOld;
 
 		RECT				clientRect				= {0, 0, getWidth(), getHeight()};
-		UINT_PTR			sceneObjCount,
+		size_t			sceneObjCount,
 							sceneLightCount,
 							scenePolyCount,
 							sceneLightedPolyCount,
@@ -167,28 +93,28 @@ BOOL CViewport::Render(HDC hDCScreen) {
 		LPCOLORREF			scenePolyColorBuffer;
 		POINT				vert2DDrawBuffer[3];
 
-		// Filling Viewport with scene ambient color
-		hBrCurrent	= CreateSolidBrush(Scene->getAmbientColor());
+		// Filling lpViewport with scene ambient color
+		hBrCurrent	= CreateSolidBrush(lpScene->getAmbientColor());
 		hBrOld		= (HBRUSH)SelectObject(hDCOutput, hBrCurrent);
 		FillRect(hDCOutput, &clientRect, hBrCurrent);
 		SelectObject(hDCOutput, hBrOld);
 		DeleteObject(hBrCurrent);
 
-		sceneObjCount	= Scene->getObjectClassCount(CLS_MESH);
+		sceneObjCount	= lpScene->getObjectClassCount(CLS_MESH);
 
 		if ( rMode != RM_WIREFRAME ) 
 		{
 			scenePolyCount = 0;
-			for (UINT_PTR i = 0; i < sceneObjCount; i++) 
-				scenePolyCount += ((LPMESH3D)Scene->getObject(CLS_MESH, i))->getPolygonsCount();
+			for (size_t i = 0; i < sceneObjCount; i++) 
+				scenePolyCount += ((LPMESH3D)lpScene->getObject(CLS_MESH, i))->getPolygonsCount();
 
-			sceneLightCount			= Scene->getObjectClassCount(CLS_LIGHT);
+			sceneLightCount			= lpScene->getObjectClassCount(CLS_LIGHT);
 			scenePolyColorBuffer	= new COLORREF[scenePolyCount];
 			sceneLightedPolyCount	= 0;
 		}
 
-		camOutput->GetViewMatrix(cameraMatrix);
-		camOutput->GetProjectionMatrix(projectionMatrix);
+		lpCamera->GetViewMatrix(cameraMatrix);
+		lpCamera->GetProjectionMatrix(projectionMatrix);
 
 		viewportMatrix.SetIdentity();
 		viewportMatrix._22 = -1.0f;
@@ -198,7 +124,7 @@ BOOL CViewport::Render(HDC hDCScreen) {
 		// Drawing objects
 		for ( UINT i = 0; i < sceneObjCount; i++ ) 
 		{
-			objToRender		= (LPMESH3D)Scene->getObject(CLS_MESH, i);	
+			objToRender		= (LPMESH3D)lpScene->getObject(CLS_MESH, i);	
 			objVertCount	= objToRender->getVerticesCount();
 			objVertBuffer	= (LPVECTOR3D)HeapAlloc(
 				procHeap, 
@@ -213,9 +139,9 @@ BOOL CViewport::Render(HDC hDCScreen) {
 			{
 				objPolyBuffer		= objToRender->getPolygonsRaw();
 				objPolyCount		= objToRender->getPolygonsCount();
-				UINT_PTR lightTo	= sceneLightedPolyCount + objPolyCount; // number of polygons to light
+				size_t lightTo	= sceneLightedPolyCount + objPolyCount; // number of polygons to light
 
-				for (UINT_PTR j = sceneLightedPolyCount; j < lightTo; j++) {
+				for (size_t j = sceneLightedPolyCount; j < lightTo; j++) {
 					VECTOR3D normal(objPolyBuffer[j - sceneLightedPolyCount].Normal(objVertBuffer, 2));
 					Vector3DNormalize(normal, normal);
 					if ( !sceneLightCount ) {
@@ -226,7 +152,7 @@ BOOL CViewport::Render(HDC hDCScreen) {
 						scenePolyColorBuffer[j] = 0;
 
 					for (UINT k = 0; k < sceneLightCount; k++) 	{
-						lightToRender = (LPDIFLIGHT3D)Scene->getObject(CLS_LIGHT, k);
+						lightToRender = (LPDIFLIGHT3D)lpScene->getObject(CLS_LIGHT, k);
 						FLOAT power = lightToRender->getPower();
 						COLORREF lightColor	= lightToRender->getColor();
 						if ( power == 0 || lightColor == BLACK)
@@ -283,13 +209,13 @@ BOOL CViewport::Render(HDC hDCScreen) {
 				if ( projectionMatrix._44 < .0f ) {
 					objVertBuffer[j] /= objVertBuffer[j].z 
 									+ projectionMatrix._34;
-					if ( z > camOutput->getFarCP() || z < camOutput->getNearCP() )
+					if ( z > lpCamera->getFarCP() || z < lpCamera->getNearCP() )
 						objVertBuffer[j].z = 2;
 				}
 				else {
 					objVertBuffer[j].z /= objVertBuffer[j].z 
 									+ projectionMatrix._34;
-					if ( z > camOutput->getFarCP() || z < camOutput->getNearCP() )
+					if ( z > lpCamera->getFarCP() || z < lpCamera->getNearCP() )
 						objVertBuffer[j].z = 2;
 				}
 
@@ -388,7 +314,7 @@ BOOL CViewport::Render(HDC hDCScreen) {
 					&& scenePolyBuffer[i].first.third.y >= 0
 			   		&& scenePolyBuffer[i].first.third.y <= clientRect.bottom
 				) { 
-					objToRender	= (LPMESH3D)Scene->getObject(
+					objToRender	= (LPMESH3D)lpScene->getObject(
 												CLS_MESH, 
 												scenePolyBuffer[i].second
 											);
@@ -427,70 +353,61 @@ BOOL CViewport::Render(HDC hDCScreen) {
 	return bResult;
 }
 
-VOID SetViewportDefaultView(LPVIEWPORT vp, VIEW_TYPE vt)
-{
-	VECTOR3D		defCamPos;
-	FLOAT			perspCoords = VIEW_DISTANCE_DEFAULT;
-
-	if ( vp != NULL )
-	{
-		LPCAMERA3D cam = vp->getCamera();
-		switch ( vt )
-		{
-			case VIEW_LEFT:
-				defCamPos.y = perspCoords;
-				break;
-
-			case VIEW_RIGHT:
-
-				defCamPos.y = -perspCoords;
-				break;
-
-			case VIEW_FRONT:
-				defCamPos.x = perspCoords;
-				break;	
-
-			case VIEW_BACK:
-				defCamPos.x = -perspCoords;
-				break;	
-
-			case VIEW_TOP:
-				defCamPos.z = perspCoords;
-				break;
-
-			case VIEW_BOTTOM:
-
-				defCamPos.z = -perspCoords;
-				break;
-
-			case VIEW_PERSPECTIVE:
-				perspCoords = sqrt((perspCoords * perspCoords) / 3);
-				defCamPos.x = perspCoords;
-				defCamPos.y = perspCoords;
-				defCamPos.z = perspCoords;
-				cam->setProjectionType(PT_CENTRAL);
-				break;
-		}
-
-		cam->Translate(defCamPos);
-	}
-}
+//VOID SetViewportDefaultView(LPVIEWPORT vp, VIEW_TYPE vt)
+//{
+//	VECTOR3D		defCamPos;
+//	FLOAT			perspCoords = VIEW_DISTANCE_DEFAULT;
+//
+//	if ( vp != NULL )
+//	{
+//		LPCAMERA3D cam = vp->getCamera();
+//		switch ( vt )
+//		{
+//			case VIEW_LEFT:
+//				defCamPos.y = perspCoords;
+//				break;
+//
+//			case VIEW_RIGHT:
+//
+//				defCamPos.y = -perspCoords;
+//				break;
+//
+//			case VIEW_FRONT:
+//				defCamPos.x = perspCoords;
+//				break;	
+//
+//			case VIEW_BACK:
+//				defCamPos.x = -perspCoords;
+//				break;	
+//
+//			case VIEW_TOP:
+//				defCamPos.z = perspCoords;
+//				break;
+//
+//			case VIEW_BOTTOM:
+//
+//				defCamPos.z = -perspCoords;
+//				break;
+//
+//			case VIEW_PERSPECTIVE:
+//				perspCoords = sqrt((perspCoords * perspCoords) / 3);
+//				defCamPos.x = perspCoords;
+//				defCamPos.y = perspCoords;
+//				defCamPos.z = perspCoords;
+//				cam->setProjectionType(PT_CENTRAL);
+//				break;
+//		}
+//
+//		cam->Translate(defCamPos);
+//	}
+//}
 
 // ============================================================================
-// ÑRenderPool Implementation:
+// ÑRenderPool class partial implementation:
 
 DWORD WINAPI ÑRenderPool::Render(LPVOID renderInfo)
 {
-	clock_t		time;
-	SIZE		szVp;
-
-	DWORD		dwWaitResult;
-	BOOL		bAlive;
-
-	LPTHREAD_DATA	vp			= (LPTHREAD_DATA)renderInfo;
-	LPTSTR			vpName		= new TCHAR[MAX_OBJECT_NAME_LEN];
-
-	HBRUSH			hBrOld;
+	LPTHREAD_DATA	vp = (LPTHREAD_DATA)renderInfo;
 
 	HFONT			hFontOld,
 					hFontCur = CreateFont(
@@ -512,26 +429,17 @@ DWORD WINAPI ÑRenderPool::Render(LPVOID renderInfo)
 									FRAME_STROKE_WIDTH, 
 									FRAME_STROKE_COLORREF
 								);
-	do {
-		dwWaitResult = WaitForMultipleObjects(
-						2,
-						(LPEVENT)&vp->threadControls,
-						FALSE,
-						INFINITE
-					);
+	while ( WaitForMultipleObjects(2, (LPEVENT)&vp->tcEvents, FALSE, INFINITE) != WAIT_OBJECT_0 + 1 )
+	{
+		clock_t	time = clock();
 
-		time = clock();
-
-		bAlive = dwWaitResult != WAIT_OBJECT_0 + 1;
-
-		vp->Viewport->Render(vp->hDCScreen);
-
-		vp->Viewport->getCamera()->getName(vpName, MAX_OBJECT_NAME_LEN);
-		if ( vp->isActive ) 
+		vp->lpViewport->Render(vp->lpScene, vp->lpCamera, vp->hDCScreen);
+		if ( vp->bIsActive ) 
 		{
-			vp->Viewport->getSize(szVp);
+			SIZE szVp;
+			vp->lpViewport->getSize(szVp);
 			hPenOld = (HPEN)SelectObject(vp->hDCScreen, hPenCur);
-			hBrOld	= (HBRUSH)SelectObject(vp->hDCScreen, GetStockObject(NULL_BRUSH));
+			HBRUSH hBrOld = (HBRUSH)SelectObject(vp->hDCScreen, GetStockObject(NULL_BRUSH));
 			Rectangle(vp->hDCScreen, 1, 1, szVp.cx - 1, szVp.cy - 1);
 			SelectObject(vp->hDCScreen, hPenOld);
 			SelectObject(vp->hDCScreen, hBrOld);
@@ -539,160 +447,113 @@ DWORD WINAPI ÑRenderPool::Render(LPVOID renderInfo)
 		hFontOld = (HFONT)SelectObject(vp->hDCScreen, hFontCur); 
 		SetBkMode(vp->hDCScreen, TRANSPARENT);
 		SetTextColor(vp->hDCScreen, FRAME_FONT_COLOR);
+		tstring tsCameraName = vp->lpCamera->getName();
 		TextOut(
 			vp->hDCScreen, 
 			FRAME_STROKE_WIDTH + 2, 
 			FRAME_STROKE_WIDTH, 
-			vpName, 
-			(INT)_tcslen(vpName)
+			tsCameraName.c_str(), 
+			(INT)tsCameraName.length()
 		);
 		SelectObject(vp->hDCScreen, hFontOld);
 
 		time = CLOCKS_PER_FRAME - clock() + time;
 		if ( time > 0 ) Sleep(time);
 
-		ResetEvent(vp->threadControls.doRender);
-		SetEvent(vp->threadControls.jobDone);
-	} while ( bAlive );
+		ResetEvent(vp->tcEvents.doRender);
+		SetEvent(vp->tcEvents.jobDone);
+	};
 
 	DeleteObject(hPenCur);	
 	DeleteObject(hFontCur);
-	delete[] vpName;
 	return SHUTDOWN_ON_DEMAND;
 }
 
-ÑRenderPool::ÑRenderPool() 
-	: Scene(NULL) 
-{
-	renderEvent	= CreateEvent(0, TRUE, FALSE, NULL);
-}
-ÑRenderPool::~ÑRenderPool() 
-{ 
-	CloseHandle(renderEvent);
-}
+ÑRenderPool::ÑRenderPool() : evTrigger(NULL) { }
+ÑRenderPool::~ÑRenderPool() { }
 
-BOOL ÑRenderPool::assignScene(LPSCENE3D lpScene)
+DWORD ÑRenderPool::addViewport(LPCAMERA3D lpCamera, HDC hDCScreen, UINT vpWidth, UINT vpHeight, RENDER_MODE vpRMode) 
 {
-	BOOL bResult;
-	if ( bResult  = lpScene != NULL )
+	DWORD dwResultID = ((DWORD)0U);
+	
+	if (lpCamera != NULL && hDCScreen != NULL)
 	{
-		Scene = lpScene;
-		for (LPVIEWPORTS_LIST::iterator 
-				cur = Viewports.begin(), 
-				end = Viewports.end(); 
-			cur != end;
-			cur++
-				)
+		LPTHREAD_DATA thData = NULL;
+		try
 		{
-			(*cur)->Viewport->setScene(Scene);
+			FillMemory(thData = new THREAD_DATA(), sizeof(THREAD_DATA), NULL);
+
+			thData->lpViewport	= new VIEWPORT();
+			thData->bIsActive	= FALSE;
+			thData->lpScene		= NULL;
+			thData->lpCamera	= lpCamera;
+			thData->hDCScreen	= hDCScreen;
+
+			thData->tcEvents.doRender	= evTrigger != NULL ? evTrigger : CreateEvent(NULL, FALSE, FALSE, NULL);
+			thData->tcEvents.jobDone	= CreateEvent(0, FALSE, FALSE, NULL);
+			thData->tcEvents.shutDown	= CreateEvent(0, FALSE, FALSE, NULL);
+			if (thData->tcEvents.jobDone == NULL || thData->tcEvents.shutDown == NULL) throw E_FAIL;
+
+			thData->hThread = CreateThread(0, 0, Render, thData, CREATE_SUSPENDED, &dwResultID);
+			if(thData->hThread == NULL) throw E_FAIL;
+
+			evTrigger = thData->tcEvents.doRender;
+
+			ResumeThread(thData->hThread);
+			tdlViewports.push_back(thData);
+		}
+		catch (DWORD)
+		{
+			if (tdlViewports.empty()) CloseHandle(thData->tcEvents.doRender);
+			CloseHandle(thData->tcEvents.shutDown);
+			CloseHandle(thData->tcEvents.jobDone);
+
+			delete thData->lpViewport;
+			delete thData;
 		}
 	}
-	return bResult;
+
+	return dwResultID;
 }
 
-DWORD ÑRenderPool::addViewport(HDC hDCScreen, UINT vpWidth, UINT vpHeight, VIEW_TYPE vpVType,	RENDER_MODE vpRMode) 
+BOOL ÑRenderPool::delViewport(size_t uVpIndex)
 {
-	LPTHREAD_DATA	thData		= {NULL};	
+	if ( uVpIndex >= tdlViewports.size() ) return FALSE;
 	
-	try {
-		if ( renderEvent == NULL )						throw E_EVENT_CREATION_FAILED;
-		if ( hDCScreen == NULL || Scene == NULL )		throw E_FAIL;
-		if ( Viewports.size() == MAX_VIEWPORT_COUNT )	throw E_MAX_COUNT_REACHED; 
+	SetEvent(tdlViewports[uVpIndex]->tcEvents.shutDown);
+	WaitForSingleObject(tdlViewports[uVpIndex]->hThread, THREAD_WAIT_TIMEOUT);
 
-		thData				= new THREAD_DATA;
-		thData->Viewport	= new VIEWPORT();
+	CloseHandle(tdlViewports[uVpIndex]->hThread);
+	CloseHandle(tdlViewports[uVpIndex]->tcEvents.shutDown);
+	CloseHandle(tdlViewports[uVpIndex]->tcEvents.jobDone);
 
-		thData->hDCScreen	= hDCScreen;
-		thData->Thread	= CreateThread(0, 0, Render, thData, CREATE_SUSPENDED, NULL);
-		
-		if( thData->Thread == NULL ) throw E_THREAD_CREATION_FAILED;
-		
-		SIZE szVp = { vpWidth, vpHeight };
-		thData->Viewport->setSize(szVp);
-		thData->Viewport->setScene(Scene);
-		thData->Viewport->setRenderMode(vpRMode);
-		SetViewportDefaultView(thData->Viewport, vpVType);
+	delete tdlViewports[uVpIndex]->lpViewport;
+	delete tdlViewports[uVpIndex];
 
-		thData->threadControls.doRender = renderEvent;
-		thData->threadControls.shutDown	= CreateEvent(0, FALSE, FALSE, NULL);
-		thData->threadControls.jobDone	= CreateEvent(0, FALSE, FALSE, NULL);
-		if (thData->threadControls.shutDown	== NULL || thData->threadControls.jobDone == NULL) 
-			throw E_EVENT_CREATION_FAILED;
+	tdlViewports.erase(tdlViewports.begin() + uVpIndex);
+	evlStates.erase(evlStates.begin() + uVpIndex);
 
-		thData->isActive = FALSE;
-		Viewports.push_back(thData);
-		vpStates.push_back(thData->threadControls.jobDone);
-		ResumeThread(thData->Thread);
-	}
-	catch ( DWORD errCode )
+	if (tdlViewports.empty())
 	{
-		if ( thData->Viewport != NULL )	delete thData->Viewport;
-		if ( thData != NULL )			delete thData;
-		return errCode;
+		CloseHandle(evTrigger);
+		evTrigger = NULL;
 	}
-	return S_OK;
+		
+	return TRUE;
 }
 
-BOOL ÑRenderPool::delViewport(UINT_PTR vpIndex)
+
+
+DWORD ÑRenderPool::RenderWorld(LPSCENE3D lpScene) 
 {
-	BOOL bResult = vpIndex < Viewports.size();
-	if ( bResult ) 
+	if (lpScene != NULL)
 	{
-		SetEvent(Viewports[vpIndex]->threadControls.shutDown);
-		WaitForSingleObject(Viewports[vpIndex]->Thread, THREAD_WAIT_TIMEOUT);
-		CloseHandle(Viewports[vpIndex]->Thread);
-		CloseHandle(Viewports[vpIndex]->threadControls.shutDown);
-		CloseHandle(Viewports[vpIndex]->threadControls.jobDone);
-		delete Viewports[vpIndex]->Viewport;
-		delete Viewports[vpIndex];
-		Viewports.erase(Viewports.begin() + vpIndex);
-		vpStates.erase(vpStates.begin() + vpIndex);
+		__foreach(THREAD_DATA_LIST::const_iterator, entry, tdlViewports)
+		{
+			(*entry)->lpScene = lpScene;
+		}
 	}
-	return bResult;
-}
 
-LPVIEWPORT ÑRenderPool::getViewport(UINT_PTR vpIndex)
-{
-	if ( vpIndex < Viewports.size() ) return Viewports[vpIndex]->Viewport;
-	return NULL;
-}
-
-LPVIEWPORT ÑRenderPool::getActiveViewport()
-{
-	size_t vpCount = Viewports.size();
-
-	for(UINT i = 0; i < vpCount; i++)
-		if ( Viewports[i]->isActive ) return Viewports[i]->Viewport;
-
-	return NULL;
-}
-
-UINT_PTR ÑRenderPool::getActiveViewportIndex()
-{
-	size_t vpCount = Viewports.size();
-
-	for(UINT_PTR i = 0; i < vpCount; i++)
-		if ( Viewports[i]->isActive ) return i;
-
-	return vpCount;
-}
-
-UINT_PTR ÑRenderPool::getViewportCount() { return Viewports.size(); }
-
-VOID ÑRenderPool::setActiveViewport(UINT_PTR vpActiveIndex)
-{
-	size_t vpCount = Viewports.size();
-	BOOL bResult = vpActiveIndex < vpCount;
-
-	for(UINT i = 0; i < vpCount; i++)
-			Viewports[i]->isActive = FALSE;
-
-	if ( bResult ) 
-		Viewports[vpActiveIndex]->isActive = bResult;
-}
-
-DWORD ÑRenderPool::RenderWorld() 
-{ 
-	SetEvent(renderEvent);
-	return WaitForMultipleObjects(DWORD(vpStates.size()), vpStates.data(), TRUE, THREAD_WAIT_TIMEOUT);
+	SetEvent(evTrigger);
+	return WaitForMultipleObjects(DWORD(evlStates.size()), evlStates.data(), TRUE, THREAD_WAIT_TIMEOUT);
 }

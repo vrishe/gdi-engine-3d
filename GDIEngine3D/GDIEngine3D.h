@@ -34,9 +34,6 @@ GDIENGINE3D_USERAPI
 	HRENDERPOOL WINAPI RenderPoolCreate();
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI RenderPoolAssignScene(HRENDERPOOL hRenderPool, HSCENE hScn3D);
-
-GDIENGINE3D_USERAPI
 	BOOL WINAPI RenderPoolRemoveViewport(HRENDERPOOL hRenderPool, HSCENE hScn3D);
 
 // ============================================================================

@@ -199,12 +199,15 @@ inline void CObject::GetRotationMatrix(MATRIX3D &mOut)
 	mOut._44 = 1.0f;
 }
 
-inline VECTOR3D CObject::getForwardLookDirection() { return fWd; }
-inline VECTOR3D CObject::getRightLookDirection() { return rWd; }
-inline VECTOR3D CObject::getUpLookDirection() { return uWd; }
-inline VECTOR3D CObject::getRotation() { return world; }
-inline VECTOR3D CObject::getScale() { return worldScale; }
+inline VECTOR3D CObject::getForwardLookDirection()	{ return fWd; }
+inline VECTOR3D CObject::getRightLookDirection()	{ return rWd; }
+inline VECTOR3D CObject::getUpLookDirection()		{ return uWd; }
+inline VECTOR3D CObject::getRotation()				{ return world; }
+inline VECTOR3D CObject::getScale()					{ return worldScale; }
 
 inline void CObject::setForwardLookDirection(const VECTOR3D &v) { fWd = v; }
-inline void CObject::setRightLookDirection(const VECTOR3D &v) { rWd = v; }
-inline void CObject::setUpLookDirection(const VECTOR3D &v) { uWd = v; }
+inline void CObject::setRightLookDirection(const VECTOR3D &v)	{ rWd = v; }
+inline void CObject::setUpLookDirection(const VECTOR3D &v)		{ uWd = v; }
+
+inline tstring	CObject::getName() const					{ return Name; }
+inline void		CObject::setName(const tstring &objName)	{	Name = objName; }

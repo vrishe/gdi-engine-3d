@@ -46,38 +46,6 @@ HRENDERPOOL WINAPI RenderPoolCreate()
 	return (HRENDERPOOL)CreateObject(new RENDER_POOL());
 }
 
-BOOL WINAPI RenderPoolAssignScene(HRENDERPOOL hRenderPool, HSCENE hScene)
-{
-	BOOL bResult;
-
-	LPUNKNOWN Master = NULL;
-	LPUNKNOWN Slave	 = NULL;
-
-	// Step 1: Lock library
-	thread_safety::LockModule(INFINITE);
-	// Step 2: Check handle(s)
-	if ( bResult = thread_safety::IsObjectRegistered((size_t)hRenderPool, typeid(RENDER_POOL)) 
-		&& thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)) )
-	{
-		// Step 3: Lock objects(s)
-		thread_safety::LockObjectRegistered((size_t)hRenderPool, Master);
-		thread_safety::LockObjectRegistered((size_t)hScene, Slave);
-	}
-	// Step 4: Unlock library 
-	thread_safety::UnlockModule();
-
-	if (bResult)
-	{
-		// Step 5: Make necessary adjustments
-		bResult = ((LPRENDER_POOL)Master)->assignScene((LPSCENE3D)Slave);
-		// Step 6: Unlock object(s)
-		thread_safety::UnlockObjectRegistered((size_t)hRenderPool, Master);
-		thread_safety::UnlockObjectRegistered((size_t)hScene, Slave);
-	}
-	// Step 7: Return operation result
-	return bResult;
-}
-
 // ============================================================================
 // CScene library interface implementation
 

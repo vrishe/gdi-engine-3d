@@ -170,7 +170,6 @@ CObject::CObject(
 CObject::~CObject() 
 {
 	Counter--;
-	if ( Name != NULL ) { delete[] Name; Name = NULL; }
 }
 
 void CObject::RotatePitch(float angle) 
@@ -299,22 +298,5 @@ void CObject::ArbitraryOrbitMoveAround(
 		Matrix3DTransformCoord(M, obj->pos, obj->pos);
 		obj->pos += vPivot;
 	}
-}
-
-void CObject::getName(LPTSTR objName, size_t bufSize) 
-{ 
-	size_t bSize = bufSize >= MAX_OBJECT_NAME_LEN 
-		? MAX_OBJECT_NAME_LEN : bufSize;
-
-	bSize--;
-	_tcsncpy_s(objName, bufSize, Name, bSize);
-}
-void CObject::setName(LPTSTR objName, size_t srcSize)
-{
-	size_t bSize = srcSize >= MAX_OBJECT_NAME_LEN 
-		? MAX_OBJECT_NAME_LEN : srcSize;
-
-	bSize--;
-	_tcsncpy_s(Name, MAX_OBJECT_NAME_LEN, objName, bSize);
 }
 
