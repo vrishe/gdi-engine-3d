@@ -86,8 +86,6 @@ public:
 
 typedef std::basic_string<TCHAR> tstring;
 
-#define __foreach(iter_type, iterator, container) for (iter_type iterator = container.begin(), end = container.end(); iterator != end; iterator++)
-
 #include "IUnknown.h"
 
 // ============================================================================

@@ -27,3 +27,5 @@
 
 // Custom Library headers:
 #include "Math.h"
+
+#define __foreach(it, i, c) for(it i = c.begin(), _end = c.end(); i != _end; i++)
