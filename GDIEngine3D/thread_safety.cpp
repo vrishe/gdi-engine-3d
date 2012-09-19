@@ -84,13 +84,9 @@ namespace thread_safety
 			{
 				uObjKey = 0;
 
-				for (OBJECT_REGISTRY::iterator 
-						cur = ++alModuleObjects.begin(), 
-						end = alModuleObjects.end(); 
-					cur != end; 
-					cur++)
+				__foreach(OBJECT_REGISTRY::iterator, entry, alModuleObjects)
 				{
-					if (++uObjKey != cur->first) break;
+					if (++uObjKey != entry->first) break;
 				}
 			}
 
@@ -180,16 +176,12 @@ namespace thread_safety
 	{
 		_INITIALIZATION_CHECK;
 
-		if (_foreach_func == NULL) return;
-
-		for ( thread_safety::OBJECT_REGISTRY::iterator 
-				cur = ++thread_safety::alModuleObjects.begin(), 
-				end = thread_safety::alModuleObjects.end(); 
-			  cur != end;
-			  cur++
-			)
+		if (_foreach_func != NULL)
 		{
-			_foreach_func(cur->second._lpObject);
+			__foreach(thread_safety::OBJECT_REGISTRY::iterator, entry, alModuleObjects)
+			{
+				_foreach_func(entry->second._lpObject);
+			}
 		}
 	}
 }

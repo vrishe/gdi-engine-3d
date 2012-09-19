@@ -54,32 +54,32 @@ void CMesh::flushVertices()
 
 size_t CMesh::findVertex(const VECTOR3D &v) 
 {
-	size_t vCount = vertices.size();
+	for (size_t i = 0, max = vertices.size(); i < max; i++)
+	{
+		if (vertices[i] == v) return i;
+	}
 
-	for (size_t i = 0; i < vCount; i++)
-		if (vertices[i] == v)
-			return i;
-	return vCount;
+	return SIZE_MAX;
 }
 
 size_t CMesh::findEdge(const EDGE3D &e) 
 {
-	size_t eCount = edges.size();
+	for (size_t i = 0, max = edges.size(); i < max; i++)
+	{
+		if (edges[i] == e) return i;
+	}
 
-	for (size_t i = 0; i < eCount; i++)
-		if (edges[i] == e)
-			return i;
-	return eCount;
+	return SIZE_MAX;
 }
 
 size_t CMesh::findPolygon(const POLY3D &p) 
 {
-	size_t pCount = polygons.size();
+	for (size_t i = 0, max = polygons.size(); i < max; i++)
+	{
+		if (polygons[i] == p) return i;
+	}
 
-	for (size_t i = 0; i < pCount; i++)
-		if (polygons[i] == p)
-			return i;
-	return pCount;
+	return SIZE_MAX;
 }
 
 void CMesh::getBuffersRaw(LPVECTOR3D *vs, LPEDGE3D *es, LPPOLY3D *ps) 
@@ -102,7 +102,7 @@ void CMesh::Transform()
 	MATRIX3D	mTransScalePos(true),
 				mLocalScale(true),
 				mLocalRot(true);
-	size_t vertCount = getVerticesCount();
+	
 	flushVertices();
 	
 	GetLocalScaleMatrix(mLocalScale);
@@ -111,22 +111,10 @@ void CMesh::Transform()
 	GetScaleMatrix(mTransScalePos);
 	
 	v = cache.data();
-	for ( size_t i = 0; i < vertCount; i++ )
+	for (size_t i = 0, max = getVerticesCount(); i < max; i++)
 	{
-		Matrix3DTransformNormal(
-				mLocalScale,
-				*(v + i),
-				*(v + i)
-			);		
-		Matrix3DTransformNormal(
-				mLocalRot,
-				*(v + i),
-				*(v + i)
-			);
-		Matrix3DTransformCoord(
-				mTransScalePos,
-				*(v + i),
-				*(v + i)
-			);
+		Matrix3DTransformNormal(mLocalScale, *(v + i), *(v + i));		
+		Matrix3DTransformNormal(mLocalRot, *(v + i), *(v + i));		
+		Matrix3DTransformCoord(mTransScalePos, *(v + i), *(v + i));
 	}
 }
