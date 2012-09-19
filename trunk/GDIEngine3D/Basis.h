@@ -2,7 +2,7 @@
 //			geometric point of view. Also here is declared mesh and scene data types.
 
 #pragma once
-
+// TODO: Fix constant object method accessibility
 #define BLACK 0
 
 // Macro-definitions for simple single-colored component extraction from COLORREF bit field 
@@ -102,10 +102,10 @@ enum CLASS_ID {
 };
 
 enum CONSTRAINTS {
-	C_FREE	,
-	C_XY	,	
-	C_ZX	,
-	C_ZY
+	CNST_OBJECT_FREE,
+	CNST_OBJECT_XY_PLANE,	
+	CNST_OBJECT_ZX_PLANE,
+	CNST_OBJECT_ZY_PLANE
 };
 
 class CObject : public IUnknown {

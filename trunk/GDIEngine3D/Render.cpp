@@ -8,9 +8,18 @@
 CViewport::CViewport() 
 {
 	SIZE szVp = {1, 1};
-	setSize(szVp);
-	
-	rMode		= RM_WIREFRAME;
+	InitValues(this, szVp, RM_WIREFRAME);
+}
+
+CViewport::CViewport(UINT uVpWidth, UINT uVpHeight, RENDER_MODE rMode)
+{
+	SIZE szVp = {uVpWidth, uVpHeight};
+	InitValues(this, szVp, rMode);
+}
+
+CViewport::CViewport(const SIZE &szVp, RENDER_MODE rMode)
+{
+	InitValues(this, szVp, rMode);
 }
 
 CViewport::~CViewport() 
@@ -20,17 +29,17 @@ CViewport::~CViewport()
 	DeleteDC(hDCOutput);
 }
 
-VOID CViewport::setSize(const SIZE &vpSize)
+VOID CViewport::setSize(const SIZE &szVp)
 {
-	if ((vpSize.cx > 0 && vpSize.cy > 0) && vpSize.cx != getWidth() || vpSize.cy != getHeight())
+	if ((szVp.cx > 0 && szVp.cy > 0) && szVp.cx != getWidth() || szVp.cy != getHeight())
 	{
 		HDC hDCScr = GetDC(NULL);
-		HBITMAP hBmpNew = CreateCompatibleBitmap(hDCScr, vpSize.cx, vpSize.cy);
+		HBITMAP hBmpNew = CreateCompatibleBitmap(hDCScr, szVp.cx, szVp.cy);
 		
 		if (hBmpNew == NULL)
 		{
 			HDC hDCNew = CreateCompatibleDC(hDCScr);
-			hBmpNew = CreateCompatibleBitmap(hDCScr, vpSize.cx, vpSize.cy);
+			hBmpNew = CreateCompatibleBitmap(hDCScr, szVp.cx, szVp.cy);
 			if (hBmpNew != NULL) 
 			{
 				SelectObject(hDCOutput, hBmpDefault);
@@ -347,7 +356,13 @@ BOOL CViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) co
 			}
 			delete[] scenePolyColorBuffer;
 		}
-		BitBlt(hDCScreen, 0, 0, clientRect.right, clientRect.bottom, hDCOutput, 0, 0, SRCCOPY);
+		StretchBlt(
+			hDCScreen, 0, 0, 
+			GetDeviceCaps(hDCScreen, HORZRES), GetDeviceCaps(hDCScreen, HORZRES), 
+			hDCOutput, 0, 0, 
+			clientRect.right, clientRect.bottom, 
+			SRCCOPY
+			);
 	}
 
 	return bResult;
@@ -472,8 +487,13 @@ DWORD WINAPI ÑRenderPool::Render(LPVOID renderInfo)
 ÑRenderPool::ÑRenderPool() : evTrigger(NULL) { }
 ÑRenderPool::~ÑRenderPool() { }
 
-DWORD ÑRenderPool::addViewport(LPCAMERA3D lpCamera, HDC hDCScreen, UINT vpWidth, UINT vpHeight, RENDER_MODE vpRMode) 
-{
+DWORD ÑRenderPool::addViewport(
+	LPCAMERA3D	lpCamera, 
+	HDC			hDCScreen,		
+	UINT		uVpWidth,	
+	UINT		uVpHeight,
+	RENDER_MODE rMode
+) {
 	DWORD dwResultID = ((DWORD)0U);
 	
 	if (lpCamera != NULL && hDCScreen != NULL)
@@ -483,7 +503,7 @@ DWORD ÑRenderPool::addViewport(LPCAMERA3D lpCamera, HDC hDCScreen, UINT vpWidth,
 		{
 			FillMemory(thData = new THREAD_DATA(), sizeof(THREAD_DATA), NULL);
 
-			thData->lpViewport	= new VIEWPORT();
+			thData->lpViewport	= new VIEWPORT(uVpWidth, uVpHeight, rMode);
 			thData->bIsActive	= FALSE;
 			thData->lpScene		= NULL;
 			thData->lpCamera	= lpCamera;
@@ -508,7 +528,6 @@ DWORD ÑRenderPool::addViewport(LPCAMERA3D lpCamera, HDC hDCScreen, UINT vpWidth,
 			CloseHandle(thData->tcEvents.shutDown);
 			CloseHandle(thData->tcEvents.jobDone);
 
-			delete thData->lpViewport;
 			delete thData;
 		}
 	}
@@ -527,7 +546,6 @@ BOOL ÑRenderPool::delViewport(size_t uVpIndex)
 	CloseHandle(tdlViewports[uVpIndex]->tcEvents.shutDown);
 	CloseHandle(tdlViewports[uVpIndex]->tcEvents.jobDone);
 
-	delete tdlViewports[uVpIndex]->lpViewport;
 	delete tdlViewports[uVpIndex];
 
 	tdlViewports.erase(tdlViewports.begin() + uVpIndex);
@@ -542,9 +560,7 @@ BOOL ÑRenderPool::delViewport(size_t uVpIndex)
 	return TRUE;
 }
 
-
-
-DWORD ÑRenderPool::RenderWorld(LPSCENE3D lpScene) 
+DWORD ÑRenderPool::RenderWorld(LPSCENE3D lpScene) const 
 {
 	if (lpScene != NULL)
 	{

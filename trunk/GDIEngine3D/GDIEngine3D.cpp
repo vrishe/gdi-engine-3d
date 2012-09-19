@@ -1,10 +1,12 @@
 // GDIEngine3D.cpp: Contains an implementation of the interface of GDIEngine3D.dll
 
 #include "stdafx.h"
+
+#include "Render.h"
+#include "thread_safety.h"
+
 #include "GDIEngine3D.h"
 
-#include "thread_safety.h"
-#include "Render.h"
 
 void accessor_cleanup(LPUNKNOWN lpObject) { delete lpObject; }
 
@@ -46,6 +48,121 @@ HRENDERPOOL WINAPI RenderPoolCreate()
 	return (HRENDERPOOL)CreateObject(new RENDER_POOL());
 }
 
+DWORD WINAPI RenderPoolViewportAdd(
+	HRENDERPOOL hRenderPool,
+	HCAMERA		hCamera, 
+	HDC			hDCScreen,
+	UINT		uVpWidth,
+	UINT		uVpHeight,
+	RENDER_MODE rMode
+) {
+	DWORD dwResult = ((DWORD)0U);
+
+	thread_safety::LockModule(INFINITE);
+
+	LPUNKNOWN Master	= NULL,
+			  Slave		= NULL;
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hRenderPool, typeid(RENDER_POOL))
+		&& thread_safety::IsObjectRegistered((size_t)hCamera, typeid(CAMERA3D)))
+	{
+		thread_safety::LockObjectRegistered((size_t)hRenderPool, Master);
+		thread_safety::LockObjectRegistered((size_t)hCamera, Slave);
+	}
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		dwResult = ((LPRENDER_POOL)Master)->
+			addViewport((LPCAMERA3D)Slave, hDCScreen, uVpWidth, uVpHeight, rMode);
+
+		thread_safety::UnlockObjectRegistered((size_t)hCamera, Slave);
+		thread_safety::UnlockObjectRegistered((size_t)hRenderPool, Master);
+	}
+
+	return dwResult;
+}
+
+BOOL WINAPI RenderPoolViewportRemoveByIndex(HRENDERPOOL hRenderPool, UINT_PTR uViewportIndex)
+{
+	BOOL bResult = FALSE;
+
+	thread_safety::LockModule(INFINITE);
+
+	LPUNKNOWN Master = NULL;
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hRenderPool, typeid(RENDER_POOL)))
+	{
+		thread_safety::LockObjectRegistered((size_t)hRenderPool, Master);
+	}
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		bResult = ((LPRENDER_POOL)Master)->delViewport(uViewportIndex);
+
+		thread_safety::UnlockObjectRegistered((size_t)hRenderPool, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI RenderPoolViewportRemoveByID(HRENDERPOOL hRenderPool, DWORD wdViewportID)
+{
+	BOOL bResult = FALSE;
+
+	thread_safety::LockModule(INFINITE);
+
+	LPUNKNOWN Master = NULL;
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hRenderPool, typeid(RENDER_POOL)))
+	{
+		thread_safety::LockObjectRegistered((size_t)hRenderPool, Master);
+	}
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		bResult = ((LPRENDER_POOL)Master)->delViewport(wdViewportID);
+
+		thread_safety::UnlockObjectRegistered((size_t)hRenderPool, Master);
+	}
+
+	return bResult;
+}
+
+UINT_PTR WINAPI RenderPoolViewportGetCount(HRENDERPOOL hRenderPool)
+{
+	UINT_PTR uResult = SIZE_MAX;
+
+	thread_safety::LockModule(INFINITE);
+
+	LPUNKNOWN Master = NULL;
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hRenderPool, typeid(RENDER_POOL)))
+	{
+		thread_safety::LockObjectRegistered((size_t)hRenderPool, Master);
+	}
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		uResult = ((LPRENDER_POOL)Master)->getViewportCount();
+
+		thread_safety::UnlockObjectRegistered((size_t)hRenderPool, Master);
+	}
+
+	return uResult;
+}
+
 // ============================================================================
 // CScene library interface implementation
 
@@ -76,31 +193,6 @@ BOOL WINAPI SceneClear(HSCENE hScene)
 
 	return bResult;
 }
-
-//
-//UINT_PTR WINAPI SceneGetObjectClassCount(HSCENE hScene, CLASS_ID clsID) 
-//{
-//	BOOL isValid;
-//
-//	LPUNKNOWN Master = NULL;
-//
-//	thread_safety::LockModule(INFINITE);
-//
-//	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
-//		thread_safety::LockObjectRegistered((size_t)hScene, Master);
-//
-//	thread_safety::UnlockModule();
-//
-//	UINT_PTR uResult = UINT_MAX;
-//	if (isValid)
-//	{
-//		((LPSCENE3D)Master)->getObjectClassCount(clsID);
-//
-//		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
-//	}
-//
-//	return uResult;
-//}
 
 BOOL WINAPI SceneSetAmbientColor(HSCENE hScene, COLORREF color)
 {
@@ -147,81 +239,5 @@ BOOL WINAPI SceneGetAmbientColor(HSCENE hScene, COLORREF &color)
 
 	return bResult;
 }
-
-//BOOL WINAPI SceneAddObject(HSCENE hScene, HOBJECT3D hObj3D)
-//{
-//	BOOL bResult = FALSE;
-//
-//	LPUNKNOWN Scene			= NULL;
-//	LPUNKNOWN Object		= NULL;
-//
-//	thread_safety::LockModule(INFINITE);
-//	if ( bResult = _IS_HANDLE_VALID(SCENE3D, hScene) 
-//		&& _IS_HANDLE_VALID(OBJECT3D, hObj3D) )
-//	{
-//		Scene	= ((LPMUTUAL_ACCESSIBLE)hScene)->Lock();
-//		Object	= ((LPMUTUAL_ACCESSIBLE)hObj3D)->Lock();
-//	}
-//	thread_safety::UnlockModule();
-//
-//	if (bResult)
-//	{
-//		bResult = ((LPSCENE3D)Scene)->AddObject((LPOBJECT3D)Object);
-//		((LPMUTUAL_ACCESSIBLE)hObj3D)->Unlock();
-//		((LPMUTUAL_ACCESSIBLE)hScene)->Unlock();
-//	}
-//
-//	return bResult;
-//}
-//
-//BOOL WINAPI SceneDeleteObject(HSCENE hScene, HOBJECT3D hObj3D)
-//{
-//	BOOL bResult = FALSE;
-//
-//	LPUNKNOWN Scene			= NULL;
-//	LPUNKNOWN Object		= NULL;
-//
-//	thread_safety::LockModule(INFINITE);
-//	if ( bResult = _IS_HANDLE_VALID(SCENE3D, hScene) 
-//		&& _IS_HANDLE_VALID(OBJECT3D, hObj3D) )
-//	{
-//		Scene	= ((LPMUTUAL_ACCESSIBLE)hScene)->Lock();
-//		Object	= ((LPMUTUAL_ACCESSIBLE)hObj3D)->Lock();
-//	}
-//	thread_safety::UnlockModule();
-//
-//	if (bResult)
-//	{
-//		// TODO: Implement another DeleteObject methods if necessary
-//		bResult = ((LPSCENE3D)Scene)->DeleteObject(((LPOBJECT3D)Object)->objID);
-//		((LPMUTUAL_ACCESSIBLE)hObj3D)->Unlock();
-//		((LPMUTUAL_ACCESSIBLE)hScene)->Unlock();
-//	}
-//
-//	return bResult;
-//}
-//
-//BOOL WINAPI SceneGetFirstObject(HSCENE hScene, CLASS_ID clsID)
-//{
-//	BOOL bResult;
-//
-//	LPUNKNOWN Master = NULL;
-//
-//	thread_safety::LockModule(INFINITE);
-//
-//	if (bResult = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
-//		thread_safety::LockObjectRegistered((size_t)hScene, Master);
-//
-//	thread_safety::UnlockModule();
-//
-//	if (bResult)
-//	{
-//		((LPSCENE3D)Master)->getFirstObject(clsID);
-//
-//		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
-//	}
-//
-//	return bResult;
-//}
 
 // TODO: implement CScene findObjectIndex, getFirstObject, getObject methods
