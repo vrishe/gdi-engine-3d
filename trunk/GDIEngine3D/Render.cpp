@@ -70,35 +70,33 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 
 	if (bResult)
 	{
-		HANDLE				procHeap				= GetProcessHeap();
+		HPEN			hPenCurrent, 
+						hPenOld;
+		HBRUSH			hBrCurrent,
+						hBrOld;
 
-		HPEN				hPenCurrent, 
-							hPenOld;
-		HBRUSH				hBrCurrent,
-							hBrOld;
-
-		RECT				clientRect				= {0, 0, getWidth(), getHeight()};
+		RECT			clientRect				= {0, 0, getWidth(), getHeight()};
 		size_t			sceneObjCount,
-							sceneLightCount,
-							scenePolyCount,
-							sceneLightedPolyCount,
-							objVertCount,
-							objEdgeCount,
-							objPolyCount;
+						sceneLightCount,
+						scenePolyCount,
+						sceneLightedPolyCount,
+						objVertCount,
+						objEdgeCount,
+						objPolyCount;
 
-		LPOMNILIGHT3D		lightToRender;
-		LPMESH3D			objToRender;
-		LPVECTOR3D			objVertBuffer;
-		LPEDGE3D			objEdgeBuffer;
-		LPPOLY3D			objPolyBuffer;
+		LPOMNILIGHT3D	lightToRender;
+		LPMESH3D		objToRender;
+		LPVECTOR3D		objVertBuffer;
+		LPEDGE3D		objEdgeBuffer;
+		LPPOLY3D		objPolyBuffer;
 
-		MATRIX3D			cameraMatrix,
-							projectionMatrix,
-							viewportMatrix;
+		MATRIX3D		cameraMatrix,
+						projectionMatrix,
+						viewportMatrix;
 	
-		SCENEPOLY			scenePolyBuffer;
-		LPCOLORREF			scenePolyColorBuffer;
-		POINT				vert2DDrawBuffer[3];
+		SCENEPOLY		scenePolyBuffer;
+		LPCOLORREF		scenePolyColorBuffer;
+		POINT			vert2DDrawBuffer[3];
 
 		// Filling lpViewport with scene ambient color
 		hBrCurrent	= CreateSolidBrush(lpScene->getAmbientColor());
@@ -131,21 +129,13 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 		// Drawing objects
 		for ( UINT i = 0; i < sceneObjCount; i++ ) 
 		{
-			objToRender		= (LPMESH3D)lpScene->getObject(CLS_MESH, i);	
-			objVertCount	= objToRender->getVerticesCount();
-			objVertBuffer	= (LPVECTOR3D)HeapAlloc(
-				procHeap, 
-				HEAP_ZERO_MEMORY, 
-				sizeof(VECTOR3D) * objVertCount
-				);
-
-			objToRender->getVerticesTransformed(objVertBuffer);
+			objToRender	= (LPMESH3D)lpScene->getObject(CLS_MESH, i);
+			objToRender->getVertexCacheDataRaw(objVertBuffer, objVertCount);
 
 			// calculate lighting here
 			if ( rMode != RM_WIREFRAME ) 
 			{
-				objPolyBuffer		= objToRender->getPolygonsRaw();
-				objPolyCount		= objToRender->getPolygonsCount();
+				objToRender->getPolygonDataRaw(objPolyBuffer, objPolyCount);
 				size_t lightTo	= sceneLightedPolyCount + objPolyCount; // number of polygons to light
 
 				for (size_t j = sceneLightedPolyCount; j < lightTo; j++) {
@@ -253,9 +243,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			}
 			else 
 			{
-				objEdgeCount	= objToRender->getEdgesCount();
-				objEdgeBuffer	= objToRender->getEdgesRaw();
-
+				objToRender->getEdgeDataRaw(objEdgeBuffer, objEdgeCount);
 				hPenCurrent		= CreatePen(PS_SOLID, 1, objToRender->getColor());
 				hPenOld			= (HPEN)SelectObject(hDCOutput, hPenCurrent);
 				for ( UINT j = 0; j < objEdgeCount; j++ ) 
@@ -289,8 +277,6 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 				SelectObject(hDCOutput, hPenOld);
 				DeleteObject(hPenCurrent);
 			}
-
-			HeapFree(procHeap, NULL, objVertBuffer);
 		}
 
 		if ( rMode != RM_WIREFRAME ) 

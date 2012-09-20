@@ -8,7 +8,7 @@
 // Obviously it consist of: vertices, edges and polygons
 
 typedef size_t MESH_ID;
-#define MSH_UNDEFINED	0x00
+#define MSH_PRIMITIVE	0x00
 
 typedef class _clsMesh : public OBJECT3D, public IColorable {
 private:
@@ -29,68 +29,28 @@ protected:
 
 public:
 	_clsMesh(MESH_ID meshTypeId);
-	_clsMesh(COLORREF c, MESH_ID meshTypeId);
-	_clsMesh(const VECTOR3D &pt,
-		float p, 
-		float y, 
-		float r, 
-		MESH_ID meshTypeId
-		);
-	_clsMesh(const VECTOR3D &pt,
-		float p, 
-		float y, 
-		float r, 
-		COLORREF c,
-		MESH_ID meshTypeId
-		);
-	_clsMesh(float	pX, 
-		float pY, 
-		float pZ, 
-		float p, 
-		float y, 
-		float r, 
-		MESH_ID meshTypeId
-		);
-	_clsMesh(float	pX, 
-		float pY, 
-		float pZ, 
-		float p, 
-		float y, 
-		float r, 
-		COLORREF c,
-		MESH_ID meshTypeId
-		);
+	_clsMesh(MESH_ID meshTypeId, COLORREF c);
 
-	// getters
-	MESH_ID			getMeshID();
-	size_t			getVerticesCount();
-	size_t			getEdgesCount();
-	size_t			getPolygonsCount();
-	LPVECTOR3D		getVerticesRaw();
-	LPEDGE3D		getEdgesRaw();
-	LPPOLY3D		getPolygonsRaw();
-	VERT_LIST		getVertices();
-	EDGE_LIST		getEdges();
-	POLY_LIST		getPolygons();
+	MESH_ID	getMeshID();
+	size_t	getVerticesCount();
+	size_t	getEdgesCount();
+	size_t	getPolygonsCount();
 
-	POLY3D			getPolygon(int);
+	void	getVertexData(VERT_LIST &vertices);
+	void	getVertexDataRaw(LPVECTOR3D &lpVertexArray, size_t &uVertexCount);
+	void	getVertexCacheData(VERT_LIST &vertices);
+	void	getVertexCacheDataRaw(LPVECTOR3D &lpVertexArray, size_t &uVertexCount);
 
-	void			getBuffersRaw(LPVECTOR3D *vs, LPEDGE3D *es, LPPOLY3D *ps);
-	void			getBuffers(LPVERT_LIST vs, LPEDGE_LIST es, LPPOLY_LIST ps);
-	void			getVerticesTransformed(LPVECTOR3D v);
+	void	getEdgeData(EDGE_LIST &edges);
+	void	getEdgeDataRaw(LPEDGE3D &lpEdgeArray, size_t &uEdgeCount);
 
-	void			setMeshID(MESH_ID);
+	void	getPolygonData(POLY_LIST &polygons);
+	void	getPolygonDataRaw(LPPOLY3D &lpPolyArray, size_t &uPolyCount);
 
-	void			addVertices(const LPVECTOR3D vs, UINT vsCount);
-	bool			delVertices();
-	
-	void			addEdges(const LPEDGE3D es, UINT esCount);
-	bool			delEdges(EDGE3D);
+	void	setMeshID(MESH_ID);
 
-	void			addPolygons(const LPPOLY3D ps, UINT psCount);
-	bool			delPolygon(POLY3D);
-
-	void			Transform();
+	void	ClearHullData();
+	void	Transform();
 } MESH3D, *LPMESH3D;
 
 #include "Mesh.inl"

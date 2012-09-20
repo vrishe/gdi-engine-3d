@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "Primitives.h"
 
+
 // ============================================================================
 // _clsPyramid class implementation
 
@@ -68,7 +69,7 @@ void _clsPyramid::Triangulate() {
 }
 
 _clsPyramid::_clsPyramid(COLORREF c) 
-	: MESH3D(c, MSH_PYRAMID), h(0), bL(0), bW(0), tL(0), tW(0), shift(0) { }
+	: MESH3D(c, MSH_PRIMITIVE), h(0), bL(0), bW(0), tL(0), tW(0), shift(0) { }
 
 _clsPyramid::_clsPyramid(
 		float		height, 
@@ -78,7 +79,7 @@ _clsPyramid::_clsPyramid(
 		float		tWidth,
 		COLORREF	c,
 		float		sh
-) : MESH3D(c, MSH_PYRAMID)
+) : MESH3D(c, MSH_PRIMITIVE)
 { 
 	h  = height;
 	bL = bLength;
@@ -89,18 +90,21 @@ _clsPyramid::_clsPyramid(
 	Triangulate();
 }
 
-float _clsPyramid::getHeight() { return h; }
+float _clsPyramid::getHeight()	{ return h; }
 float _clsPyramid::getBLength() { return bL; }
-float _clsPyramid::getBWidth() { return bW; }
+float _clsPyramid::getBWidth()	{ return bW; }
 float _clsPyramid::getTLength() {return tL; }
-float _clsPyramid::getTWidth() {return tW; }
+float _clsPyramid::getTWidth()	{return tW; }
 
-void _clsPyramid::setHeight(float n) { h = n; }
-void _clsPyramid::setBLength(float n) { bL = n; }
-void _clsPyramid::setBWidth(float n) { bW = n; }
-void _clsPyramid::setTLength(float n) { tL = n; }
-void _clsPyramid::setTWidth(float n) {tW = n; }
+void _clsPyramid::setHeight(float n)	{ h = n; }
+void _clsPyramid::setBLength(float n)	{ bL = n; }
+void _clsPyramid::setBWidth(float n)	{ bW = n; }
+void _clsPyramid::setTLength(float n)	{ tL = n; }
+void _clsPyramid::setTWidth(float n)	{tW = n; }
 
+
+// ============================================================================
+// _clsCone class implementation
 
 void _clsCone::Triangulate() {
 	vertices.clear();
@@ -190,219 +194,8 @@ void _clsCone::Triangulate() {
 	polygons.shrink_to_fit();
 }
 
-
-// ============================================================================
-// _clsCone class implementation
-
-void CExCone::Triangulate() {
-	vertices.clear();
-	edges.clear();
-	polygons.clear();
-
-	int step = 360 / precision; // шаг между точками в градусах
-		// setting vertices
-	if ( secant >= 0 ) {
-		vertices.push_back(VECTOR3D(0, 0, 0));
-		vertices.push_back(VECTOR3D(0, 0, h));
-	}
-	else { // нулевая вершина лежит на секущей плоскости т.к. центр конуса "отрезан"
-		vertices.push_back(VECTOR3D(0, secant, 0));
-		vertices.push_back(VECTOR3D(0, secant, h));
-	}
-		// secant vertices
-	int secBaseLeft = 2, secTopLeft = 2; // кол-во еще недобавленных вершин пересачения плоскости сечения с реберами основания и верхней плоскости конуса
-	VECTOR3D bV1, bV2, tV1, tV2; // точки пересечения плоскости сечения с ребрами основания и верхней плоскости конуса
-	if ( abs(secant) >= bR ) // плоскость сечения не пересекается/касается основания конуса
-		secBaseLeft = 0; // отдельная обработка вершины касания не требуется
-	else {
-		bV1 = VECTOR3D((float)sqrt(bR*bR - secant * secant), secant, 0);
-		bV2 = VECTOR3D((float)-sqrt(bR*bR - secant * secant), secant, 0);
-	}
-	if ( abs(secant) >= tR ) // аналогично основанию
-		secTopLeft = 0;
-	else {	
-		tV1 = VECTOR3D((float)sqrt(tR*tR - secant * secant), secant, h);
-		tV2 = VECTOR3D((float)-sqrt(tR*tR - secant * secant), secant, h);
-	}
-	for (int i = 0; i < precision; i++) { // нахождение вершин кривых основания и верхней плоскости конуса
-		switch (step*i) {
-		case 0:
-			if ( secant >= 0 ) {
-				vertices.push_back(VECTOR3D(bR, 0, 0));
-				vertices.push_back(VECTOR3D(tR, 0, h));
-			}
-			else { // вершина не лежит на оси OX, т.к. центр конуса "отрезан"
-				if (secBaseLeft) // проверки для сохранения правильного порядка добавления вершин (аналогично не усеченному конусу)
-					vertices.push_back(bV1);
-				if (secTopLeft)
-					vertices.push_back(tV1);
-				if (secBaseLeft)
-					vertices.push_back(bV2);
-				if (secTopLeft)
-					vertices.push_back(tV2);
-				secBaseLeft = secTopLeft = 0; // все вершины пересечения добавлены
-			}
-			break;
-		case 90:
-			if ( secant > 0 ) {
-				switch ( secBaseLeft ) {
-				case 2: // вместо одной вершины на оси ОУ будут добавлены две вершины пересечения
-					vertices.push_back(bV1);
-					if (secTopLeft) { 
-						vertices.push_back(tV1);
-						vertices.push_back(bV2);
-						vertices.push_back(tV2);
-					}
-					else { // в верхней плоскости конуса дублируем вершину для быстрого построения полигонов
-						vertices.push_back(VECTOR3D(0, tR, h));
-						vertices.push_back(bV2);
-						vertices.push_back(VECTOR3D(0, tR, h));
-					}	
-					secBaseLeft = secTopLeft = 0; // все вершины пересечения добавлены
-					break;
-				case 1: // добвление одной вершины на оси ОУ
-					if ( secant < bR )
-						vertices.push_back(VECTOR3D(0, secant, 0));
-					else
-						vertices.push_back(VECTOR3D(0, bR, h));
-					if ( secant < tR )
-						vertices.push_back(VECTOR3D(0, secant, h));
-					else
-						vertices.push_back(VECTOR3D(0, tR, h));
-					break;
-				//default:
-				//	vertices.push_back(VECTOR3D(0, bR, h));
-				//	vertices.push_back(VECTOR3D(0, tR, h));
-				}
-			}
-			break;
-		case 180:
-			if ( secant >= 0 ) {
-				vertices.push_back(VECTOR3D(-bR, 0, 0));
-				vertices.push_back(VECTOR3D(-tR, 0, h));
-			}
-			break;
-		case 270:
-			vertices.push_back(VECTOR3D(0, -bR, 0));
-			vertices.push_back(VECTOR3D(0, -tR, h));
-			break;
-		default:
-			/// находим точку пересечения окружности и очередной прямой в плоскости ОУ,
-			/// построенной под углом step*i относительно ОХ и проходящей через начало координат
-			float k = (float)tan((step*i) * 3.1415926535 / 180), x;
- 			if (step*i < 90 || step*i > 270) // находим квадрант где должна быть очередная точка
- 				x = sqrt(bR*bR / (1 + k*k));
-			else
-				x = -sqrt(bR*bR / (1 + k*k));
-			float y = k * x;
-			bool pushed = false; // была ли вершина добавлена в список
-			if ( y >= secant ) { // если найденная вершина "отрезана" плоскостью сечения
-				if ( secBaseLeft ) {
-					if ( x > 0 ) {
-						vertices.push_back(bV1);
-						secBaseLeft = 1;
-					}
-					else {
-						vertices.push_back(bV2);
-						secBaseLeft = 0;
-					}
-					pushed = true;
-				}
-			}
-			else {
-				vertices.push_back(VECTOR3D(x, y, 0));
-				pushed = true;
-			}
-			/// аналогично добавляем вершину для верхней плоскости конуса
-			if (step*i < 90 || step*i > 270)
- 				x = sqrt(tR*tR / (1 + k*k));
-			else
-				x = -sqrt(tR*tR / (1 + k*k));
-			y = k * x;
-			if ( y >= secant ) {
-				if ( secTopLeft ) {
-					if ( !pushed )
-						if ( x > 0 )
-							vertices.push_back(bV1);
-						else
-							vertices.push_back(bV2);
-					if ( x > 0 ) {
-						vertices.push_back(tV1);
-						secTopLeft = 1;
-					}
-					else {
-						vertices.push_back(tV2);
-						secTopLeft = 0;
-					}
-				}
-				else if ( pushed ) {
-					if ( x > 0 )
-						vertices.push_back(tV1);
-					else
-						vertices.push_back(tV2);
-					pushed = false;
-				}
-			}
-			else {
-				if ( !pushed )
-					if ( x > 0 )
-						vertices.push_back(bV1);
-					else
-						vertices.push_back(bV2);
-				vertices.push_back(VECTOR3D(x, y, h));
-			}
-
-		}
-	}
-
-		// setting base edges
-	int N = (vertices.size() - 2) / 2;
-	for (int i = 1; i < N; i++) {
-		edges.push_back(EDGE3D(0, i*2));
-		edges.push_back(EDGE3D(i*2, i*2 + 2));
-	}
-	edges.push_back(EDGE3D(0, N*2));
-	edges.push_back(EDGE3D(N*2, 2));
-		// setting top edges
-	for (int i = 1; i < N; i++) {
-		edges.push_back(EDGE3D(1, i*2 + 1));
-		edges.push_back(EDGE3D(i*2 + 1, i*2 + 3));
-	}
-	edges.push_back(EDGE3D(1, N*2 + 1));
-	edges.push_back(EDGE3D(N*2 + 1, 3));
-		// setting side edges
-	for (int i = 1; i < N; i++) {
-		edges.push_back(EDGE3D(i*2, i*2 + 1));
-		edges.push_back(EDGE3D(i*2 + 1, i*2 + 2));
-	}
-	edges.push_back(EDGE3D(N*2, N*2 + 1));
-	edges.push_back(EDGE3D(N*2 + 1, 2));
-
-		// setting base polygons
-	N = (vertices.size() - 2) / 2; int index = ( N == precision / 2 + 1 ? 2 : 1 );
-	for (int i = index; i < N; i++)
-		polygons.push_back(POLY3D(i*2, 0, i*2 + 2));
-	polygons.push_back(POLY3D(N*2, 0, 2));
-		// setting top polygons
-	for (int i = index; i < N; i++)
-		polygons.push_back(POLY3D(1, i*2 + 1, i*2 + 3));
-	polygons.push_back(POLY3D(1, N*2 + 1, 3));
-		// setting side polygons
-	for (int i = index; i < N; i++) {
-		polygons.push_back(POLY3D(i*2 + 1, i*2, i*2 + 2));
-		polygons.push_back(POLY3D(i*2 + 1, i*2 + 2, i*2 + 3));
-	}
-	polygons.push_back(POLY3D(N*2 + 1, N*2, 2));
-	polygons.push_back(POLY3D(N*2 + 1, 2, 3));
-
-	flushVertices();
-	vertices.shrink_to_fit();
-	edges.shrink_to_fit();
-	polygons.shrink_to_fit();
-}
-
 _clsCone::_clsCone(COLORREF c) 
-	: MESH3D(c, MSH_CONE), h(0), bR(0), tR(0), precision(24) { }
+	: MESH3D(c, MSH_PRIMITIVE), h(0), bR(0), tR(0), precision(24) { }
 
 _clsCone::_clsCone(
 		float		height, 
@@ -410,7 +203,7 @@ _clsCone::_clsCone(
 		float		tRadius, 
 		int			prec,
 		COLORREF	c
-) : MESH3D(c, MSH_CONE)
+) : MESH3D(c, MSH_PRIMITIVE)
 { 
 	h			= height;
 	bR			= bRadius;
@@ -419,55 +212,22 @@ _clsCone::_clsCone(
 	Triangulate();
 }
 
-float _clsCone::getHeight()	{ return h; }
+float _clsCone::getHeight()		{ return h; }
 float _clsCone::getBRadius()	{ return bR; }
 float _clsCone::getTRadius()	{ return tR; }
-int _clsCone::getPrecision()	{ return precision; }
+int	  _clsCone::getPrecision()	{ return precision; }
 
-void _clsCone::setHeight(float n)		{ h = n; } 
-void _clsCone::setBRadius(float n)		{ bR = n; }
-void _clsCone::setTRadius(float n)		{ tR = n; }
+void _clsCone::setHeight(float n)	{ h = n; } 
+void _clsCone::setBRadius(float n)	{ bR = n; }
+void _clsCone::setTRadius(float n)	{ tR = n; }
 void _clsCone::setPrecission(int n)	{ precision = n; }
 
-// ============================================================================
-// CExCone class implementation
-
-CExCone::CExCone(COLORREF c) 
-	: _clsCone(c) 
-{ 
-	setMeshID(MSH_EXCONE);
-	secant = max(bR, tR);
-}
-
-CExCone::CExCone(
-		float		height, 
-		float		bRadius, 
-		float		tRadius,
-		float		s,
-		int			prec,
-		COLORREF	c
-) : _clsCone(c) 
-{ 
-	setMeshID(MSH_EXCONE);
-
-	secant		= s;
-	h			= height;
-	bR			= bRadius;
-	tR			= tRadius;
-	precision	= prec;
-
-	Triangulate();
-}
-
-float CExCone::getSecant()			{ return secant; }
-void CExCone::setSecant(float n)	{ secant = n; }
- 
 
 // ============================================================================
 // _clsPipe class implementation
 
 _clsPipe::_clsPipe(COLORREF c) 
-	: MESH3D(c, MSH_HOLE), h(0), bR(0), bRh(0), tR(0), tRh(0), precision(0) { }
+	: MESH3D(c, MSH_PRIMITIVE), h(0), bR(0), bRh(0), tR(0), tRh(0), precision(0) { }
 
 _clsPipe::_clsPipe(
 		float height, 
@@ -477,7 +237,7 @@ _clsPipe::_clsPipe(
 		float tHoleRadius,
 		int	  prec,
 		COLORREF	c
-) : MESH3D(c, MSH_HOLE)
+) : MESH3D(c, MSH_PRIMITIVE)
 { 
 	h			= height;
 	bR			= bRadius;
@@ -635,20 +395,20 @@ void _clsPipe::Triangulate() {
 	polygons.shrink_to_fit();
 }
 
-float _clsPipe::getHeight() { return h; }
-float _clsPipe::getBRadius() { return bR; }
-float _clsPipe::getTRadius() { return tR; }
-float _clsPipe::getBHoleRadius() { return bRh; }
-float _clsPipe::getTHoleRadius() { return tRh; }
-int _clsPipe::getPrecision() { return precision; }
+float _clsPipe::getHeight()			{ return h; }
+float _clsPipe::getBRadius()		{ return bR; }
+float _clsPipe::getTRadius()		{ return tR; }
+float _clsPipe::getBHoleRadius()	{ return bRh; }
+float _clsPipe::getTHoleRadius()	{ return tRh; }
+int   _clsPipe::getPrecision()		{ return precision; }
 
 
-void _clsPipe::setHeight(float n) { h = n; } 
-void _clsPipe::setBRadius(float n) { bR = n; }
-void _clsPipe::setTRadius(float n) { tR = n; }
-void _clsPipe::setBHoleRadius(float n) { bRh = n; }
-void _clsPipe::setTHoleRadius(float n) { tRh = n; }
-void _clsPipe::setPrecission(int n) { precision = n; }
+void _clsPipe::setHeight(float n)		{ h = n; } 
+void _clsPipe::setBRadius(float n)		{ bR = n; }
+void _clsPipe::setTRadius(float n)		{ tR = n; }
+void _clsPipe::setBHoleRadius(float n)	{ bRh = n; }
+void _clsPipe::setTHoleRadius(float n)	{ tRh = n; }
+void _clsPipe::setPrecission(int n)		{ precision = n; }
 
 
 // ============================================================================
@@ -661,7 +421,7 @@ _clsSphere::_clsSphere(
 		float			To,
 		unsigned int	Prec,
 		COLORREF		c
-) : MESH3D(c, MSH_SPHERE) {
+) : MESH3D(c, MSH_PRIMITIVE) {
 	radius		= abs(Radius);
 	precision	= Prec;
 	cropMult	= Crop;
@@ -692,7 +452,7 @@ void _clsSphere::Triangulate()
 		if ( abs(cropZ) < radius - EPS ) 
 			vertices.push_back(VECTOR3D(.0f, .0f, cropZ));
 
-		while ( (FLOAT)M_PI_2 - vAngle > -EPS )
+		while ( (float)M_PI_2 - vAngle > -EPS )
 		{
 			float cropX	= radius * cos(vAngle);
 			UINT vCount	= cropX > EPS ? perCircle : 1;
