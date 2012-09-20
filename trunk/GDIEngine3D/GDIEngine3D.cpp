@@ -42,6 +42,7 @@ BOOL WINAPI EngineObjectRelease(HGDIENGINE3DOBJ hGDIEngineObject)
 	return lpObject != NULL;
 }
 
+
 // ============================================================================
 // CRenderPool library interface implementation
 
@@ -292,9 +293,9 @@ BOOL WINAPI ViewportRenderModeBySet(HVIEWPORT hViewport, RENDER_MODE rMode)
 // ============================================================================
 // CCamera library interface implementation
 
-HCAMERA WINAPI CameraCreate(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode)
+HCAMERA WINAPI CameraCreate(PROJECTION_TYPE pt, FLOAT hFOV, FLOAT vFOV)
 {
-	return (HCAMERA)CreateObject(new CAMERA3D(uVpWidth, uVpHeight, rMode));
+	return (HCAMERA)CreateObject(new CAMERA3D(pt, hFOV, vFOV));
 }
 
 BOOL WINAPI CameraTranslate(HCAMERA hCamera, FLOAT fX, FLOAT fY, FLOAT fZ)
@@ -490,7 +491,7 @@ SCENE_OBJECT WINAPI SceneSphereCreate(HSCENE hScene, FLOAT Radius, UINT Precisio
 
 	if (isValid)
 	{
-		LPSPHERE3D lpSphere = new SPHERE3D(Radius, 0, 0, 2 * M_PI, Precision, RGB(255, 255, 255));
+		LPSPHERE3D lpSphere = new SPHERE3D(Radius, 0, 0, 2.0F * M_PI, Precision, RGB(255, 255, 255));
 		if (((LPSCENE3D)Master)->AddObject(lpSphere))
 		{
 			size_t uSphereIndex = ((LPSCENE3D)Master)->findObjectIndex(lpSphere);
