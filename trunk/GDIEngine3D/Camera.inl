@@ -1,9 +1,9 @@
 #pragma once
 
 // ============================================================================
-// CCamera partial implementation:
+// _clsCamera partial implementation:
 
-inline void CCamera::InitDefaultValues(CCamera *cam)
+inline void _clsCamera::InitDefaultValues(_clsCamera *cam)
 {
 	cam->projectionType	= PT_PARALLEL;
 	cam->hFOV			= (float)M_PI_2;
@@ -13,54 +13,54 @@ inline void CCamera::InitDefaultValues(CCamera *cam)
 	cam->fDist			= 499.5F; // (farClip - nearClip) / 2
 }
 
-inline PROJECTION_TYPE	CCamera::getProjectionType()	{ return projectionType; }
-inline float			CCamera::getHFov()				{ return hFOV; }
-inline float			CCamera::getVFov()				{ return vFOV; }
-inline float			CCamera::getFDist()				{ return fDist; }
-inline float			CCamera::getNearCP()			{ return nearClip; }
-inline float			CCamera::getFarCP()				{ return farClip; }
+inline PROJECTION_TYPE	_clsCamera::getProjectionType()	{ return projectionType; }
+inline float			_clsCamera::getHFov()				{ return hFOV; }
+inline float			_clsCamera::getVFov()				{ return vFOV; }
+inline float			_clsCamera::getFDist()				{ return fDist; }
+inline float			_clsCamera::getNearCP()			{ return nearClip; }
+inline float			_clsCamera::getFarCP()				{ return farClip; }
 
-inline void CCamera::Zoom(float aspect)
+inline void _clsCamera::Zoom(float aspect)
 {
 	float rel = vFOV / hFOV;
 	setHFov(hFOV + aspect);
 	vFOV = hFOV * rel;
 }
 
-inline void CCamera::setProjectionType(PROJECTION_TYPE projType) 
+inline void _clsCamera::setProjectionType(PROJECTION_TYPE projType) 
 { 
 	projectionType = projType; 
 }
 
-inline void CCamera::setHFov(float fieldOfViewHoriz) 
+inline void _clsCamera::setHFov(float fieldOfViewHoriz) 
 { 
 	if (fieldOfViewHoriz > EPS 
 		&& (FLOAT)M_PI - fieldOfViewHoriz > EPS
 		) hFOV = fieldOfViewHoriz;
 }
 
-inline void CCamera::setVFov(float fieldOfViewVert) 
+inline void _clsCamera::setVFov(float fieldOfViewVert) 
 { 
 	if (fieldOfViewVert > EPS 
 		&& (FLOAT)M_PI - fieldOfViewVert > EPS
 		) vFOV = fieldOfViewVert;
 }
 
-inline void CCamera::setFDist(float dist)
+inline void _clsCamera::setFDist(float dist)
 {
 	if (dist - nearClip > EPS
 		&& farClip - dist > EPS
 		) fDist = dist;
 }
 
-inline void CCamera::setNearCP(float nearCP) 
+inline void _clsCamera::setNearCP(float nearCP) 
 { 
 	if (nearCP >= EPS 
 		&& farClip - nearClip > EPS
 		) nearClip = nearCP; 
 }
 
-inline void CCamera::setFarCP(float farCP) 
+inline void _clsCamera::setFarCP(float farCP) 
 { 
 	if ( farCP - nearClip > EPS ) farClip = farCP; 
 }

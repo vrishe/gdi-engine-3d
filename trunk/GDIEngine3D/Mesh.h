@@ -4,13 +4,13 @@
 #include "Basis.h"
 
 // ============================================================================
-// CMesh class represents some body model inside of a 3D scene
+// _clsMesh class represents some body model inside of a 3D scene
 // Obviously it consist of: vertices, edges and polygons
 
 typedef size_t MESH_ID;
 #define MSH_UNDEFINED	0x00
 
-class CMesh : public CObject, public IColorable {
+typedef class _clsMesh : public OBJECT3D, public IColorable {
 private:
 	MESH_ID			_mTypeID;
 
@@ -28,22 +28,22 @@ protected:
 	size_t findPolygon(const POLY3D &p);	// returns a Polygon_ position
 
 public:
-	CMesh(MESH_ID meshTypeId);
-	CMesh(COLORREF c, MESH_ID meshTypeId);
-	CMesh(const VECTOR3D &pt,
+	_clsMesh(MESH_ID meshTypeId);
+	_clsMesh(COLORREF c, MESH_ID meshTypeId);
+	_clsMesh(const VECTOR3D &pt,
 		float p, 
 		float y, 
 		float r, 
 		MESH_ID meshTypeId
 		);
-	CMesh(const VECTOR3D &pt,
+	_clsMesh(const VECTOR3D &pt,
 		float p, 
 		float y, 
 		float r, 
 		COLORREF c,
 		MESH_ID meshTypeId
 		);
-	CMesh(float	pX, 
+	_clsMesh(float	pX, 
 		float pY, 
 		float pZ, 
 		float p, 
@@ -51,7 +51,7 @@ public:
 		float r, 
 		MESH_ID meshTypeId
 		);
-	CMesh(float	pX, 
+	_clsMesh(float	pX, 
 		float pY, 
 		float pZ, 
 		float p, 
@@ -91,7 +91,6 @@ public:
 	bool			delPolygon(POLY3D);
 
 	void			Transform();
-};
-typedef CMesh MESH3D, *LPMESH3D;
+} MESH3D, *LPMESH3D;
 
 #include "Mesh.inl"

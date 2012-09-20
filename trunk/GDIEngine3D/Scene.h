@@ -4,17 +4,17 @@
 #include "Basis.h"
 
 // ============================================================================
-// CScene class declaration
-class CScene : public IUnknown {
+// _clsScene class declaration
+typedef class _clsScene : public IUnknown {
 private:
 	CONTENT		objects;
 	COLORREF	ambientColor;
 
-	static void InitDefaultValues(CScene *obj);
+	static void InitDefaultValues(_clsScene *obj);
 
 public:
-	CScene();
-	~CScene();
+	_clsScene();
+	~_clsScene();
 
 	bool AddObject(const LPOBJECT3D lpObject);
 	bool DeleteObject(CLASS_ID clsID, size_t objIndex); 
@@ -29,7 +29,6 @@ public:
 	COLORREF	getAmbientColor()							const;
 
 	VOID		setAmbientColor(COLORREF color);
-};
-typedef CScene SCENE3D, *LPSCENE3D;
+} SCENE3D, *LPSCENE3D;
 
 #include "Scene.inl"

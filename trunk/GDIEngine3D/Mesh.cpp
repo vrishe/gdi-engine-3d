@@ -3,39 +3,39 @@
 #include "Mesh.h"
 
 // ============================================================================
-// Partial implementation of CMesh class:
+// Partial implementation of _clsMesh class:
 
-CMesh::CMesh(MESH_ID meshTypeId) 
-	: CObject(CLS_MESH), IColorable() { setMeshID(meshTypeId); }
+_clsMesh::_clsMesh(MESH_ID meshTypeId) 
+	: OBJECT3D(CLS_MESH), IColorable() { setMeshID(meshTypeId); }
 
-CMesh::CMesh(COLORREF c, MESH_ID meshTypeId) 
-	: CObject(CLS_MESH), IColorable(c) { setMeshID(meshTypeId); }
+_clsMesh::_clsMesh(COLORREF c, MESH_ID meshTypeId) 
+	: OBJECT3D(CLS_MESH), IColorable(c) { setMeshID(meshTypeId); }
 
-CMesh::CMesh(const VECTOR3D &pt,
+_clsMesh::_clsMesh(const VECTOR3D &pt,
 		float p, 
 		float y, 
 		float r,
 		MESH_ID meshTypeId
-		) : CObject(pt, p, y, r, CLS_MESH), IColorable() { }
+		) : OBJECT3D(pt, p, y, r, CLS_MESH), IColorable() { }
 
-CMesh::CMesh(const VECTOR3D &pt,
+_clsMesh::_clsMesh(const VECTOR3D &pt,
 		float p, 
 		float y, 
 		float r, 
 		COLORREF c,
 		MESH_ID meshTypeId
-		) : CObject(pt, p, y, r, CLS_MESH), IColorable(c) { }
+		) : OBJECT3D(pt, p, y, r, CLS_MESH), IColorable(c) { }
 
-CMesh::CMesh(float pX, 
+_clsMesh::_clsMesh(float pX, 
 		float pY, 
 		float pZ, 
 		float p, 
 		float y, 
 		float r, 
 		MESH_ID meshTypeId
-		) : CObject(pX, pY, pZ, p, y, r, CLS_MESH), IColorable() { }
+		) : OBJECT3D(pX, pY, pZ, p, y, r, CLS_MESH), IColorable() { }
 
-CMesh::CMesh(float pX, 
+_clsMesh::_clsMesh(float pX, 
 		float pY, 
 		float pZ, 
 		float p, 
@@ -43,16 +43,16 @@ CMesh::CMesh(float pX,
 		float r, 
 		COLORREF c,
 		MESH_ID meshTypeId
-		) : CObject(pX, pY, pZ, p, y, r, CLS_MESH), IColorable(c) { }
+		) : OBJECT3D(pX, pY, pZ, p, y, r, CLS_MESH), IColorable(c) { }
 
-void CMesh::flushVertices()
+void _clsMesh::flushVertices()
 {
 	cache.clear();
 	cache.insert(cache.begin(), vertices.begin(), vertices.end());
 	cache.shrink_to_fit();
 }
 
-size_t CMesh::findVertex(const VECTOR3D &v) 
+size_t _clsMesh::findVertex(const VECTOR3D &v) 
 {
 	for (size_t i = 0, max = vertices.size(); i < max; i++)
 	{
@@ -62,7 +62,7 @@ size_t CMesh::findVertex(const VECTOR3D &v)
 	return SIZE_MAX;
 }
 
-size_t CMesh::findEdge(const EDGE3D &e) 
+size_t _clsMesh::findEdge(const EDGE3D &e) 
 {
 	for (size_t i = 0, max = edges.size(); i < max; i++)
 	{
@@ -72,7 +72,7 @@ size_t CMesh::findEdge(const EDGE3D &e)
 	return SIZE_MAX;
 }
 
-size_t CMesh::findPolygon(const POLY3D &p) 
+size_t _clsMesh::findPolygon(const POLY3D &p) 
 {
 	for (size_t i = 0, max = polygons.size(); i < max; i++)
 	{
@@ -82,21 +82,21 @@ size_t CMesh::findPolygon(const POLY3D &p)
 	return SIZE_MAX;
 }
 
-void CMesh::getBuffersRaw(LPVECTOR3D *vs, LPEDGE3D *es, LPPOLY3D *ps) 
+void _clsMesh::getBuffersRaw(LPVECTOR3D *vs, LPEDGE3D *es, LPPOLY3D *ps) 
 {
 	if ( vs != NULL ) *vs = vertices.data();
 	if ( es != NULL ) *es = edges.data();
 	if ( ps != NULL ) *ps = polygons.data();
 }
 
-void CMesh::getBuffers(LPVERT_LIST vs, LPEDGE_LIST es, LPPOLY_LIST ps) 
+void _clsMesh::getBuffers(LPVERT_LIST vs, LPEDGE_LIST es, LPPOLY_LIST ps) 
 {
 	if ( vs != NULL ) *vs = vertices;
 	if ( es != NULL ) *es = edges;
 	if ( ps != NULL ) *ps = polygons;
 }
 
-void CMesh::Transform()
+void _clsMesh::Transform()
 {
 	LPVECTOR3D	v;
 	MATRIX3D	mTransScalePos(true),

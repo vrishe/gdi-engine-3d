@@ -3,12 +3,11 @@
 #include "Light.h"
 
 // ============================================================================
-// CLight partial implementation:
+// _clsOmniLight partial implementation:
 
-CLight::CLight() { InitDefaultValues(this); }
+_clsOmniLight::_clsOmniLight() { InitDefaultValues(this); }
 
-CLight::CLight(COLORREF c, float p) 
-	: CObject(CLS_LIGHT) 
+_clsOmniLight::_clsOmniLight(COLORREF c, float p) : OBJECT3D(CLS_LIGHT) 
 {
 	setPower(p);
 	setColor(c);

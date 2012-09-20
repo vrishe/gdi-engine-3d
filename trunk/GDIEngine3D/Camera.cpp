@@ -3,16 +3,15 @@
 #include "Camera.h"
 
 // ============================================================================
-// CCamera partial implementation:
+// _clsCamera partial implementation:
 
-CCamera::CCamera() 
-	: CObject(CLS_CAMERA) 
+_clsCamera::_clsCamera() : OBJECT3D(CLS_CAMERA) 
 { 
 	InitDefaultValues(this);
 }
 
-CCamera::CCamera(PROJECTION_TYPE projType, float horizFov, float vertFov) 
-	: CObject(CLS_CAMERA) 
+_clsCamera::_clsCamera(PROJECTION_TYPE projType, float horizFov, float vertFov) 
+	: OBJECT3D(CLS_CAMERA) 
 { 
 	InitDefaultValues(this);
 	projectionType	= projType;
@@ -20,7 +19,7 @@ CCamera::CCamera(PROJECTION_TYPE projType, float horizFov, float vertFov)
 	vFOV			= vertFov;
 }
 
-void CCamera::GetViewMatrix(MATRIX3D &mOut)
+void _clsCamera::GetViewMatrix(MATRIX3D &mOut)
 {
 	mOut._11 = rWd.x;
 	mOut._12 = uWd.x;
@@ -43,7 +42,7 @@ void CCamera::GetViewMatrix(MATRIX3D &mOut)
 	mOut._44 = 1.0f;
 }
 
-void CCamera::GetProjectionMatrix(MATRIX3D &mOut)
+void _clsCamera::GetProjectionMatrix(MATRIX3D &mOut)
 {
 	mOut.SetIdentity();
 

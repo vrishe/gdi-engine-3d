@@ -3,31 +3,31 @@
 #include "Render.h"
 
 // ============================================================================
-// CViewport class partial implementation:
+// _clsViewport class partial implementation:
 
-CViewport::CViewport() 
+_clsViewport::_clsViewport() 
 {
 	InitValues(this, 1, 1, RM_WIREFRAME);
 }
 
-CViewport::CViewport(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode)
+_clsViewport::_clsViewport(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode)
 {
 	InitValues(this, uVpWidth, uVpHeight, rMode);
 }
 
-CViewport::CViewport(const SIZE &szVp, RENDER_MODE rMode)
+_clsViewport::_clsViewport(const SIZE &szVp, RENDER_MODE rMode)
 {
 	InitValues(this, szVp.cx, szVp.cy, rMode);
 }
 
-CViewport::~CViewport() 
+_clsViewport::~_clsViewport() 
 { 
 	SelectObject(hDCOutput, hBmpDefault);
 	DeleteObject(hBmpOutput);
 	DeleteDC(hDCOutput);
 }
 
-VOID CViewport::setSize(LONG uVpWidth, LONG uVpHeight)
+VOID _clsViewport::setSize(LONG uVpWidth, LONG uVpHeight)
 {
 	if ((uVpWidth > 0 && uVpHeight > 0) && uVpWidth != getWidth() || uVpHeight != getHeight())
 	{
@@ -64,7 +64,7 @@ bool ZDepthComparator(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY
 			> (b.first.first.z + b.first.second.z + b.first.third.z);
 }
 
-BOOL CViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const 
+BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const 
 {
 	BOOL bResult = hDCScreen!= NULL && lpScene != NULL && lpCamera != NULL;
 
@@ -86,7 +86,7 @@ BOOL CViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) co
 							objEdgeCount,
 							objPolyCount;
 
-		LPDIFLIGHT3D		lightToRender;
+		LPOMNILIGHT3D		lightToRender;
 		LPMESH3D			objToRender;
 		LPVECTOR3D			objVertBuffer;
 		LPEDGE3D			objEdgeBuffer;
@@ -159,7 +159,7 @@ BOOL CViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) co
 						scenePolyColorBuffer[j] = 0;
 
 					for (UINT k = 0; k < sceneLightCount; k++) 	{
-						lightToRender = (LPDIFLIGHT3D)lpScene->getObject(CLS_LIGHT, k);
+						lightToRender = (LPOMNILIGHT3D)lpScene->getObject(CLS_LIGHT, k);
 						FLOAT power = lightToRender->getPower();
 						COLORREF lightColor	= lightToRender->getColor();
 						if ( power == 0 || lightColor == BLACK)
@@ -416,9 +416,9 @@ BOOL CViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) co
 //}
 
 // ============================================================================
-// CRenderPool class partial implementation:
+// _clsRenderPool class partial implementation:
 
-DWORD WINAPI CRenderPool::Render(LPVOID renderInfo)
+DWORD WINAPI _clsRenderPool::Render(LPVOID renderInfo)
 {
 	LPTHREAD_DATA	vp = (LPTHREAD_DATA)renderInfo;
 
@@ -482,14 +482,14 @@ DWORD WINAPI CRenderPool::Render(LPVOID renderInfo)
 	return SHUTDOWN_ON_DEMAND;
 }
 
-CRenderPool::CRenderPool() : evTrigger(NULL) { }
-CRenderPool::CRenderPool(LPSCENE3D lpScene) : evTrigger(NULL) { setRenderScene(lpScene); }
-CRenderPool::~CRenderPool() 
+_clsRenderPool::_clsRenderPool() : evTrigger(NULL) { }
+_clsRenderPool::_clsRenderPool(LPSCENE3D lpScene) : evTrigger(NULL) { setRenderScene(lpScene); }
+_clsRenderPool::~_clsRenderPool() 
 { 
 	for (size_t i = 0, max = tdlViewports.size(); i < max; i++) delViewport(i);
 }
 
-DWORD CRenderPool::addViewport(
+DWORD _clsRenderPool::addViewport(
 	LPVIEWPORT	lpViewport,
 	LPCAMERA3D	lpCamera, 
 	HDC			hDCScreen
@@ -535,7 +535,7 @@ DWORD CRenderPool::addViewport(
 	return dwResultID;
 }
 
-BOOL CRenderPool::delViewport(size_t uVpIndex)
+BOOL _clsRenderPool::delViewport(size_t uVpIndex)
 {
 	if ( uVpIndex >= tdlViewports.size() ) return FALSE;
 	
@@ -563,7 +563,7 @@ BOOL CRenderPool::delViewport(size_t uVpIndex)
 	return TRUE;
 }
 
-HDC CRenderPool::setViewportScreen(size_t uVpIndex, HDC hDCScreen)
+HDC _clsRenderPool::setViewportScreen(size_t uVpIndex, HDC hDCScreen)
 {
 	if (uVpIndex < tdlViewports.size())
 	{

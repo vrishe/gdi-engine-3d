@@ -5,11 +5,11 @@
 #include "SharedDef.h"
 
 // ============================================================================
-// CCamera class
+// _clsCamera class
 
-class CCamera : public CObject {
+typedef class _clsCamera : public OBJECT3D {
 private:
-	static void InitDefaultValues(CCamera *cam);
+	static void InitDefaultValues(_clsCamera *cam);
 
 protected:
 	PROJECTION_TYPE projectionType;
@@ -21,8 +21,8 @@ protected:
 	float			farClip;
 
 public:
-	CCamera();
-	CCamera(PROJECTION_TYPE projType, float horizFov, float vertFov);
+	_clsCamera();
+	_clsCamera(PROJECTION_TYPE projType, float horizFov, float vertFov);
 
 	PROJECTION_TYPE	getProjectionType();
 	float			getHFov();
@@ -42,8 +42,7 @@ public:
 
 	void			GetViewMatrix(MATRIX3D &mOut);
 	void			GetProjectionMatrix(MATRIX3D &mOutm);
-};
-typedef CCamera CAMERA3D, *LPCAMERA3D;
+} CAMERA3D, *LPCAMERA3D;
 
 #include "Camera.inl"
 

@@ -3,17 +3,17 @@
 #include "Scene.h"
 
 // ============================================================================
-// Partial implementation of CScene class:
+// Partial implementation of _clsScene class:
 
-CScene::CScene() 
+_clsScene::_clsScene() 
 { 
 	InitDefaultValues(this);
 }
-CScene::~CScene() { }
+_clsScene::~_clsScene() { }
 
-bool CScene::findObjectIndex(const LPOBJECT3D lpObject, size_t *objIndex) const
+bool _clsScene::findObjectIndex(const LPOBJECT3D lpObject, size_t *objIndex) const
 {
-	CONTENT::const_iterator finder = lpObject != NULL ? objects.find(lpObject->clsID()) : objects.end();
+	CONTENT::const_iterator finder = lpObject != NULL ? objects.find(lpObject->getClassID()) : objects.end();
 
  	if ( finder != objects.end() ) 
 	{

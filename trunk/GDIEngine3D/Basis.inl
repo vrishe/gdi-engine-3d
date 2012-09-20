@@ -50,9 +50,9 @@ inline bool _tagColor3D::operator==(const float &b) const { return ( Red == b &&
 inline bool _tagColor3D::operator!=(const float &b) const { return ( Red != b || Green != b || Blue != b); }
 
 // ===========================================================================
-// CObject partial implementation:
+// _clsObject partial implementation:
 
-inline void CObject::InitDefaultValues(CObject *obj)
+inline void _clsObject::InitDefaultValues(_clsObject *obj)
 {
 	obj->Name		= new TCHAR[MAX_OBJECT_NAME_LEN];
 	obj->Name[0]	= '\0';
@@ -66,117 +66,117 @@ inline void CObject::InitDefaultValues(CObject *obj)
 	obj->localScale	= obj->worldScale;
 }
 
-inline CLASS_ID CObject::clsID() { return ClassID; }
-inline size_t CObject::objID()	{ return ID; }
+inline CLASS_ID _clsObject::getClassID() { return ClassID; }
+inline size_t _clsObject::getID()	{ return ID; }
 
-inline VECTOR3D CObject::getPosition() { return pos; }
+inline VECTOR3D _clsObject::getPosition() { return pos; }
 
-inline void CObject::MoveAlong(float units)			{ pos += fWd * units; }
-inline void CObject::MoveHAcross(float units)		{ pos += rWd * units; }
-inline void CObject::MoveVAcross(float units)		{ pos += uWd * units; }
-inline void CObject::Move(const VECTOR3D &tV)
+inline void _clsObject::MoveAlong(float units)			{ pos += fWd * units; }
+inline void _clsObject::MoveHAcross(float units)		{ pos += rWd * units; }
+inline void _clsObject::MoveVAcross(float units)		{ pos += uWd * units; }
+inline void _clsObject::Move(const VECTOR3D &tV)
 {
 	pos += fWd * tV.x;
 	pos += rWd * tV.y;
 	pos += uWd * tV.z;
 }
-inline void CObject::Move(float tX, float tY, float tZ)
+inline void _clsObject::Move(float tX, float tY, float tZ)
 {
 	pos += fWd * tX;
 	pos += rWd * tY;
 	pos += uWd * tZ;
 }
-inline void CObject::Translate(const VECTOR3D &tV) { pos = tV; }
-inline void CObject::Translate(float tX, float tY, float tZ) 
+inline void _clsObject::Translate(const VECTOR3D &tV) { pos = tV; }
+inline void _clsObject::Translate(float tX, float tY, float tZ) 
 { 
 	pos = VECTOR3D(tX, tY, tZ); 
 }
 
-inline void CObject::ScaleAlong(float factor)	{ localScale.x *= factor; }
-inline void CObject::ScaleHAcross(float factor)	{ localScale.y *= factor; }
-inline void CObject::ScaleVAcross(float factor)	{ localScale.z *= factor; }
-inline void CObject::LocalScale(float fX, float fY, float fZ)
+inline void _clsObject::ScaleAlong(float factor)	{ localScale.x *= factor; }
+inline void _clsObject::ScaleHAcross(float factor)	{ localScale.y *= factor; }
+inline void _clsObject::ScaleVAcross(float factor)	{ localScale.z *= factor; }
+inline void _clsObject::LocalScale(float fX, float fY, float fZ)
 {
 	localScale.x *= fX;
 	localScale.y *= fY;
 	localScale.z *= fZ;
 }
-inline void CObject::Scale(float fX, float fY, float fZ)
+inline void _clsObject::Scale(float fX, float fY, float fZ)
 {
 	worldScale.x *= fX;
 	worldScale.y *= fY;
 	worldScale.z *= fZ;
 }
 
-inline float CObject::Distance(const VECTOR3D &vDst)
+inline float _clsObject::Distance(const VECTOR3D &vDst)
 {
 	return Vector3DLength(pos - vDst);
 }
 
-inline float CObject::Distance(const CObject &objDst)
+inline float _clsObject::Distance(const _clsObject &objDst)
 {
 	return Distance(objDst.pos);
 }
 
-inline void CObject::LookAt(const CObject &objToLookAt) 
+inline void _clsObject::LookAt(const _clsObject &objToLookAt) 
 { 
 	LookAt(objToLookAt.pos, (LPVECTOR3D)&objToLookAt.uWd); 
 }
 
-inline void CObject::LookAt(float lX, float lY, float lZ) 
+inline void _clsObject::LookAt(float lX, float lY, float lZ) 
 { 
 	LookAt(VECTOR3D(lX, lY, lZ), NULL); 
 }
 
-inline void CObject::HorizOrbitMoveAround(const VECTOR3D &vPivot, float units)
+inline void _clsObject::HorizOrbitMoveAround(const VECTOR3D &vPivot, float units)
 {
 	ArbitraryOrbitMoveAround(this, this->uWd, vPivot, units);
 }
 
-inline void CObject::VertOrbitMoveAround(const VECTOR3D &vPivot, float units)
+inline void _clsObject::VertOrbitMoveAround(const VECTOR3D &vPivot, float units)
 {
 	ArbitraryOrbitMoveAround(this, this->rWd, vPivot, units);
 }
 
-inline void CObject::MoveTo(const VECTOR3D &vPivot, float units)
+inline void _clsObject::MoveTo(const VECTOR3D &vPivot, float units)
 {
 	VECTOR3D vN;
 	Vector3DNormalize(vPivot, vN);
 	pos += vN * units;
 }
 
-inline void CObject::MoveTo(const CObject &objPivot, float units)
+inline void _clsObject::MoveTo(const _clsObject &objPivot, float units)
 {
 	MoveTo(objPivot.pos, units);
 }
 
-inline void CObject::MoveTo(float pX, float pY, float pZ, float units)
+inline void _clsObject::MoveTo(float pX, float pY, float pZ, float units)
 {
 	MoveTo(VECTOR3D(pX, pY, pZ), units);
 }
 
-inline void CObject::GetMoveMatrix(MATRIX3D &mOut) 
+inline void _clsObject::GetMoveMatrix(MATRIX3D &mOut) 
 {
 	mOut._41 = pos.x;
 	mOut._42 = pos.y;
 	mOut._43 = pos.z;
 }
 
-inline void CObject::GetLocalScaleMatrix(MATRIX3D &mOut)
+inline void _clsObject::GetLocalScaleMatrix(MATRIX3D &mOut)
 {
 	mOut._11 = localScale.x;
 	mOut._22 = localScale.y;
 	mOut._33 = localScale.z;
 }
 
-inline void CObject::GetScaleMatrix(MATRIX3D &mOut) 
+inline void _clsObject::GetScaleMatrix(MATRIX3D &mOut) 
 {
 	mOut._11 = worldScale.x;
 	mOut._22 = worldScale.y;
 	mOut._33 = worldScale.z;
 }
 
-inline void CObject::GetRotationMatrix(MATRIX3D &mOut) 
+inline void _clsObject::GetRotationMatrix(MATRIX3D &mOut) 
 {
 	mOut._11 = rWd.x;
 	mOut._21 = fWd.x;
@@ -199,15 +199,15 @@ inline void CObject::GetRotationMatrix(MATRIX3D &mOut)
 	mOut._44 = 1.0f;
 }
 
-inline VECTOR3D CObject::getForwardLookDirection()	{ return fWd; }
-inline VECTOR3D CObject::getRightLookDirection()	{ return rWd; }
-inline VECTOR3D CObject::getUpLookDirection()		{ return uWd; }
-inline VECTOR3D CObject::getRotation()				{ return world; }
-inline VECTOR3D CObject::getScale()					{ return worldScale; }
+inline VECTOR3D _clsObject::getForwardLookDirection()	{ return fWd; }
+inline VECTOR3D _clsObject::getRightLookDirection()	{ return rWd; }
+inline VECTOR3D _clsObject::getUpLookDirection()		{ return uWd; }
+inline VECTOR3D _clsObject::getRotation()				{ return world; }
+inline VECTOR3D _clsObject::getScale()					{ return worldScale; }
 
-inline void CObject::setForwardLookDirection(const VECTOR3D &v) { fWd = v; }
-inline void CObject::setRightLookDirection(const VECTOR3D &v)	{ rWd = v; }
-inline void CObject::setUpLookDirection(const VECTOR3D &v)		{ uWd = v; }
+inline void _clsObject::setForwardLookDirection(const VECTOR3D &v) { fWd = v; }
+inline void _clsObject::setRightLookDirection(const VECTOR3D &v)	{ rWd = v; }
+inline void _clsObject::setUpLookDirection(const VECTOR3D &v)		{ uWd = v; }
 
-inline tstring	CObject::getName() const					{ return Name; }
-inline void		CObject::setName(const tstring &objName)	{	Name = objName; }
+inline tstring	_clsObject::getName() const					{ return Name; }
+inline void		_clsObject::setName(const tstring &objName)	{	Name = objName; }

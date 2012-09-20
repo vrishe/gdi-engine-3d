@@ -119,11 +119,11 @@ VECTOR3D _tagPoly3D::Normal(const LPVECTOR3D vs, size_t startVert) {
 inline _tagColor3D::_tagColor3D(unsigned char r, unsigned char g, unsigned char b) { Red = r; Green = g; Blue = b; }
 
 // ===========================================================================
-// CObject partial implementation:
+// _clsObject partial implementation:
 
-size_t CObject::Counter = 1;
+size_t _clsObject::Counter = 1;
 
-CObject::CObject(CLASS_ID clsID) 
+_clsObject::_clsObject(CLASS_ID clsID) 
 	: ClassID(clsID), ID(Counter++)
 {
 	InitDefaultValues(this);
@@ -131,7 +131,7 @@ CObject::CObject(CLASS_ID clsID)
 	pos	= VECTOR3D(.0f, .0f, .0f);
 }
 
-CObject::CObject(
+_clsObject::_clsObject(
 			const VECTOR3D &pt, 
 			float p, 
 			float y, 
@@ -148,7 +148,7 @@ CObject::CObject(
 	RotateRoll(r);
 }
 
-CObject::CObject(
+_clsObject::_clsObject(
 		float pX, 
 		float pY, 
 		float pZ, 
@@ -167,12 +167,12 @@ CObject::CObject(
 	RotateRoll(r);
 }
 
-CObject::~CObject() 
+_clsObject::~_clsObject() 
 {
 	Counter--;
 }
 
-void CObject::RotatePitch(float angle) 
+void _clsObject::RotatePitch(float angle) 
 {
 	MATRIX3D M;
 
@@ -184,7 +184,7 @@ void CObject::RotatePitch(float angle)
 	Vector3DNormalize(uWd, uWd);
 }
 
-void CObject::RotateYaw(float angle) 
+void _clsObject::RotateYaw(float angle) 
 {
 	MATRIX3D M;
 
@@ -196,7 +196,7 @@ void CObject::RotateYaw(float angle)
 	Vector3DNormalize(rWd, rWd);
 }
 
-void CObject::RotateRoll(float angle) 
+void _clsObject::RotateRoll(float angle) 
 {
 	MATRIX3D M;
 
@@ -208,7 +208,7 @@ void CObject::RotateRoll(float angle)
 	Vector3DNormalize(uWd, uWd);
 }
 
-void CObject::LocalRotate(float roll, float yaw, float pitch)
+void _clsObject::LocalRotate(float roll, float yaw, float pitch)
 {
 	MATRIX3D M;
 
@@ -231,7 +231,7 @@ void CObject::LocalRotate(float roll, float yaw, float pitch)
 	Vector3DNormalize(uWd, uWd);
 }
 
-void CObject::Rotate(float x, float y, float z)
+void _clsObject::Rotate(float x, float y, float z)
 {
 	MATRIX3D M;
 
@@ -262,7 +262,7 @@ void CObject::Rotate(float x, float y, float z)
 	Vector3DNormalize(uWd, uWd);
 }
 
-void CObject::LookAt(const VECTOR3D &lookAt, const LPVECTOR3D upOrient)
+void _clsObject::LookAt(const VECTOR3D &lookAt, const LPVECTOR3D upOrient)
 {
 	VECTOR3D lookDir	= lookAt - pos;
 	VECTOR3D vUp		= abs(uWd.z) < EPS ? uWd : VECTOR3D(0, 0, 1) * uWd.z;
@@ -282,8 +282,8 @@ void CObject::LookAt(const VECTOR3D &lookAt, const LPVECTOR3D upOrient)
 	}
 }
 
-void CObject::ArbitraryOrbitMoveAround(
-	CObject *obj, 
+void _clsObject::ArbitraryOrbitMoveAround(
+	_clsObject *obj, 
 	const VECTOR3D &vAxis, 
 	const VECTOR3D &vPivot, 
 	float units

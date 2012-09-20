@@ -1,9 +1,9 @@
 #pragma once
 
 // ============================================================================
-// Partial implementation of CScene class:
+// Partial implementation of _clsScene class:
 
-inline void CScene::InitDefaultValues(CScene *obj)
+inline void _clsScene::InitDefaultValues(_clsScene *obj)
 {
 	obj->objects[CLS_MESH];
 	obj->objects[CLS_LIGHT];
@@ -11,9 +11,9 @@ inline void CScene::InitDefaultValues(CScene *obj)
 	obj->ambientColor = RGB(0, 0, 0);
 }
 
-inline bool CScene::AddObject(const LPOBJECT3D lpObject)
+inline bool _clsScene::AddObject(const LPOBJECT3D lpObject)
 {
-	CONTENT::iterator finder = lpObject != NULL ? objects.find(lpObject->clsID()) : objects.end();
+	CONTENT::iterator finder = lpObject != NULL ? objects.find(lpObject->getClassID()) : objects.end();
 
  	if ( finder != objects.end() ) 
 	{
@@ -24,7 +24,7 @@ inline bool CScene::AddObject(const LPOBJECT3D lpObject)
 	return false;
 }
 
-inline bool CScene::DeleteObject(CLASS_ID clsID, size_t objIndex)
+inline bool _clsScene::DeleteObject(CLASS_ID clsID, size_t objIndex)
 {
 	CONTENT::iterator finder = objects.find(clsID);
 	
@@ -37,21 +37,21 @@ inline bool CScene::DeleteObject(CLASS_ID clsID, size_t objIndex)
 	return false;
 }
 
-inline bool CScene::DeleteObject(const LPOBJECT3D lpObject)
+inline bool _clsScene::DeleteObject(const LPOBJECT3D lpObject)
 {
 	size_t objIndex;
 	return findObjectIndex(lpObject, &objIndex)
-			&& DeleteObject(lpObject->clsID(), objIndex);	
+			&& DeleteObject(lpObject->getClassID(), objIndex);	
 }
 
-inline void CScene::Clear()
+inline void _clsScene::Clear()
 {
 	objects.clear();
 	
 	InitDefaultValues(this);
 }
 
-inline LPOBJECT3D CScene::getObject(CLASS_ID clsID, size_t objIndex) const
+inline LPOBJECT3D _clsScene::getObject(CLASS_ID clsID, size_t objIndex) const
 {
 	CONTENT::const_iterator finder = objects.find(clsID);
 
@@ -61,7 +61,7 @@ inline LPOBJECT3D CScene::getObject(CLASS_ID clsID, size_t objIndex) const
 	return NULL;
 }
 
-inline size_t CScene::getObjectClassCount(CLASS_ID clsID) const 
+inline size_t _clsScene::getObjectClassCount(CLASS_ID clsID) const 
 { 
 	CONTENT::const_iterator finder = objects.find(clsID);
 
@@ -69,13 +69,13 @@ inline size_t CScene::getObjectClassCount(CLASS_ID clsID) const
 	return SIZE_MAX;
 }
 
-inline LPOBJECT3D CScene::getFirstObject(CLASS_ID clsID) const
+inline LPOBJECT3D _clsScene::getFirstObject(CLASS_ID clsID) const
 {
 	CONTENT::const_iterator finder = objects.find(clsID);
 
 	return finder != objects.end() ? *(finder->second.begin()) : NULL;
 }
 
-inline COLORREF CScene::getAmbientColor() const { return ambientColor; }
+inline COLORREF _clsScene::getAmbientColor() const { return ambientColor; }
 
-inline VOID	CScene::setAmbientColor(COLORREF color) { ambientColor = color; }
+inline VOID	_clsScene::setAmbientColor(COLORREF color) { ambientColor = color; }
