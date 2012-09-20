@@ -226,7 +226,22 @@ UINT_PTR WINAPI RenderPoolViewportGetCount(HRENDERPOOL hRenderPool)
 	return uResult;
 }
 
+DWORD WINAPI RenderPoolRenderWorld(HRENDERPOOL hRenderPool)
+{
+	DWORD dwResult = ULONG_MAX;
 
+	thread_safety::LockModule(INFINITE);
+
+	LPUNKNOWN Master = NULL;
+
+	BOOL isValid = thread_safety::IsObjectRegistered((size_t)hRenderPool, typeid(RENDER_POOL));
+
+	thread_safety::UnlockModule();
+
+	if (isValid) dwResult = ((LPRENDER_POOL)Master)->RenderWorld();
+
+	return dwResult;
+}
 // ============================================================================
 // CViewport library interface implementation
 

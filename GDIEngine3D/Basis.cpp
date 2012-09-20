@@ -113,11 +113,6 @@ VECTOR3D _tagPoly3D::Normal(const LPVECTOR3D vs, size_t startVert) {
 	return ans;
 }
 
-// ============================================================================
-// _tagColor3D partial implementation:
-
-inline _tagColor3D::_tagColor3D(unsigned char r, unsigned char g, unsigned char b) { Red = r; Green = g; Blue = b; }
-
 // ===========================================================================
 // _clsObject partial implementation:
 
@@ -129,42 +124,6 @@ _clsObject::_clsObject(CLASS_ID clsID)
 	InitDefaultValues(this);
 
 	pos	= VECTOR3D(.0f, .0f, .0f);
-}
-
-_clsObject::_clsObject(
-			const VECTOR3D &pt, 
-			float p, 
-			float y, 
-			float r, 
-			CLASS_ID clsID) 
-	: ClassID(clsID), ID(Counter++)
-{
-	InitDefaultValues(this);
-
-	pos	= pt;
-
-	RotatePitch(p);
-	RotateYaw(y);
-	RotateRoll(r);
-}
-
-_clsObject::_clsObject(
-		float pX, 
-		float pY, 
-		float pZ, 
-		float p,
-		float y,
-		float r, 
-		CLASS_ID clsID)
-	: ClassID(clsID), ID(Counter++)
-{
-	InitDefaultValues(this);
-
-	pos	= VECTOR3D(pX, pY, pZ);
-
-	RotatePitch(p);
-	RotateYaw(y);
-	RotateRoll(r);
 }
 
 _clsObject::~_clsObject() 

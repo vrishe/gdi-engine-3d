@@ -2,13 +2,6 @@
 
 #include "Mesh.h"
 
-#define MSH_PYRAMID		MSH_UNDEFINED + 1
-#define MSH_CONE		MSH_UNDEFINED + 2
-#define MSH_EXCONE		MSH_UNDEFINED + 3
-#define MSH_HOLE		MSH_UNDEFINED + 4
-#define MSH_SPHERE		MSH_UNDEFINED + 5
-
-
 // ============================================================================
 // _clsPyramid class declaration
 
@@ -88,37 +81,6 @@ public:
 	void setTRadius(float);
 	void setPrecission(int);
 } CONE3D, *LPCONE3D;
-
-
-// ============================================================================
-// CExCone class declaration
-
-typedef class CExCone : public CONE3D {
-	/// конус, отсеченный плоскостью, параллельной OXZ и пересекающей OY в т. (0, secant, 0)
-	/// должно выполняться неравенство: -min(bR,tR) <= secant <= max(bR, tR),
-	/// иначе фигура неопределена
-	float secant;
-
-public:
-	CExCone(COLORREF c);
-	CExCone(
-		float		height, 
-		float		bRadius, 
-		float		tRadius,
-		float		s,
-		int			prec,
-		COLORREF	c
-	);
-
-	// functionality
-	virtual void Triangulate(); // generate vertices, edges and polygons lists
-
-	// getters
-	float getSecant();
-
-	// setters
-	void setSecant(float); 
-} EXCONE3D, *LPEXCONE3D;
 
 
 // ============================================================================

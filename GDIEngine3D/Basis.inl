@@ -43,20 +43,11 @@ inline bool _tagPoly3D::isContainingEdge(const EDGE3D &e)
 	return isContainingVertex(e.first) && isContainingVertex(e.second);
 }
 
-// ============================================================================
-// _tagColor3D partial implementation:
-
-inline bool _tagColor3D::operator==(const float &b) const { return ( Red == b && Green == b && Blue == b); }
-inline bool _tagColor3D::operator!=(const float &b) const { return ( Red != b || Green != b || Blue != b); }
-
 // ===========================================================================
 // _clsObject partial implementation:
 
 inline void _clsObject::InitDefaultValues(_clsObject *obj)
 {
-	obj->Name		= new TCHAR[MAX_OBJECT_NAME_LEN];
-	obj->Name[0]	= '\0';
-
 	obj->fWd		= VECTOR3D(1.0f, .0f, .0f);
 	obj->rWd		= VECTOR3D(.0f, 1.0f, .0f);
 	obj->uWd		= VECTOR3D(.0f, .0f, 1.0f);
@@ -65,9 +56,6 @@ inline void _clsObject::InitDefaultValues(_clsObject *obj)
 	obj->worldScale	= VECTOR3D(1.0f, 1.0f, 1.0f);
 	obj->localScale	= obj->worldScale;
 }
-
-inline CLASS_ID _clsObject::getClassID() { return ClassID; }
-inline size_t _clsObject::getID()	{ return ID; }
 
 inline VECTOR3D _clsObject::getPosition() { return pos; }
 
@@ -199,8 +187,11 @@ inline void _clsObject::GetRotationMatrix(MATRIX3D &mOut)
 	mOut._44 = 1.0f;
 }
 
+inline CLASS_ID _clsObject::getClassID() const	{ return ClassID; }
+inline size_t	_clsObject::getID()		 const	{ return ID; }
+
 inline VECTOR3D _clsObject::getForwardLookDirection()	{ return fWd; }
-inline VECTOR3D _clsObject::getRightLookDirection()	{ return rWd; }
+inline VECTOR3D _clsObject::getRightLookDirection()		{ return rWd; }
 inline VECTOR3D _clsObject::getUpLookDirection()		{ return uWd; }
 inline VECTOR3D _clsObject::getRotation()				{ return world; }
 inline VECTOR3D _clsObject::getScale()					{ return worldScale; }

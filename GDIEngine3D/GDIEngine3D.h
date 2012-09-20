@@ -7,12 +7,8 @@
 
 #ifdef GDIENGINE3D_EXPORTS
 #define GDIENGINE3D_USERAPI __declspec(dllexport)
-
-#include "SharedDef.h"
 #else
 #define GDIENGINE3D_USERAPI __declspec(dllimport)
-
-#include <SharedDef.h>
 #endif
 
 typedef HANDLE HGDIENGINE3DOBJ;
@@ -26,6 +22,7 @@ DECLARE_HANDLE(HRENDERPOOL);
 DECLARE_HANDLE(HCAMERA);
 DECLARE_HANDLE(HOBJECT3D);
 
+#include "SharedDef.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,6 +71,8 @@ GDIENGINE3D_USERAPI
 GDIENGINE3D_USERAPI
 	UINT_PTR WINAPI RenderPoolViewportGetCount(HRENDERPOOL hRenderPool);
 
+GDIENGINE3D_USERAPI
+	DWORD WINAPI RenderPoolRenderWorld(HRENDERPOOL hRenderPool);
 
 // ============================================================================
 // CViewport library interface implementation

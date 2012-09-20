@@ -60,17 +60,6 @@ typedef struct _tagPoly3D {
 } POLY3D, *LPPOLY3D;
 typedef vector<POLY3D> POLY_LIST, *LPPOLY_LIST;
 
-typedef struct _tagColor3D
-{
-	unsigned char Red;
-	unsigned char Green;
-	unsigned char Blue;
-	_tagColor3D(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0);
-
-	bool operator==(const float &b) const;
-	bool operator!=(const float &b) const;
-} COLOR3D, *LPCOLOR3D;
-
 class IColorable
 {
 protected:
@@ -102,7 +91,7 @@ enum CLASS_ID {
 };
 
 enum CONSTRAINTS {
-	CNST_OBJECT_FREE,
+	CNST_OBJECT_FREE	,
 	CNST_OBJECT_XY_PLANE,	
 	CNST_OBJECT_ZX_PLANE,
 	CNST_OBJECT_ZY_PLANE
@@ -113,7 +102,7 @@ private:
 	CLASS_ID		ClassID;
 	size_t			ID;
 
-	static size_t	Counter;
+	static size_t Counter;
 
 	static void InitDefaultValues(_clsObject *obj);
 
@@ -139,23 +128,7 @@ protected:
 
 public:
 	_clsObject(CLASS_ID getClassID = CLS_OBJECT);
-	_clsObject(const VECTOR3D	&pt, 
-		float		p, 
-		float		y, 
-		float		r, 
-		CLASS_ID	getClassID = CLS_OBJECT
-	);
-	_clsObject(float pX, 
-		float pY, 
-		float pZ, 
-		float p,
-		float y,
-		float r, 
-		CLASS_ID getClassID = CLS_OBJECT
-	);
 	virtual ~_clsObject();
-	CLASS_ID getClassID();
-	size_t	 getID();
 
 	// Positioning
 	void MoveAlong(float units);		// Along local-x
@@ -212,6 +185,9 @@ public:
 	void GetLocalScaleMatrix(MATRIX3D &mOut);
 	void GetScaleMatrix(MATRIX3D &mOut);
 	void GetRotationMatrix(MATRIX3D &mOut);
+
+	CLASS_ID getClassID()	const;
+	size_t	 getID()		const;
 
 	VECTOR3D getForwardLookDirection();
 	VECTOR3D getRightLookDirection();
