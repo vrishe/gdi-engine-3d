@@ -416,9 +416,9 @@ BOOL CViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) co
 //}
 
 // ============================================================================
-// ÑRenderPool class partial implementation:
+// CRenderPool class partial implementation:
 
-DWORD WINAPI ÑRenderPool::Render(LPVOID renderInfo)
+DWORD WINAPI CRenderPool::Render(LPVOID renderInfo)
 {
 	LPTHREAD_DATA	vp = (LPTHREAD_DATA)renderInfo;
 
@@ -446,7 +446,7 @@ DWORD WINAPI ÑRenderPool::Render(LPVOID renderInfo)
 	{
 		clock_t	time = clock();
 
-		vp->lpViewport->Render(vp->lpScene, vp->lpCamera, vp->hDCScreen);
+		vp->lpViewport->Render(*(vp->lppScene), vp->lpCamera, vp->hDCScreen);
 		if ( vp->bIsActive ) 
 		{
 			SIZE szVp;
@@ -482,13 +482,14 @@ DWORD WINAPI ÑRenderPool::Render(LPVOID renderInfo)
 	return SHUTDOWN_ON_DEMAND;
 }
 
-ÑRenderPool::ÑRenderPool() : evTrigger(NULL) { }
-ÑRenderPool::~ÑRenderPool() 
+CRenderPool::CRenderPool() : evTrigger(NULL) { }
+CRenderPool::CRenderPool(LPSCENE3D lpScene) : evTrigger(NULL) { setRenderScene(lpScene); }
+CRenderPool::~CRenderPool() 
 { 
 	for (size_t i = 0, max = tdlViewports.size(); i < max; i++) delViewport(i);
 }
 
-DWORD ÑRenderPool::addViewport(
+DWORD CRenderPool::addViewport(
 	LPVIEWPORT	lpViewport,
 	LPCAMERA3D	lpCamera, 
 	HDC			hDCScreen
@@ -504,7 +505,7 @@ DWORD ÑRenderPool::addViewport(
 
 			thData->lpViewport	= lpViewport;
 			thData->bIsActive	= FALSE;
-			thData->lpScene		= NULL;
+			thData->lppScene	= &lpScene;
 			thData->lpCamera	= lpCamera;
 			thData->hDCScreen	= hDCScreen;
 
@@ -534,7 +535,7 @@ DWORD ÑRenderPool::addViewport(
 	return dwResultID;
 }
 
-BOOL ÑRenderPool::delViewport(size_t uVpIndex)
+BOOL CRenderPool::delViewport(size_t uVpIndex)
 {
 	if ( uVpIndex >= tdlViewports.size() ) return FALSE;
 	
@@ -562,7 +563,7 @@ BOOL ÑRenderPool::delViewport(size_t uVpIndex)
 	return TRUE;
 }
 
-HDC ÑRenderPool::setViewportScreen(size_t uVpIndex, HDC hDCScreen)
+HDC CRenderPool::setViewportScreen(size_t uVpIndex, HDC hDCScreen)
 {
 	if (uVpIndex < tdlViewports.size())
 	{
@@ -571,18 +572,4 @@ HDC ÑRenderPool::setViewportScreen(size_t uVpIndex, HDC hDCScreen)
 		return hDCScreenLast;
 	}
 	return NULL;
-}
-
-DWORD ÑRenderPool::RenderWorld(LPSCENE3D lpScene) const 
-{
-	if (lpScene != NULL)
-	{
-		__foreach(THREAD_DATA_LIST::const_iterator, entry, tdlViewports)
-		{
-			(*entry)->lpScene = lpScene;
-		}
-	}
-
-	SetEvent(evTrigger);
-	return WaitForMultipleObjects(DWORD(evlStates.size()), evlStates.data(), TRUE, THREAD_WAIT_TIMEOUT);
 }

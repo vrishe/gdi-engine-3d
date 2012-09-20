@@ -82,7 +82,7 @@ typedef struct tagTHREAD_DATA {
 	LPVIEWPORT		lpViewport;
 	BOOL			bIsActive;
 
-	LPSCENE3D		lpScene;
+	LPSCENE3D		*lppScene;
 	LPCAMERA3D		lpCamera;
 	HDC				hDCScreen;
 
@@ -93,17 +93,20 @@ typedef struct tagTHREAD_DATA {
 typedef vector<LPTHREAD_DATA>	THREAD_DATA_LIST;
 typedef vector<EVENT>			EVENT_LIST;
 
-class ÑRenderPool : public IUnknown {
+class CRenderPool : public IUnknown {
 private:
 	THREAD_DATA_LIST	tdlViewports;
 	EVENT_LIST			evlStates;
 	EVENT				evTrigger;
 
+	LPSCENE3D			lpScene;
+
 	static DWORD WINAPI Render(LPVOID renderInfo);
 
 public:
-	ÑRenderPool();
-	~ÑRenderPool();
+	CRenderPool();
+	CRenderPool(LPSCENE3D lpScene);
+	~CRenderPool();
 
 	DWORD addViewport(
 		LPVIEWPORT	lpViewport,
@@ -113,6 +116,8 @@ public:
 	BOOL delViewport(DWORD dwVpID);
 	BOOL delViewport(size_t uVpIndex);
 
+	LPSCENE3D getRenderScene() const;
+	
 	LPVIEWPORT getViewport(DWORD dwVpID)	const;
 	LPVIEWPORT getViewport(size_t uVpIndex)	const;
 
@@ -124,14 +129,16 @@ public:
 	size_t getActiveViewportIndex() const;
 	DWORD  getActiveViewportID()	const;
 
+	VOID setRenderScene(LPSCENE3D lpScene);
+
 	VOID setActiveViewport(size_t uVpIndex);
 	VOID setActiveViewport(DWORD dwVpID);
 
 	HDC setViewportScreen(size_t uVpIndex, HDC hDCScreen);
 	HDC setViewportScreen(DWORD dwVpID, HDC hDCScreen);
 
-	DWORD RenderWorld(LPSCENE3D lpScene) const;
+	DWORD RenderWorld() const;
 };
-typedef ÑRenderPool RENDER_POOL, *LPRENDER_POOL;
+typedef CRenderPool RENDER_POOL, *LPRENDER_POOL;
 
 #include "Render.inl"

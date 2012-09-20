@@ -39,14 +39,16 @@ inline VOID CViewport::setSize(const SIZE &szVp)
 
 
 // ============================================================================
-// ÑRenderPool class partial implementation:
+// CRenderPool class partial implementation:
 
-inline BOOL ÑRenderPool::delViewport(DWORD dwVpID)
+inline BOOL CRenderPool::delViewport(DWORD dwVpID)
 {
 	return delViewport(getViewportIndex(dwVpID));
 }
 
-inline LPVIEWPORT ÑRenderPool::getViewport(DWORD dwVpID) const
+inline LPSCENE3D CRenderPool::getRenderScene() const { return lpScene; }
+
+inline LPVIEWPORT CRenderPool::getViewport(DWORD dwVpID) const
 {
 	size_t uVpIndex;
 	if ((uVpIndex = getViewportIndex(dwVpID)) != SIZE_MAX)
@@ -55,7 +57,7 @@ inline LPVIEWPORT ÑRenderPool::getViewport(DWORD dwVpID) const
 	return NULL;
 }
 
-inline LPVIEWPORT ÑRenderPool::getViewport(size_t uVpIndex) const
+inline LPVIEWPORT CRenderPool::getViewport(size_t uVpIndex) const
 {
 	if (uVpIndex < tdlViewports.size())
 		return tdlViewports[uVpIndex]->lpViewport;
@@ -63,9 +65,9 @@ inline LPVIEWPORT ÑRenderPool::getViewport(size_t uVpIndex) const
 	return NULL;
 }
 
-inline size_t ÑRenderPool::getViewportCount() const { return tdlViewports.size(); }
+inline size_t CRenderPool::getViewportCount() const { return tdlViewports.size(); }
 
-inline size_t ÑRenderPool::getViewportIndex(DWORD dwVpID) const
+inline size_t CRenderPool::getViewportIndex(DWORD dwVpID) const
 {
 	for(size_t i = 0, max = tdlViewports.size(); i < max; i++)
 		if ( GetThreadId(tdlViewports[i]->hThread) == dwVpID ) return i;
@@ -73,7 +75,7 @@ inline size_t ÑRenderPool::getViewportIndex(DWORD dwVpID) const
 	return SIZE_MAX;
 }
 
-inline DWORD ÑRenderPool::getViewportID(size_t uVpIndex) const
+inline DWORD CRenderPool::getViewportID(size_t uVpIndex) const
 {
 	if (uVpIndex < tdlViewports.size())
 		return GetThreadId(tdlViewports[uVpIndex]->hThread);
@@ -81,7 +83,7 @@ inline DWORD ÑRenderPool::getViewportID(size_t uVpIndex) const
 	return ((DWORD)0U);
 }
 
-inline size_t ÑRenderPool::getActiveViewportIndex() const
+inline size_t CRenderPool::getActiveViewportIndex() const
 {
 	for(size_t i = 0, max = tdlViewports.size(); i < max; i++)
 		if ( tdlViewports[i]->bIsActive ) return i;
@@ -89,12 +91,17 @@ inline size_t ÑRenderPool::getActiveViewportIndex() const
 	return SIZE_MAX;
 }
 
-inline DWORD ÑRenderPool::getActiveViewportID() const
+inline DWORD CRenderPool::getActiveViewportID() const
 {
 	return getViewportID(getActiveViewportIndex());
 }
 
-inline VOID ÑRenderPool::setActiveViewport(size_t uVpIndex)
+inline VOID CRenderPool::setRenderScene(LPSCENE3D lpScene)
+{
+	this->lpScene = lpScene;
+}
+
+inline VOID CRenderPool::setActiveViewport(size_t uVpIndex)
 {
 	__foreach(THREAD_DATA_LIST::const_iterator, entry, tdlViewports)
 	{
@@ -104,13 +111,19 @@ inline VOID ÑRenderPool::setActiveViewport(size_t uVpIndex)
 	if (uVpIndex < tdlViewports.size()) tdlViewports[uVpIndex]->bIsActive = TRUE;
 }
 
-inline VOID ÑRenderPool::setActiveViewport(DWORD dwVpID)
+inline VOID CRenderPool::setActiveViewport(DWORD dwVpID)
 {
 	setActiveViewport(getViewportIndex(dwVpID));
 }
 
-inline HDC ÑRenderPool::setViewportScreen(DWORD dwVpID, HDC hDCScreen)
+inline HDC CRenderPool::setViewportScreen(DWORD dwVpID, HDC hDCScreen)
 {
 	return setViewportScreen(getViewportIndex(dwVpID), hDCScreen);
+}
+
+inline DWORD CRenderPool::RenderWorld() const 
+{
+	SetEvent(evTrigger);
+	return WaitForMultipleObjects(DWORD(evlStates.size()), evlStates.data(), TRUE, THREAD_WAIT_TIMEOUT);
 }
 
