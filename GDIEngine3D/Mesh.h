@@ -7,9 +7,12 @@
 // CMesh class represents some body model inside of a 3D scene
 // Obviously it consist of: vertices, edges and polygons
 
+typedef size_t MESH_ID;
+#define MSH_UNDEFINED	0x00
+
 class CMesh : public CObject, public IColorable {
 private:
-	size_t			_mTypeID;
+	MESH_ID			_mTypeID;
 
 protected:
 	VERT_LIST		vertices;	// list of vertexes
@@ -25,20 +28,20 @@ protected:
 	size_t findPolygon(const POLY3D &p);	// returns a Polygon_ position
 
 public:
-	CMesh(size_t meshTypeId);
-	CMesh(COLORREF c, size_t meshTypeId);
+	CMesh(MESH_ID meshTypeId);
+	CMesh(COLORREF c, MESH_ID meshTypeId);
 	CMesh(const VECTOR3D &pt,
 		float p, 
 		float y, 
 		float r, 
-		size_t meshTypeId
+		MESH_ID meshTypeId
 		);
 	CMesh(const VECTOR3D &pt,
 		float p, 
 		float y, 
 		float r, 
 		COLORREF c,
-		size_t meshTypeId
+		MESH_ID meshTypeId
 		);
 	CMesh(float	pX, 
 		float pY, 
@@ -46,7 +49,7 @@ public:
 		float p, 
 		float y, 
 		float r, 
-		size_t meshTypeId
+		MESH_ID meshTypeId
 		);
 	CMesh(float	pX, 
 		float pY, 
@@ -55,11 +58,11 @@ public:
 		float y, 
 		float r, 
 		COLORREF c,
-		size_t meshTypeId
+		MESH_ID meshTypeId
 		);
 
 	// getters
-	size_t			getMeshID();
+	MESH_ID			getMeshID();
 	size_t			getVerticesCount();
 	size_t			getEdgesCount();
 	size_t			getPolygonsCount();
@@ -76,7 +79,7 @@ public:
 	void			getBuffers(LPVERT_LIST vs, LPEDGE_LIST es, LPPOLY_LIST ps);
 	void			getVerticesTransformed(LPVECTOR3D v);
 
-	void			setMeshID(size_t);
+	void			setMeshID(MESH_ID);
 
 	void			addVertices(const LPVECTOR3D vs, UINT vsCount);
 	bool			delVertices();

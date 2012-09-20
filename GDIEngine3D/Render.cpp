@@ -7,19 +7,17 @@
 
 CViewport::CViewport() 
 {
-	SIZE szVp = {1, 1};
-	InitValues(this, szVp, RM_WIREFRAME);
+	InitValues(this, 1, 1, RM_WIREFRAME);
 }
 
-CViewport::CViewport(UINT uVpWidth, UINT uVpHeight, RENDER_MODE rMode)
+CViewport::CViewport(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode)
 {
-	SIZE szVp = {uVpWidth, uVpHeight};
-	InitValues(this, szVp, rMode);
+	InitValues(this, uVpWidth, uVpHeight, rMode);
 }
 
 CViewport::CViewport(const SIZE &szVp, RENDER_MODE rMode)
 {
-	InitValues(this, szVp, rMode);
+	InitValues(this, szVp.cx, szVp.cy, rMode);
 }
 
 CViewport::~CViewport() 
@@ -29,17 +27,17 @@ CViewport::~CViewport()
 	DeleteDC(hDCOutput);
 }
 
-VOID CViewport::setSize(const SIZE &szVp)
+VOID CViewport::setSize(LONG uVpWidth, LONG uVpHeight)
 {
-	if ((szVp.cx > 0 && szVp.cy > 0) && szVp.cx != getWidth() || szVp.cy != getHeight())
+	if ((uVpWidth > 0 && uVpHeight > 0) && uVpWidth != getWidth() || uVpHeight != getHeight())
 	{
 		HDC hDCScr = GetDC(NULL);
-		HBITMAP hBmpNew = CreateCompatibleBitmap(hDCScr, szVp.cx, szVp.cy);
+		HBITMAP hBmpNew = CreateCompatibleBitmap(hDCScr, uVpWidth, uVpHeight);
 		
 		if (hBmpNew == NULL)
 		{
 			HDC hDCNew = CreateCompatibleDC(hDCScr);
-			hBmpNew = CreateCompatibleBitmap(hDCScr, szVp.cx, szVp.cy);
+			hBmpNew = CreateCompatibleBitmap(hDCScr, uVpWidth, uVpHeight);
 			if (hBmpNew != NULL) 
 			{
 				SelectObject(hDCOutput, hBmpDefault);
@@ -485,25 +483,26 @@ DWORD WINAPI ÑRenderPool::Render(LPVOID renderInfo)
 }
 
 ÑRenderPool::ÑRenderPool() : evTrigger(NULL) { }
-ÑRenderPool::~ÑRenderPool() { }
+ÑRenderPool::~ÑRenderPool() 
+{ 
+	for (size_t i = 0, max = tdlViewports.size(); i < max; i++) delViewport(i);
+}
 
 DWORD ÑRenderPool::addViewport(
+	LPVIEWPORT	lpViewport,
 	LPCAMERA3D	lpCamera, 
-	HDC			hDCScreen,		
-	UINT		uVpWidth,	
-	UINT		uVpHeight,
-	RENDER_MODE rMode
+	HDC			hDCScreen
 ) {
 	DWORD dwResultID = ((DWORD)0U);
 	
-	if (lpCamera != NULL && hDCScreen != NULL)
+	if (lpViewport != NULL && lpCamera != NULL && hDCScreen != NULL)
 	{
 		LPTHREAD_DATA thData = NULL;
 		try
 		{
 			FillMemory(thData = new THREAD_DATA(), sizeof(THREAD_DATA), NULL);
 
-			thData->lpViewport	= new VIEWPORT(uVpWidth, uVpHeight, rMode);
+			thData->lpViewport	= lpViewport;
 			thData->bIsActive	= FALSE;
 			thData->lpScene		= NULL;
 			thData->lpCamera	= lpCamera;
@@ -540,7 +539,10 @@ BOOL ÑRenderPool::delViewport(size_t uVpIndex)
 	if ( uVpIndex >= tdlViewports.size() ) return FALSE;
 	
 	SetEvent(tdlViewports[uVpIndex]->tcEvents.shutDown);
-	WaitForSingleObject(tdlViewports[uVpIndex]->hThread, THREAD_WAIT_TIMEOUT);
+	if (WaitForSingleObject(tdlViewports[uVpIndex]->hThread, THREAD_WAIT_TIMEOUT) == WAIT_TIMEOUT)
+	{
+		TerminateThread(tdlViewports[uVpIndex]->hThread, SHUTDOWN_ON_TERMINATE);
+	}
 
 	CloseHandle(tdlViewports[uVpIndex]->hThread);
 	CloseHandle(tdlViewports[uVpIndex]->tcEvents.shutDown);
@@ -558,6 +560,17 @@ BOOL ÑRenderPool::delViewport(size_t uVpIndex)
 	}
 		
 	return TRUE;
+}
+
+HDC ÑRenderPool::setViewportScreen(size_t uVpIndex, HDC hDCScreen)
+{
+	if (uVpIndex < tdlViewports.size())
+	{
+		HDC hDCScreenLast = tdlViewports[uVpIndex]->hDCScreen;
+		tdlViewports[uVpIndex]->hDCScreen = hDCScreen;
+		return hDCScreenLast;
+	}
+	return NULL;
 }
 
 DWORD ÑRenderPool::RenderWorld(LPSCENE3D lpScene) const 

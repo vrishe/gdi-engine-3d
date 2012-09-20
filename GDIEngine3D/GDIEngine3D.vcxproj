@@ -176,6 +176,7 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Primitives.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SharedDef.h" />
@@ -203,6 +204,7 @@
     <ClCompile Include="GDIEngine3D.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Primitives.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="stdafx.cpp">

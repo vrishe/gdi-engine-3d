@@ -231,13 +231,19 @@ void CObject::LocalRotate(float roll, float yaw, float pitch)
 	Vector3DNormalize(uWd, uWd);
 }
 
-void CObject::Rotate(float y, float z, float x)
+void CObject::Rotate(float x, float y, float z)
 {
 	MATRIX3D M;
 
 	world.x = x;
 	world.y = y;
 	world.z = z;
+
+	Matrix3DRotateAxis(VECTOR3D(1.0f, .0f, .0f), world.x, M);
+	Matrix3DTransformNormal(M, fWd, fWd);
+	Matrix3DTransformNormal(M, rWd, rWd);
+	Matrix3DTransformNormal(M, uWd, uWd);
+	Matrix3DTransformCoord(M, pos, pos);
 
 	Matrix3DRotateAxis(VECTOR3D(.0f, 1.0f, .0f), world.y, M);
 	Matrix3DTransformNormal(M, fWd, fWd);
@@ -246,12 +252,6 @@ void CObject::Rotate(float y, float z, float x)
 	Matrix3DTransformCoord(M, pos, pos);
 
 	Matrix3DRotateAxis(VECTOR3D(.0f, .0f, 1.0f), world.z, M);
-	Matrix3DTransformNormal(M, fWd, fWd);
-	Matrix3DTransformNormal(M, rWd, rWd);
-	Matrix3DTransformNormal(M, uWd, uWd);
-	Matrix3DTransformCoord(M, pos, pos);
-
-	Matrix3DRotateAxis(VECTOR3D(1.0f, .0f, .0f), world.x, M);
 	Matrix3DTransformNormal(M, fWd, fWd);
 	Matrix3DTransformNormal(M, rWd, rWd);
 	Matrix3DTransformNormal(M, uWd, uWd);

@@ -5,17 +5,17 @@
 // ============================================================================
 // Partial implementation of CMesh class:
 
-CMesh::CMesh(size_t meshTypeId) 
+CMesh::CMesh(MESH_ID meshTypeId) 
 	: CObject(CLS_MESH), IColorable() { setMeshID(meshTypeId); }
 
-CMesh::CMesh(COLORREF c, size_t meshTypeId) 
+CMesh::CMesh(COLORREF c, MESH_ID meshTypeId) 
 	: CObject(CLS_MESH), IColorable(c) { setMeshID(meshTypeId); }
 
 CMesh::CMesh(const VECTOR3D &pt,
 		float p, 
 		float y, 
 		float r,
-		size_t meshTypeId
+		MESH_ID meshTypeId
 		) : CObject(pt, p, y, r, CLS_MESH), IColorable() { }
 
 CMesh::CMesh(const VECTOR3D &pt,
@@ -23,7 +23,7 @@ CMesh::CMesh(const VECTOR3D &pt,
 		float y, 
 		float r, 
 		COLORREF c,
-		size_t meshTypeId
+		MESH_ID meshTypeId
 		) : CObject(pt, p, y, r, CLS_MESH), IColorable(c) { }
 
 CMesh::CMesh(float pX, 
@@ -32,7 +32,7 @@ CMesh::CMesh(float pX,
 		float p, 
 		float y, 
 		float r, 
-		size_t meshTypeId
+		MESH_ID meshTypeId
 		) : CObject(pX, pY, pZ, p, y, r, CLS_MESH), IColorable() { }
 
 CMesh::CMesh(float pX, 
@@ -42,7 +42,7 @@ CMesh::CMesh(float pX,
 		float y, 
 		float r, 
 		COLORREF c,
-		size_t meshTypeId
+		MESH_ID meshTypeId
 		) : CObject(pX, pY, pZ, p, y, r, CLS_MESH), IColorable(c) { }
 
 void CMesh::flushVertices()
