@@ -10,9 +10,9 @@
 
 
 // ============================================================================
-// CPyramid class declaration
+// _clsPyramid class declaration
 
-class CPyramid : public CMesh {
+typedef class _clsPyramid : public MESH3D {
 protected:
 	float h;		// height
 	float bL;		// base length
@@ -22,8 +22,8 @@ protected:
 	float shift;    // get your head out by OX
 
 public:
-	CPyramid(COLORREF c);
-	CPyramid(
+	_clsPyramid(COLORREF c);
+	_clsPyramid(
 		float height, 
 		float bLength, 
 		float bWidth, 
@@ -49,14 +49,13 @@ public:
 	void setBWidth(float n);
 	void setTLength(float n);
 	void setTWidth(float n);
-};
-typedef CPyramid PYRAMID3D, *LPPYRAMID3D;
+} PYRAMID3D, *LPPYRAMID3D;
 
 
 // ============================================================================
-// CCone class declaration
+// _clsCone class declaration
 
-class CCone : public CMesh {
+typedef class _clsCone : public MESH3D {
 protected:
 	float h;			// cone height
 	float bR;			// base radius
@@ -64,8 +63,8 @@ protected:
 	int precision;	// precision of circle approximation in polygons
 
 public:
-	CCone(COLORREF c);
-	CCone(
+	_clsCone(COLORREF c);
+	_clsCone(
 		float		height, 
 		float		bRadius, 
 		float		tRadius, 
@@ -88,27 +87,26 @@ public:
 	void setBRadius(float);
 	void setTRadius(float);
 	void setPrecission(int);
-};
-typedef CCone CONE3D, *LPCONE3D;
+} CONE3D, *LPCONE3D;
 
 
 // ============================================================================
 // CExCone class declaration
 
-class CExCone : public CCone {
-	/// конус, отсеченный плоскостью, паралельной OXZ и пересекающей OY в т. (0, secant, 0)
-	/// должно выполнятся неравенство -min(bR,tR) <= secant <= max(bR, tR),
+typedef class CExCone : public CONE3D {
+	/// конус, отсеченный плоскостью, параллельной OXZ и пересекающей OY в т. (0, secant, 0)
+	/// должно выполняться неравенство: -min(bR,tR) <= secant <= max(bR, tR),
 	/// иначе фигура неопределена
 	float secant;
 
 public:
 	CExCone(COLORREF c);
 	CExCone(
-		float height, 
-		float bRadius, 
-		float tRadius,
-		float s,
-		int	  prec,
+		float		height, 
+		float		bRadius, 
+		float		tRadius,
+		float		s,
+		int			prec,
 		COLORREF	c
 	);
 
@@ -120,14 +118,13 @@ public:
 
 	// setters
 	void setSecant(float); 
-};
-typedef CExCone EXCONE3D, *LPEXCONE3D;
+} EXCONE3D, *LPEXCONE3D;
 
 
 // ============================================================================
-// CHole class declaration
+// _clsPipe class declaration
 
-class CHole : public CMesh {
+typedef class _clsPipe : public MESH3D {
 protected:
 	float h;			// cone height
 	float bR;			// base radius
@@ -137,8 +134,8 @@ protected:
 	int precision;	// precision of circle approximation in polygons
 
 public:
-	CHole(COLORREF c);
-	CHole(
+	_clsPipe(COLORREF c);
+	_clsPipe(
 		float height, 
 		float bRadius, 
 		float bHoleRadius,
@@ -166,14 +163,13 @@ public:
 	void setBHoleRadius(float);
 	void setTHoleRadius(float);
 	void setPrecission(int);
-};
-typedef CHole HOLE3D, *LPHOLE3D;
+} PIPE3D, *LPPIPE3D;
 
 
 // ============================================================================
-// CSphere class declaration
+// _clsSphere class declaration
 
-class CSphere : public CMesh {
+typedef class _clsSphere : public MESH3D {
 protected:
 	float			radius;
 	float			cropMult;
@@ -183,8 +179,8 @@ protected:
 
 	void			Triangulate();
 public:
-	CSphere(COLORREF c);
-	CSphere(
+	_clsSphere(COLORREF c);
+	_clsSphere(
 		float			Radius,
 		float			Crop,
 		float			From,
@@ -200,5 +196,4 @@ public:
 	float	getRadius();
 	float	getCrop();
 	int		getPrecision();
-};
-typedef CSphere SPHERE3D, *LPSPHERE3D;
+} SPHERE3D, *LPSPHERE3D;

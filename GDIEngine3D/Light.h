@@ -6,21 +6,20 @@
 #define DARK_SIDE 0.1
 
 // ============================================================================
-// CLight class
+// _clsOmniLight class
 
-class CLight : public CObject, public IColorable {
+typedef class _clsOmniLight : public OBJECT3D, public IColorable {
 private:
 	float		power;
 
-	static void InitDefaultValues(CLight *obj);
+	static void InitDefaultValues(_clsOmniLight *obj);
 
 public:
-	CLight();
-	CLight(COLORREF c, float p);
+	_clsOmniLight();
+	_clsOmniLight(COLORREF c, float p);
 
 	virtual float getPower();
 	void setPower(float);
-};
-typedef CLight DIFLIGHT3D, *LPDIFLIGHT3D;
+} OMNILIGHT3D, *LPOMNILIGHT3D;
 
 #include "Light.inl"

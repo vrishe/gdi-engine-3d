@@ -491,11 +491,11 @@ SCENE_OBJECT WINAPI SceneSphereCreate(HSCENE hScene, FLOAT Radius, UINT Precisio
 
 	if (isValid)
 	{
-		LPSPHERE3D lpSphere = new SPHERE3D(Radius, 0, 0, 2.0F * M_PI, Precision, RGB(255, 255, 255));
+		LPSPHERE3D lpSphere = new SPHERE3D(Radius, 0, 0, float(2 * M_PI), Precision, RGB(255, 255, 255));
 		if (((LPSCENE3D)Master)->AddObject(lpSphere))
 		{
 			size_t uSphereIndex = ((LPSCENE3D)Master)->findObjectIndex(lpSphere);
-			scoResult = _MAKE_SCENE_OBJECT(lpSphere->clsID(), uSphereIndex);
+			scoResult = _MAKE_SCENE_OBJECT(lpSphere->getClassID(), uSphereIndex);
 		}
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);

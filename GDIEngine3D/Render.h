@@ -12,10 +12,10 @@ typedef vector <pair<DIRECTPOLY3D, UINT>> SCENEPOLY;
 typedef vector <VECTOR3D> SCENEVERT;
 
 // ============================================================================
-// CViewport provides an interface for picture plane that recieves 2D projection 
+// _clsViewport provides an interface for picture plane that recieves 2D projection 
 // of a 3D space through camera's eye.
 
-class CViewport : public IUnknown {
+typedef class _clsViewport : public IUnknown {
 private:
 	HDC				hDCOutput;
 	HBITMAP			hBmpOutput;
@@ -23,13 +23,13 @@ private:
 
 	RENDER_MODE		rMode;
 
-	static void InitValues(CViewport *obj, LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
+	static void InitValues(_clsViewport *obj, LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
 
 public:
-	CViewport();
-	CViewport(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
-	CViewport(const SIZE &szVp, RENDER_MODE rMode);
-	~CViewport();
+	_clsViewport();
+	_clsViewport(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
+	_clsViewport(const SIZE &szVp, RENDER_MODE rMode);
+	~_clsViewport();
 	
 	RENDER_MODE	getRenderMode()								const;
 	LONG		getWidth()									const;
@@ -44,13 +44,12 @@ public:
 	VOID		setSize(const SIZE &szVp);
 
 	BOOL Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const;
-};
-typedef CViewport VIEWPORT, *LPVIEWPORT;
+} VIEWPORT, *LPVIEWPORT;
 
 VOID SetViewportDefaultView(LPVIEWPORT vp, VIEW_TYPE vt);
 
 // ============================================================================
-// CRenderPool provides centralized viewport-n-rendering management. That means 
+// _clsRenderPool provides centralized viewport-n-rendering management. That means 
 // it controls multithreaded rendering process which is implemented in
 // barrier computtation manner
 
@@ -93,7 +92,7 @@ typedef struct tagTHREAD_DATA {
 typedef vector<LPTHREAD_DATA>	THREAD_DATA_LIST;
 typedef vector<EVENT>			EVENT_LIST;
 
-class CRenderPool : public IUnknown {
+typedef class _clsRenderPool : public IUnknown {
 private:
 	THREAD_DATA_LIST	tdlViewports;
 	EVENT_LIST			evlStates;
@@ -104,9 +103,9 @@ private:
 	static DWORD WINAPI Render(LPVOID renderInfo);
 
 public:
-	CRenderPool();
-	CRenderPool(LPSCENE3D lpScene);
-	~CRenderPool();
+	_clsRenderPool();
+	_clsRenderPool(LPSCENE3D lpScene);
+	~_clsRenderPool();
 
 	DWORD addViewport(
 		LPVIEWPORT	lpViewport,
@@ -138,7 +137,6 @@ public:
 	HDC setViewportScreen(DWORD dwVpID, HDC hDCScreen);
 
 	DWORD RenderWorld() const;
-};
-typedef CRenderPool RENDER_POOL, *LPRENDER_POOL;
+} RENDER_POOL, *LPRENDER_POOL;
 
 #include "Render.inl"

@@ -4,9 +4,9 @@
 #include "Primitives.h"
 
 // ============================================================================
-// CPyramid class implementation
+// _clsPyramid class implementation
 
-void CPyramid::Triangulate() {
+void _clsPyramid::Triangulate() {
 	vertices.clear();
 	edges.clear();
 	polygons.clear();
@@ -67,10 +67,10 @@ void CPyramid::Triangulate() {
 	polygons.shrink_to_fit();
 }
 
-CPyramid::CPyramid(COLORREF c) 
-	: CMesh(c, MSH_PYRAMID), h(0), bL(0), bW(0), tL(0), tW(0), shift(0) { }
+_clsPyramid::_clsPyramid(COLORREF c) 
+	: MESH3D(c, MSH_PYRAMID), h(0), bL(0), bW(0), tL(0), tW(0), shift(0) { }
 
-CPyramid::CPyramid(
+_clsPyramid::_clsPyramid(
 		float		height, 
 		float		bLength, 
 		float		bWidth, 
@@ -78,7 +78,7 @@ CPyramid::CPyramid(
 		float		tWidth,
 		COLORREF	c,
 		float		sh
-) : CMesh(c, MSH_PYRAMID)
+) : MESH3D(c, MSH_PYRAMID)
 { 
 	h  = height;
 	bL = bLength;
@@ -89,20 +89,20 @@ CPyramid::CPyramid(
 	Triangulate();
 }
 
-float CPyramid::getHeight() { return h; }
-float CPyramid::getBLength() { return bL; }
-float CPyramid::getBWidth() { return bW; }
-float CPyramid::getTLength() {return tL; }
-float CPyramid::getTWidth() {return tW; }
+float _clsPyramid::getHeight() { return h; }
+float _clsPyramid::getBLength() { return bL; }
+float _clsPyramid::getBWidth() { return bW; }
+float _clsPyramid::getTLength() {return tL; }
+float _clsPyramid::getTWidth() {return tW; }
 
-void CPyramid::setHeight(float n) { h = n; }
-void CPyramid::setBLength(float n) { bL = n; }
-void CPyramid::setBWidth(float n) { bW = n; }
-void CPyramid::setTLength(float n) { tL = n; }
-void CPyramid::setTWidth(float n) {tW = n; }
+void _clsPyramid::setHeight(float n) { h = n; }
+void _clsPyramid::setBLength(float n) { bL = n; }
+void _clsPyramid::setBWidth(float n) { bW = n; }
+void _clsPyramid::setTLength(float n) { tL = n; }
+void _clsPyramid::setTWidth(float n) {tW = n; }
 
 
-void CCone::Triangulate() {
+void _clsCone::Triangulate() {
 	vertices.clear();
 	edges.clear();
 	polygons.clear();
@@ -192,7 +192,7 @@ void CCone::Triangulate() {
 
 
 // ============================================================================
-// CCone class implementation
+// _clsCone class implementation
 
 void CExCone::Triangulate() {
 	vertices.clear();
@@ -401,16 +401,16 @@ void CExCone::Triangulate() {
 	polygons.shrink_to_fit();
 }
 
-CCone::CCone(COLORREF c) 
-	: CMesh(c, MSH_CONE), h(0), bR(0), tR(0), precision(24) { }
+_clsCone::_clsCone(COLORREF c) 
+	: MESH3D(c, MSH_CONE), h(0), bR(0), tR(0), precision(24) { }
 
-CCone::CCone(
+_clsCone::_clsCone(
 		float		height, 
 		float		bRadius, 
 		float		tRadius, 
 		int			prec,
 		COLORREF	c
-) : CMesh(c, MSH_CONE)
+) : MESH3D(c, MSH_CONE)
 { 
 	h			= height;
 	bR			= bRadius;
@@ -419,21 +419,21 @@ CCone::CCone(
 	Triangulate();
 }
 
-float CCone::getHeight()	{ return h; }
-float CCone::getBRadius()	{ return bR; }
-float CCone::getTRadius()	{ return tR; }
-int CCone::getPrecision()	{ return precision; }
+float _clsCone::getHeight()	{ return h; }
+float _clsCone::getBRadius()	{ return bR; }
+float _clsCone::getTRadius()	{ return tR; }
+int _clsCone::getPrecision()	{ return precision; }
 
-void CCone::setHeight(float n)		{ h = n; } 
-void CCone::setBRadius(float n)		{ bR = n; }
-void CCone::setTRadius(float n)		{ tR = n; }
-void CCone::setPrecission(int n)	{ precision = n; }
+void _clsCone::setHeight(float n)		{ h = n; } 
+void _clsCone::setBRadius(float n)		{ bR = n; }
+void _clsCone::setTRadius(float n)		{ tR = n; }
+void _clsCone::setPrecission(int n)	{ precision = n; }
 
 // ============================================================================
 // CExCone class implementation
 
 CExCone::CExCone(COLORREF c) 
-	: CCone(c) 
+	: _clsCone(c) 
 { 
 	setMeshID(MSH_EXCONE);
 	secant = max(bR, tR);
@@ -446,7 +446,7 @@ CExCone::CExCone(
 		float		s,
 		int			prec,
 		COLORREF	c
-) : CCone(c) 
+) : _clsCone(c) 
 { 
 	setMeshID(MSH_EXCONE);
 
@@ -464,12 +464,12 @@ void CExCone::setSecant(float n)	{ secant = n; }
  
 
 // ============================================================================
-// CHole class implementation
+// _clsPipe class implementation
 
-CHole::CHole(COLORREF c) 
-	: CMesh(c, MSH_HOLE), h(0), bR(0), bRh(0), tR(0), tRh(0), precision(0) { }
+_clsPipe::_clsPipe(COLORREF c) 
+	: MESH3D(c, MSH_HOLE), h(0), bR(0), bRh(0), tR(0), tRh(0), precision(0) { }
 
-CHole::CHole(
+_clsPipe::_clsPipe(
 		float height, 
 		float bRadius, 
 		float bHoleRadius,
@@ -477,7 +477,7 @@ CHole::CHole(
 		float tHoleRadius,
 		int	  prec,
 		COLORREF	c
-) : CMesh(c, MSH_HOLE)
+) : MESH3D(c, MSH_HOLE)
 { 
 	h			= height;
 	bR			= bRadius;
@@ -488,7 +488,7 @@ CHole::CHole(
 	Triangulate();
 }
 
-void CHole::Triangulate() {
+void _clsPipe::Triangulate() {
 	vertices.clear();
 	edges.clear();
 	polygons.clear();
@@ -635,33 +635,33 @@ void CHole::Triangulate() {
 	polygons.shrink_to_fit();
 }
 
-float CHole::getHeight() { return h; }
-float CHole::getBRadius() { return bR; }
-float CHole::getTRadius() { return tR; }
-float CHole::getBHoleRadius() { return bRh; }
-float CHole::getTHoleRadius() { return tRh; }
-int CHole::getPrecision() { return precision; }
+float _clsPipe::getHeight() { return h; }
+float _clsPipe::getBRadius() { return bR; }
+float _clsPipe::getTRadius() { return tR; }
+float _clsPipe::getBHoleRadius() { return bRh; }
+float _clsPipe::getTHoleRadius() { return tRh; }
+int _clsPipe::getPrecision() { return precision; }
 
 
-void CHole::setHeight(float n) { h = n; } 
-void CHole::setBRadius(float n) { bR = n; }
-void CHole::setTRadius(float n) { tR = n; }
-void CHole::setBHoleRadius(float n) { bRh = n; }
-void CHole::setTHoleRadius(float n) { tRh = n; }
-void CHole::setPrecission(int n) { precision = n; }
+void _clsPipe::setHeight(float n) { h = n; } 
+void _clsPipe::setBRadius(float n) { bR = n; }
+void _clsPipe::setTRadius(float n) { tR = n; }
+void _clsPipe::setBHoleRadius(float n) { bRh = n; }
+void _clsPipe::setTHoleRadius(float n) { tRh = n; }
+void _clsPipe::setPrecission(int n) { precision = n; }
 
 
 // ============================================================================
-// CSphere class implementation
+// _clsSphere class implementation
 
-CSphere::CSphere(
+_clsSphere::_clsSphere(
 		float			Radius,
 		float			Crop,
 		float			From,
 		float			To,
 		unsigned int	Prec,
 		COLORREF		c
-) : CMesh(c, MSH_SPHERE) {
+) : MESH3D(c, MSH_SPHERE) {
 	radius		= abs(Radius);
 	precision	= Prec;
 	cropMult	= Crop;
@@ -673,7 +673,7 @@ CSphere::CSphere(
 	Triangulate();
 }
 
-void CSphere::Triangulate()
+void _clsSphere::Triangulate()
 {
 	if ( cropMult < 1.0f )
 	{

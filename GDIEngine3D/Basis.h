@@ -108,14 +108,14 @@ enum CONSTRAINTS {
 	CNST_OBJECT_ZY_PLANE
 };
 
-class CObject : public IUnknown {
+typedef class _clsObject : public IUnknown {
 private: 	
 	CLASS_ID		ClassID;
 	size_t			ID;
 
 	static size_t	Counter;
 
-	static void InitDefaultValues(CObject *obj);
+	static void InitDefaultValues(_clsObject *obj);
 
 protected:
 	tstring	Name;
@@ -138,24 +138,24 @@ protected:
 	//void PitchYawRoll();
 
 public:
-	CObject(CLASS_ID clsID = CLS_OBJECT);
-	CObject(const VECTOR3D	&pt, 
+	_clsObject(CLASS_ID getClassID = CLS_OBJECT);
+	_clsObject(const VECTOR3D	&pt, 
 		float		p, 
 		float		y, 
 		float		r, 
-		CLASS_ID	clsID = CLS_OBJECT
+		CLASS_ID	getClassID = CLS_OBJECT
 	);
-	CObject(float pX, 
+	_clsObject(float pX, 
 		float pY, 
 		float pZ, 
 		float p,
 		float y,
 		float r, 
-		CLASS_ID clsID = CLS_OBJECT
+		CLASS_ID getClassID = CLS_OBJECT
 	);
-	virtual ~CObject();
-	CLASS_ID clsID();
-	size_t	 objID();
+	virtual ~_clsObject();
+	CLASS_ID getClassID();
+	size_t	 getID();
 
 	// Positioning
 	void MoveAlong(float units);		// Along local-x
@@ -182,30 +182,30 @@ public:
 	void Rotate(float x, float y, float z);
 
 	float Distance(const VECTOR3D &vDst);
-	float Distance(const CObject &objDst);
+	float Distance(const _clsObject &objDst);
 
 	// Take a look at point or object
 	void LookAt(const VECTOR3D &lookAt, const LPVECTOR3D upOrient);
-	void LookAt(const CObject &objToLookAt);
+	void LookAt(const _clsObject &objToLookAt);
 	void LookAt(float lX, float lY, float lZ);
 
 	static void ArbitraryOrbitMoveAround(
-		CObject *obj, 
+		_clsObject *obj, 
 		const VECTOR3D &vAxis, 
 		const VECTOR3D &vPivot, 
 		float units
 		);
 
 	void HorizOrbitMoveAround(const VECTOR3D &vPivot, float units);
-	void HorizOrbitMoveAround(const CObject &objPivot, float units);
+	void HorizOrbitMoveAround(const _clsObject &objPivot, float units);
 	void HorizOrbitMoveAround(float pX, float pY, float pZ, float units);
 
 	void VertOrbitMoveAround(const VECTOR3D &vPivot, float units);
-	void VertOrbitMoveAround(const CObject &objPivot, float units);
+	void VertOrbitMoveAround(const _clsObject &objPivot, float units);
 	void VertOrbitMoveAround(float pX, float pY, float pZ, float units);
 
 	void MoveTo(const VECTOR3D &vPivot, float units);
-	void MoveTo(const CObject &objPivot, float units);
+	void MoveTo(const _clsObject &objPivot, float units);
 	void MoveTo(float pX, float pY, float pZ, float units);
 
 	void GetMoveMatrix(MATRIX3D &mOut);
@@ -226,8 +226,8 @@ public:
 
 	tstring getName() const;
 	void setName(const tstring &objName);
-};
-typedef CObject OBJECT3D, *LPOBJECT3D;
+} OBJECT3D, *LPOBJECT3D;
+
 typedef std::vector<LPOBJECT3D> OBJECTS_LIST;
 typedef std::map<CLASS_ID, OBJECTS_LIST> CONTENT;
 typedef std::pair<CLASS_ID, OBJECTS_LIST> CONTENT_CLASS;
