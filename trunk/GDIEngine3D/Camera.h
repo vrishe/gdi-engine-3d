@@ -2,11 +2,7 @@
 #pragma once
 
 #include "Basis.h"
-
-enum PROJECTION_TYPE {
-	PT_PARALLEL	= 0,
-	PT_CENTRAL	= 1
-};
+#include "SharedDef.h"
 
 // ============================================================================
 // CCamera class

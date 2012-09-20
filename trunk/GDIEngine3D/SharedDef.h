@@ -1,6 +1,10 @@
 
 #pragma once
 
+typedef int PROJECTION_TYPE;
+#define PT_PARALLEL		0
+#define PT_CENTRAL		1
+
 typedef int RENDER_MODE;
 #define RM_WIREFRAME	0x01
 #define RM_SHADED		0x02

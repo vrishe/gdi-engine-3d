@@ -179,7 +179,7 @@ public:
 	void RotateYaw(float angle);
 	void RotateRoll(float angle);
 	void LocalRotate(float roll, float yaw, float pitch);
-	void Rotate(float y, float z, float x);
+	void Rotate(float x, float y, float z);
 
 	float Distance(const VECTOR3D &vDst);
 	float Distance(const CObject &objDst);

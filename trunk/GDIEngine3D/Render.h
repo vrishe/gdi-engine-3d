@@ -23,22 +23,24 @@ private:
 
 	RENDER_MODE		rMode;
 
-	static void InitValues(CViewport *obj, const SIZE &szVp, RENDER_MODE rMode);
+	static void InitValues(CViewport *obj, LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
 
 public:
 	CViewport();
-	CViewport(UINT uVpWidth, UINT uVpHeight, RENDER_MODE rMode);
+	CViewport(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
 	CViewport(const SIZE &szVp, RENDER_MODE rMode);
 	~CViewport();
 	
-	RENDER_MODE	getRenderMode()			const;
-	UINT		getWidth()				const;
-	UINT		getHeight()				const;
-	VOID		getSize(SIZE &szVp)		const;
+	RENDER_MODE	getRenderMode()								const;
+	LONG		getWidth()									const;
+	LONG		getHeight()									const;
+	VOID		getSize(LONG &uVpWidth, LONG &uVpHeight)	const;
+	VOID		getSize(SIZE &szVp)							const;
 
 	VOID		setRenderMode(RENDER_MODE renderMode);
-	VOID		setWidth(UINT uVpWidth);
-	VOID		setHeight(UINT uVpHeight);
+	VOID		setWidth(LONG uVpWidth);
+	VOID		setHeight(LONG uVpHeight);
+	VOID		setSize(LONG uVpWidth, LONG uVpHeight);
 	VOID		setSize(const SIZE &szVp);
 
 	BOOL Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const;
@@ -60,6 +62,7 @@ VOID SetViewportDefaultView(LPVIEWPORT vp, VIEW_TYPE vt);
 #define FRAME_FONT_FAMILY		_T("Arial narrow")
 
 #define SHUTDOWN_ON_DEMAND			0
+#define SHUTDOWN_ON_TERMINATE		-1
 
 #define MAX_VIEWPORT_COUNT	6
 #define CLOCKS_PER_FRAME	50
@@ -103,11 +106,9 @@ public:
 	~ÑRenderPool();
 
 	DWORD addViewport(
+		LPVIEWPORT	lpViewport,
 		LPCAMERA3D	lpCamera,
-		HDC			hDCScreen,
-		UINT		uVpWidth,
-		UINT		uVpHeight,
-		RENDER_MODE rMode
+		HDC			hDCScreen
 		);
 	BOOL delViewport(DWORD dwVpID);
 	BOOL delViewport(size_t uVpIndex);
@@ -125,6 +126,9 @@ public:
 
 	VOID setActiveViewport(size_t uVpIndex);
 	VOID setActiveViewport(DWORD dwVpID);
+
+	HDC setViewportScreen(size_t uVpIndex, HDC hDCScreen);
+	HDC setViewportScreen(DWORD dwVpID, HDC hDCScreen);
 
 	DWORD RenderWorld(LPSCENE3D lpScene) const;
 };
