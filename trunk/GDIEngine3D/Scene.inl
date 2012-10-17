@@ -24,31 +24,46 @@ inline bool _clsScene::AddObject(const LPOBJECT3D lpObject)
 	return false;
 }
 
-inline bool _clsScene::DeleteObject(CLASS_ID clsID, size_t objIndex)
+inline LPOBJECT3D _clsScene::DeleteObject(CLASS_ID clsID, size_t objIndex)
 {
 	CONTENT::iterator finder = objects.find(clsID);
 	
 	if ( finder != objects.end() && objIndex < finder->second.size() ) 
 	{
-		finder->second.erase(finder->second.begin() + objIndex);
+		return *(finder->second.erase(finder->second.begin() + objIndex));
+	}
+
+	return NULL;
+}
+
+inline bool _clsScene::DeleteObject(const LPOBJECT3D lpObject)
+{
+	size_t objIndex;
+	if (findObjectIndex(lpObject, &objIndex))
+	{
+		DeleteObject(lpObject->getClassID(), objIndex);	
 		return true;
 	}
 
 	return false;
 }
 
-inline bool _clsScene::DeleteObject(const LPOBJECT3D lpObject)
+inline void _clsScene::Clear(OBJECTS_LIST &removal)
 {
-	size_t objIndex;
-	return findObjectIndex(lpObject, &objIndex)
-			&& DeleteObject(lpObject->getClassID(), objIndex);	
+	getObjectsBulkVector(removal, true);
+
+	objects.clear();
+	InitDefaultValues(this);
 }
 
-inline void _clsScene::Clear()
+inline void _clsScene::getObjectsBulkVector(OBJECTS_LIST &bulk, bool preClean) const
 {
-	objects.clear();
-	
-	InitDefaultValues(this);
+	if (preClean) bulk.clear();
+
+	__foreach(CONTENT::const_iterator, entry, objects)
+	{
+		bulk.insert(bulk.end(), entry->second.begin(), entry->second.end());
+	}
 }
 
 inline LPOBJECT3D _clsScene::getObject(CLASS_ID clsID, size_t objIndex) const

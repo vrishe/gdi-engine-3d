@@ -18,3 +18,5 @@ typedef int VIEW_TYPE;
 #define	VIEW_TOP			5
 #define	VIEW_BOTTOM			6
 #define	VIEW_PERSPECTIVE	7
+
+#define DEAD_COLORREF_VALUE ((COLORREF)((DWORD)0xFF << 24))

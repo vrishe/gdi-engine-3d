@@ -5,56 +5,64 @@
 // ============================================================================
 // _clsViewport class partial implementation:
 
+void _clsViewport::InitValues(_clsViewport *obj, RENDER_MODE rMode)
+{
+	obj->hDCOutput		= NULL;
+	obj->hBmpOutput		= NULL;
+	obj->hBmpOriginal	= NULL;
+
+	//obj->setSize(uVpWidth, uVpHeight);	
+	obj->rMode = rMode;
+}
+
 _clsViewport::_clsViewport() 
 {
-	InitValues(this, 1, 1, RM_WIREFRAME);
+	InitValues(this, RM_WIREFRAME);
 }
 
-_clsViewport::_clsViewport(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode)
+_clsViewport::_clsViewport(RENDER_MODE rMode)
 {
-	InitValues(this, uVpWidth, uVpHeight, rMode);
+	InitValues(this, rMode);
 }
 
-_clsViewport::_clsViewport(const SIZE &szVp, RENDER_MODE rMode)
-{
-	InitValues(this, szVp.cx, szVp.cy, rMode);
-}
+//_clsViewport::_clsViewport(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode)
+//{
+//	InitValues(this, uVpWidth, uVpHeight, rMode);
+//}
+//
+//_clsViewport::_clsViewport(const SIZE &szVp, RENDER_MODE rMode)
+//{
+//	InitValues(this, szVp.cx, szVp.cy, rMode);
+//}
 
 _clsViewport::~_clsViewport() 
 { 
-	SelectObject(hDCOutput, hBmpDefault);
 	DeleteObject(hBmpOutput);
 	DeleteDC(hDCOutput);
 }
 
-VOID _clsViewport::setSize(LONG uVpWidth, LONG uVpHeight)
+BOOL _clsViewport::setSize(LONG uVpWidth, LONG uVpHeight)
 {
-	if ((uVpWidth > 0 && uVpHeight > 0) && uVpWidth != getWidth() || uVpHeight != getHeight())
+	if (uVpWidth <= 0 || uVpHeight <= 0) return FALSE;
+		
+	if (uVpWidth != getWidth() || uVpHeight != getHeight())
 	{
 		HDC hDCScr = GetDC(NULL);
-		HBITMAP hBmpNew = CreateCompatibleBitmap(hDCScr, uVpWidth, uVpHeight);
 		
-		if (hBmpNew == NULL)
-		{
-			HDC hDCNew = CreateCompatibleDC(hDCScr);
-			hBmpNew = CreateCompatibleBitmap(hDCScr, uVpWidth, uVpHeight);
-			if (hBmpNew != NULL) 
-			{
-				SelectObject(hDCOutput, hBmpDefault);
-				DeleteObject(hBmpOutput);
-				DeleteDC(hDCOutput);
+		if (hDCOutput == NULL) hDCOutput = CreateCompatibleDC(hDCScr);
 
-				hDCOutput = hDCNew;
-				hBmpOutput = hBmpNew;
-				hBmpDefault = (HBITMAP)SelectObject(hDCOutput, hBmpOutput);
-			}
-		}
-		else
+		DeleteObject(hBmpOutput);
+		hBmpOutput = CreateCompatibleBitmap(hDCScr, uVpWidth, uVpHeight);
+
+		if (SelectObject(hDCOutput, hBmpOutput) == NULL)
 		{
-			DeleteObject(SelectObject(hDCOutput, hBmpOutput = hBmpNew));
+			DeleteObject(hBmpOutput);	hBmpOutput	= NULL;
+			DeleteDC(hDCOutput);		hDCOutput	= NULL;
 		}
+
 		ReleaseDC(NULL, hDCScr);
 	}
+	return TRUE;
 }
 
 // Is used as predicate for std::sort algorithm; provides a > b comparison
@@ -66,7 +74,7 @@ bool ZDepthComparator(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY
 
 BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const 
 {
-	BOOL bResult = hDCScreen!= NULL && lpScene != NULL && lpCamera != NULL;
+	BOOL bResult = hDCScreen != NULL && lpScene != NULL && lpCamera != NULL;
 
 	if (bResult)
 	{
@@ -340,9 +348,9 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			}
 			delete[] scenePolyColorBuffer;
 		}
-		StretchBlt(
+		bResult &= StretchBlt(
 			hDCScreen, 0, 0, 
-			GetDeviceCaps(hDCScreen, HORZRES), GetDeviceCaps(hDCScreen, HORZRES), 
+			GetDeviceCaps(hDCScreen, HORZRES), GetDeviceCaps(hDCScreen, VERTRES), 
 			hDCOutput, 0, 0, 
 			clientRect.right, clientRect.bottom, 
 			SRCCOPY
@@ -549,13 +557,12 @@ BOOL _clsRenderPool::delViewport(size_t uVpIndex)
 	return TRUE;
 }
 
-HDC _clsRenderPool::setViewportScreen(size_t uVpIndex, HDC hDCScreen)
+BOOL _clsRenderPool::setViewportScreen(size_t uVpIndex, HDC hDcNew, HDC &hDcOld)
 {
-	if (uVpIndex < tdlViewports.size())
-	{
-		HDC hDCScreenLast = tdlViewports[uVpIndex]->hDCScreen;
-		tdlViewports[uVpIndex]->hDCScreen = hDCScreen;
-		return hDCScreenLast;
-	}
-	return NULL;
+	if (uVpIndex >= tdlViewports.size()) return FALSE;
+
+	hDcOld = tdlViewports[uVpIndex]->hDCScreen;
+	tdlViewports[uVpIndex]->hDCScreen = hDcNew;
+	
+	return TRUE;
 }

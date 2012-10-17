@@ -19,29 +19,31 @@ typedef class _clsViewport : public IUnknown {
 private:
 	HDC				hDCOutput;
 	HBITMAP			hBmpOutput;
-	HBITMAP			hBmpDefault;
+	HBITMAP			hBmpOriginal;
 
 	RENDER_MODE		rMode;
 
-	static void InitValues(_clsViewport *obj, LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
+	//static void InitValues(_clsViewport *obj, LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
+	static void InitValues(_clsViewport *obj, RENDER_MODE rMode);
 
 public:
 	_clsViewport();
-	_clsViewport(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
-	_clsViewport(const SIZE &szVp, RENDER_MODE rMode);
+	_clsViewport(RENDER_MODE rMode);
+	//_clsViewport(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
+	//_clsViewport(const SIZE &szVp, RENDER_MODE rMode);
 	~_clsViewport();
 	
 	RENDER_MODE	getRenderMode()								const;
+	VOID		getSize(SIZE &szVp)							const;
+	VOID		getSize(LONG &uVpWidth, LONG &uVpHeight)	const;
 	LONG		getWidth()									const;
 	LONG		getHeight()									const;
-	VOID		getSize(LONG &uVpWidth, LONG &uVpHeight)	const;
-	VOID		getSize(SIZE &szVp)							const;
 
 	VOID		setRenderMode(RENDER_MODE renderMode);
-	VOID		setWidth(LONG uVpWidth);
-	VOID		setHeight(LONG uVpHeight);
-	VOID		setSize(LONG uVpWidth, LONG uVpHeight);
-	VOID		setSize(const SIZE &szVp);
+	BOOL		setWidth(LONG uVpWidth);
+	BOOL		setHeight(LONG uVpHeight);
+	BOOL		setSize(LONG uVpWidth, LONG uVpHeight);
+	BOOL		setSize(const SIZE &szVp);
 
 	BOOL Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const;
 } VIEWPORT, *LPVIEWPORT;
@@ -133,8 +135,8 @@ public:
 	VOID setActiveViewport(size_t uVpIndex);
 	VOID setActiveViewport(DWORD dwVpID);
 
-	HDC setViewportScreen(size_t uVpIndex, HDC hDCScreen);
-	HDC setViewportScreen(DWORD dwVpID, HDC hDCScreen);
+	BOOL setViewportScreen(size_t uVpIndex, HDC hDcNew, HDC &hDcOld);
+	BOOL setViewportScreen(DWORD dwVpID, HDC hDcNew, HDC &hDcOld);
 
 	DWORD RenderWorld() const;
 } RENDER_POOL, *LPRENDER_POOL;
