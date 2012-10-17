@@ -17,11 +17,12 @@ public:
 	~_clsScene();
 
 	bool AddObject(const LPOBJECT3D lpObject);
-	bool DeleteObject(CLASS_ID clsID, size_t objIndex); 
+	LPOBJECT3D DeleteObject(CLASS_ID clsID, size_t objIndex); 
 	bool DeleteObject(const LPOBJECT3D lpObject);
-	void Clear();
+	void Clear(OBJECTS_LIST &removal);
 
-	bool findObjectIndex(const LPOBJECT3D lpObject, size_t *objIndex = NULL) const;
+	bool findObjectIndex(const LPOBJECT3D lpObject, size_t *objIndex = NULL)	const;
+	void getObjectsBulkVector(OBJECTS_LIST &bulk, bool preClean)				const;
 
 	size_t		getObjectClassCount(CLASS_ID clsID)			const;
 	LPOBJECT3D	getFirstObject(CLASS_ID clsID)				const;

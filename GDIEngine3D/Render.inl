@@ -3,38 +3,49 @@
 // ============================================================================
 // _clsViewport partial implementation:
 
-inline void _clsViewport::InitValues(_clsViewport *obj, LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode)
-{
-	obj->setSize(uVpWidth, uVpHeight);	
-	obj->rMode = rMode;
-}
-
-inline RENDER_MODE _clsViewport::getRenderMode()	const { return rMode; }
-inline LONG _clsViewport::getWidth()				const { return GetDeviceCaps(hDCOutput, HORZRES); }
-inline LONG _clsViewport::getHeight()				const { return GetDeviceCaps(hDCOutput, VERTRES); }
-inline VOID _clsViewport::getSize(LONG &uVpWidth, LONG &uVpHeight) const
-{
-	uVpWidth	= getWidth();
-	uVpHeight	= getHeight();
-}
+inline RENDER_MODE _clsViewport::getRenderMode() const { return rMode; }
 inline VOID _clsViewport::getSize(SIZE &szVp) const
 {
-	szVp.cx = getWidth();
-	szVp.cy = getHeight();
+	BITMAP info;
+	if (GetObject(hBmpOutput, sizeof(BITMAP), &info) == sizeof(BITMAP))
+	{
+		szVp.cx = info.bmWidth;
+		szVp.cy = info.bmHeight;
+	}
+}
+inline VOID _clsViewport::getSize(LONG &uVpWidth, LONG &uVpHeight) const
+{
+	SIZE szVp = { 0, 0 };
+	getSize(szVp);
+
+	uVpWidth	= szVp.cx;
+	uVpHeight	= szVp.cy;
+}
+inline LONG _clsViewport::getWidth() const 
+{ 
+	SIZE szVp = { 0, 0 };
+	getSize(szVp);
+	return szVp.cx; 
+}
+inline LONG _clsViewport::getHeight() const 
+{ 
+	SIZE szVp = { 0, 0 };
+	getSize(szVp);
+	return szVp.cy; 
 }
 
 inline VOID _clsViewport::setRenderMode(RENDER_MODE renderMode) { rMode = renderMode; }
-inline VOID _clsViewport::setWidth(LONG vpWidth)
+inline BOOL _clsViewport::setWidth(LONG vpWidth)
 {
-	setSize(vpWidth, getHeight());
+	return setSize(vpWidth, getHeight());
 }
-inline VOID _clsViewport::setHeight(LONG vpHeight)
+inline BOOL _clsViewport::setHeight(LONG vpHeight)
 {
-	setSize(getWidth(), vpHeight);
+	return setSize(getWidth(), vpHeight);
 }
-inline VOID _clsViewport::setSize(const SIZE &szVp)
+inline BOOL _clsViewport::setSize(const SIZE &szVp)
 {
-	setSize(szVp.cx, szVp.cy);
+	return setSize(szVp.cx, szVp.cy);
 }
 
 
@@ -116,9 +127,9 @@ inline VOID _clsRenderPool::setActiveViewport(DWORD dwVpID)
 	setActiveViewport(getViewportIndex(dwVpID));
 }
 
-inline HDC _clsRenderPool::setViewportScreen(DWORD dwVpID, HDC hDCScreen)
+inline BOOL _clsRenderPool::setViewportScreen(DWORD dwVpID, HDC hDcNew, HDC &hDcOld)
 {
-	return setViewportScreen(getViewportIndex(dwVpID), hDCScreen);
+	return setViewportScreen(getViewportIndex(dwVpID), hDcNew, hDcOld);
 }
 
 inline DWORD _clsRenderPool::RenderWorld() const 
