@@ -956,10 +956,9 @@ SCENE_OBJECT SceneObjectAdd(HSCENE hScene, LPOBJECT3D lpObject)
 	{
 		if (((LPSCENE3D)Master)->AddObject(lpObject))
 		{
-			scoResult = _MAKE_SCENE_OBJECT(
-				lpObject->getClassID(), 
-				((LPSCENE3D)Master)->findObjectIndex(lpObject)
-				);
+			size_t objIndex;
+			((LPSCENE3D)Master)->findObjectIndex(lpObject, &objIndex);
+			scoResult = _MAKE_SCENE_OBJECT(lpObject->getClassID(), objIndex);
 		}
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);

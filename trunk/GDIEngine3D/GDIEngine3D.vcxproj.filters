@@ -54,9 +54,6 @@
     <ClInclude Include="Scene.h">
       <Filter>Заголовочные файлы\GDIEngine3D</Filter>
     </ClInclude>
-    <ClInclude Include="Math.h">
-      <Filter>Заголовочные файлы\GDIEngine3D</Filter>
-    </ClInclude>
     <ClInclude Include="thread_safety.h">
       <Filter>Заголовочные файлы\Service_internals</Filter>
     </ClInclude>
@@ -67,6 +64,9 @@
       <Filter>Заголовочные файлы\GDIEngine3D</Filter>
     </ClInclude>
     <ClInclude Include="Primitives.h">
+      <Filter>Заголовочные файлы\GDIEngine3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Math3D.h">
       <Filter>Заголовочные файлы\GDIEngine3D</Filter>
     </ClInclude>
   </ItemGroup>
@@ -115,9 +115,6 @@
     <None Include="Camera.inl">
       <Filter>Файлы исходного кода\GDIEngine3D</Filter>
     </None>
-    <None Include="Math.inl">
-      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
-    </None>
     <None Include="Mesh.inl">
       <Filter>Файлы исходного кода\GDIEngine3D</Filter>
     </None>
@@ -128,6 +125,9 @@
       <Filter>Файлы исходного кода\Service_internals</Filter>
     </None>
     <None Include="Render.inl">
+      <Filter>Файлы исходного кода\GDIEngine3D</Filter>
+    </None>
+    <None Include="Math3D.inl">
       <Filter>Файлы исходного кода\GDIEngine3D</Filter>
     </None>
   </ItemGroup>

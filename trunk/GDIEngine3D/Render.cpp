@@ -49,12 +49,16 @@ BOOL _clsViewport::setSize(LONG uVpWidth, LONG uVpHeight)
 	{
 		HDC hDCScr = GetDC(NULL);
 		
-		if (hDCOutput == NULL) hDCOutput = CreateCompatibleDC(hDCScr);
-
-		DeleteObject(hBmpOutput);
+		if (hDCOutput != NULL) 
+		{
+			SelectObject(hDCOutput, hBmpOriginal);
+			DeleteObject(hBmpOutput);
+			DeleteDC(hDCOutput);
+		}
+		hDCOutput = CreateCompatibleDC(hDCScr);
 		hBmpOutput = CreateCompatibleBitmap(hDCScr, uVpWidth, uVpHeight);
 
-		if (SelectObject(hDCOutput, hBmpOutput) == NULL)
+		if ((hBmpOriginal = (HBITMAP)SelectObject(hDCOutput, hBmpOutput)) == NULL)
 		{
 			DeleteObject(hBmpOutput);	hBmpOutput	= NULL;
 			DeleteDC(hDCOutput);		hDCOutput	= NULL;
@@ -83,7 +87,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 		HBRUSH			hBrCurrent,
 						hBrOld;
 
-		RECT			clientRect				= {0, 0, getWidth(), getHeight()};
+		RECT			viewportRect			= {0, 0, getWidth(), getHeight()};
 		size_t			sceneObjCount,
 						sceneLightCount,
 						scenePolyCount,
@@ -109,7 +113,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 		// Filling lpViewport with scene ambient color
 		hBrCurrent	= CreateSolidBrush(lpScene->getAmbientColor());
 		hBrOld		= (HBRUSH)SelectObject(hDCOutput, hBrCurrent);
-		FillRect(hDCOutput, &clientRect, hBrCurrent);
+		FillRect(hDCOutput, &viewportRect, hBrCurrent);
 		SelectObject(hDCOutput, hBrOld);
 		DeleteObject(hBrCurrent);
 
@@ -131,14 +135,18 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 
 		viewportMatrix.SetIdentity();
 		viewportMatrix._22 = -1.0f;
-		viewportMatrix._41 = (FLOAT)clientRect.right / 2;
-		viewportMatrix._42 = (FLOAT)clientRect.bottom / 2;
+		viewportMatrix._41 = (FLOAT)viewportRect.right / 2;
+		viewportMatrix._42 = (FLOAT)viewportRect.bottom / 2;
 
 		// Drawing objects
 		for ( UINT i = 0; i < sceneObjCount; i++ ) 
 		{
 			objToRender	= (LPMESH3D)lpScene->getObject(CLS_MESH, i);
-			objToRender->getVertexCacheDataRaw(objVertBuffer, objVertCount);
+
+			LPVECTOR3D objVertBufferRaw;
+			objToRender->getVertexCacheDataRaw(objVertBufferRaw, objVertCount);
+			objVertBuffer = new VECTOR3D[objVertCount];
+			CopyMemory(objVertBuffer, objVertBufferRaw, objVertCount * sizeof(VECTOR3D));
 
 			// calculate lighting here
 			if ( rMode != RM_WIREFRAME ) 
@@ -252,8 +260,8 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			else 
 			{
 				objToRender->getEdgeDataRaw(objEdgeBuffer, objEdgeCount);
-				hPenCurrent		= CreatePen(PS_SOLID, 1, objToRender->getColor());
-				hPenOld			= (HPEN)SelectObject(hDCOutput, hPenCurrent);
+				hPenCurrent	= CreatePen(PS_SOLID, 1, objToRender->getColor());
+				hPenOld		= (HPEN)SelectObject(hDCOutput, hPenCurrent);
 				for ( UINT j = 0; j < objEdgeCount; j++ ) 
 				{
 					if ( objVertBuffer[objEdgeBuffer[j].first].z >= 0
@@ -261,13 +269,13 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 						&& objVertBuffer[objEdgeBuffer[j].second].z >= 0
 						&& objVertBuffer[objEdgeBuffer[j].second].z <= 1 
 						&& objVertBuffer[objEdgeBuffer[j].first].x >= 0
-						&& objVertBuffer[objEdgeBuffer[j].first].x <= clientRect.right
+						&& objVertBuffer[objEdgeBuffer[j].first].x <= viewportRect.right
 						&& objVertBuffer[objEdgeBuffer[j].first].y >= 0
-						&& objVertBuffer[objEdgeBuffer[j].first].y <= clientRect.bottom
+						&& objVertBuffer[objEdgeBuffer[j].first].y <= viewportRect.bottom
 						&& objVertBuffer[objEdgeBuffer[j].second].x >= 0
-						&& objVertBuffer[objEdgeBuffer[j].second].x <= clientRect.right
+						&& objVertBuffer[objEdgeBuffer[j].second].x <= viewportRect.right
 						&& objVertBuffer[objEdgeBuffer[j].second].y >= 0
-						&& objVertBuffer[objEdgeBuffer[j].second].y <= clientRect.bottom
+						&& objVertBuffer[objEdgeBuffer[j].second].y <= viewportRect.bottom
 					) { 
 						vert2DDrawBuffer[0].x 
 							= (LONG)objVertBuffer[objEdgeBuffer[j].first].x;
@@ -279,12 +287,14 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 						vert2DDrawBuffer[1].y 
 							= (LONG)objVertBuffer[objEdgeBuffer[j].second].y;
 
-						Polyline( hDCOutput, vert2DDrawBuffer, 2 );
+						Polyline(hDCOutput, vert2DDrawBuffer, 2);
 					}
 				}
 				SelectObject(hDCOutput, hPenOld);
 				DeleteObject(hPenCurrent);
 			}
+
+			delete[] objVertBuffer;
 		}
 
 		if ( rMode != RM_WIREFRAME ) 
@@ -302,18 +312,18 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 					&& scenePolyBuffer[i].first.third.z < 1 
 
 					&& scenePolyBuffer[i].first.first.x >= 0
-					&& scenePolyBuffer[i].first.first.x <= clientRect.right
+					&& scenePolyBuffer[i].first.first.x <= viewportRect.right
 					&& scenePolyBuffer[i].first.second.x >= 0
-			   		&& scenePolyBuffer[i].first.second.x <= clientRect.right
+			   		&& scenePolyBuffer[i].first.second.x <= viewportRect.right
 					&& scenePolyBuffer[i].first.third.x >= 0
-			   		&& scenePolyBuffer[i].first.third.x <= clientRect.right
+			   		&& scenePolyBuffer[i].first.third.x <= viewportRect.right
 				  
 					&& scenePolyBuffer[i].first.first.y >= 0
-			   		&& scenePolyBuffer[i].first.first.y <= clientRect.bottom
+			   		&& scenePolyBuffer[i].first.first.y <= viewportRect.bottom
 					&& scenePolyBuffer[i].first.second.y >= 0
-			   		&& scenePolyBuffer[i].first.second.y <= clientRect.bottom
+			   		&& scenePolyBuffer[i].first.second.y <= viewportRect.bottom
 					&& scenePolyBuffer[i].first.third.y >= 0
-			   		&& scenePolyBuffer[i].first.third.y <= clientRect.bottom
+			   		&& scenePolyBuffer[i].first.third.y <= viewportRect.bottom
 				) { 
 					objToRender	= (LPMESH3D)lpScene->getObject(
 												CLS_MESH, 
@@ -348,13 +358,10 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			}
 			delete[] scenePolyColorBuffer;
 		}
-		bResult &= StretchBlt(
-			hDCScreen, 0, 0, 
-			GetDeviceCaps(hDCScreen, HORZRES), GetDeviceCaps(hDCScreen, VERTRES), 
-			hDCOutput, 0, 0, 
-			clientRect.right, clientRect.bottom, 
-			SRCCOPY
-			);
+
+		BITMAP info;
+		bResult &= (GetObject(GetCurrentObject(hDCScreen, OBJ_BITMAP), sizeof(BITMAP), &info) == sizeof(BITMAP))
+			&& StretchBlt(hDCScreen, 0, 0, info.bmWidth, info.bmHeight, hDCOutput, 0, 0, viewportRect.right, viewportRect.bottom, SRCCOPY);
 	}
 
 	return bResult;

@@ -69,7 +69,7 @@ void _clsPyramid::Triangulate() {
 }
 
 _clsPyramid::_clsPyramid(COLORREF c) 
-	: MESH3D(c, MSH_PRIMITIVE), h(0), bL(0), bW(0), tL(0), tW(0), shift(0) { }
+	: MESH3D(MSH_PRIMITIVE, c), h(0), bL(0), bW(0), tL(0), tW(0), shift(0) { }
 
 _clsPyramid::_clsPyramid(
 		float		height, 
@@ -203,7 +203,7 @@ _clsCone::_clsCone(
 		float		tRadius, 
 		int			prec,
 		COLORREF	c
-) : MESH3D(c, MSH_PRIMITIVE)
+) : MESH3D(MSH_PRIMITIVE, c)
 { 
 	h			= height;
 	bR			= bRadius;
@@ -237,7 +237,7 @@ _clsPipe::_clsPipe(
 		float tHoleRadius,
 		int	  prec,
 		COLORREF	c
-) : MESH3D(c, MSH_PRIMITIVE)
+) : MESH3D(MSH_PRIMITIVE, c)
 { 
 	h			= height;
 	bR			= bRadius;
@@ -421,7 +421,7 @@ _clsSphere::_clsSphere(
 		float			To,
 		unsigned int	Prec,
 		COLORREF		c
-) : MESH3D(c, MSH_PRIMITIVE) {
+) : MESH3D(MSH_PRIMITIVE, c) {
 	radius		= abs(Radius);
 	precision	= Prec;
 	cropMult	= Crop;
@@ -444,8 +444,7 @@ void _clsSphere::Triangulate()
 		float	cropZ	= radius *  (2 * cropMult - 1),
 				vAngle  = asin(cropZ / radius),
 				vDelta	= ((float)M_PI_2 - vAngle) / (float)(precision / 2),	
-				hDelta	= abs((angleTo - angleFrom) / precision),
-				radius2p = radius * radius;
+				hDelta	= abs((angleTo - angleFrom) / precision);
 
 		BOOL isSliced	= cos(angleFrom) != 1.0f || cos(angleTo) != 1.0f;
 		UINT perCircle	= isSliced ? precision + 2 : precision;
