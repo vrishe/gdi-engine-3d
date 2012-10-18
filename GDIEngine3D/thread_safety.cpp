@@ -86,7 +86,14 @@ namespace thread_safety
 
 				__foreach(OBJECT_REGISTRY::iterator, entry, alModuleObjects)
 				{
-					if (++uObjKey != entry->first) break;
+					OBJECT_REGISTRY::iterator entry_next = entry;
+					if (++entry_next == _end || (entry_next->first - entry->first) > 1) 
+					{
+						uObjKey = entry->first + 1;
+						break;
+					}
+
+					//if (++uObjKey != entry->first) break;
 				}
 			}
 

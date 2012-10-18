@@ -64,22 +64,26 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(ProjectName)_x64</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(SolutionDir)$(PlatformShortName)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformShortName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(PlatformShortName)\$(Configuration)\</OutDir>
-    <TargetName>$(ProjectName)_x86</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
     <IntDir>$(PlatformShortName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>$(ProjectName)_x64</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(SolutionDir)$(PlatformShortName)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformShortName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(PlatformShortName)\$(Configuration)\</OutDir>
-    <TargetName>$(ProjectName)_x86</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
     <IntDir>$(PlatformShortName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -174,7 +178,7 @@
     <ClInclude Include="GDIEngine3D.h" />
     <ClInclude Include="IUnknown.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="Math.h" />
+    <ClInclude Include="Math3D.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Primitives.h" />
     <ClInclude Include="Render.h" />
@@ -220,7 +224,7 @@
     <None Include="Camera.inl" />
     <None Include="IUnknown.inl" />
     <None Include="Light.inl" />
-    <None Include="Math.inl" />
+    <None Include="Math3D.inl" />
     <None Include="Mesh.inl" />
     <None Include="Render.inl" />
     <None Include="Scene.inl" />

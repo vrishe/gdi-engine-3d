@@ -30,7 +30,9 @@ inline LPOBJECT3D _clsScene::DeleteObject(CLASS_ID clsID, size_t objIndex)
 	
 	if ( finder != objects.end() && objIndex < finder->second.size() ) 
 	{
-		return *(finder->second.erase(finder->second.begin() + objIndex));
+		LPOBJECT3D removal = finder->second.at(objIndex);
+		finder->second.erase(finder->second.begin() + objIndex);
+		return removal;
 	}
 
 	return NULL;
