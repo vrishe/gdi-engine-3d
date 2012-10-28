@@ -206,6 +206,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="GDIEngine3D.cpp" />
+    <ClCompile Include="IUnknown.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Primitives.cpp" />

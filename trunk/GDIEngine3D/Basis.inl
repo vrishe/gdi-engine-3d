@@ -51,11 +51,13 @@ inline void _clsObject::InitDefaultValues(_clsObject *obj)
 	obj->fWd		= VECTOR3D(1.0f, .0f, .0f);
 	obj->rWd		= VECTOR3D(.0f, 1.0f, .0f);
 	obj->uWd		= VECTOR3D(.0f, .0f, 1.0f);
-	obj->world		= VECTOR3D();
+	obj->rot		= VECTOR3D();
 
 	obj->worldScale	= VECTOR3D(1.0f, 1.0f, 1.0f);
 	obj->localScale	= obj->worldScale;
 }
+
+inline _clsObject::~_clsObject() { }
 
 inline VECTOR3D _clsObject::getPosition() { return pos; }
 
@@ -188,12 +190,11 @@ inline void _clsObject::GetRotationMatrix(MATRIX3D &mOut)
 }
 
 inline CLASS_ID _clsObject::getClassID() const	{ return ClassID; }
-inline size_t	_clsObject::getID()		 const	{ return ID; }
 
 inline VECTOR3D _clsObject::getForwardLookDirection()	{ return fWd; }
 inline VECTOR3D _clsObject::getRightLookDirection()		{ return rWd; }
 inline VECTOR3D _clsObject::getUpLookDirection()		{ return uWd; }
-inline VECTOR3D _clsObject::getRotation()				{ return world; }
+inline VECTOR3D _clsObject::getRotation()				{ return rot; }
 inline VECTOR3D _clsObject::getScale()					{ return worldScale; }
 
 inline void _clsObject::setForwardLookDirection(const VECTOR3D &v) { fWd = v; }

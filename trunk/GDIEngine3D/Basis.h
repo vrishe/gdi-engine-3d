@@ -84,9 +84,10 @@ typedef std::basic_string<TCHAR> tstring;
 #define MAX_OBJECT_NAME_LEN	256
 
 enum CLASS_ID {
-	CLS_OBJECT	,
-	CLS_MESH	,
-	CLS_CAMERA	,
+	CLS_UNKNOWN,
+	CLS_OBJECT ,
+	CLS_MESH   ,
+	CLS_CAMERA ,
 	CLS_LIGHT
 };
 
@@ -99,10 +100,8 @@ enum CONSTRAINTS {
 
 typedef class _clsObject : public IUnknown {
 private: 	
-	CLASS_ID		ClassID;
-	size_t			ID;
-
-	static size_t Counter;
+	CLASS_ID ClassID;
+	size_t	 ID;
 
 	static void InitDefaultValues(_clsObject *obj);
 
@@ -116,7 +115,7 @@ protected:
 	VECTOR3D fWd;		// Forward
 	VECTOR3D rWd;		// Rightward
 	VECTOR3D uWd;		// Upward
-	VECTOR3D world;		// World orts-in-one
+	VECTOR3D rot;		// World orts-in-one
 
 	// Scaling
 	VECTOR3D	worldScale;
@@ -187,7 +186,6 @@ public:
 	void GetRotationMatrix(MATRIX3D &mOut);
 
 	CLASS_ID getClassID()	const;
-	size_t	 getID()		const;
 
 	VECTOR3D getForwardLookDirection();
 	VECTOR3D getRightLookDirection();
@@ -203,9 +201,8 @@ public:
 	tstring getName() const;
 	void setName(const tstring &objName);
 } OBJECT3D, *LPOBJECT3D;
-
 typedef std::vector<LPOBJECT3D> OBJECTS_LIST;
-typedef std::map<CLASS_ID, OBJECTS_LIST> CONTENT;
+typedef std::map<CLASS_ID, OBJECTS_LIST>  CONTENT;
 typedef std::pair<CLASS_ID, OBJECTS_LIST> CONTENT_CLASS;
 
 #include "Basis.inl"

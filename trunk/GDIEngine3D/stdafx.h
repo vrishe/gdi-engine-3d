@@ -14,6 +14,7 @@
 #include <tchar.h>
 
 // C Library Headers:
+#include <limits>
 #include <cmath>
 #include <ctime>
 
