@@ -399,7 +399,7 @@ BOOL WINAPI CameraTranslate(HCAMERA hCamera, FLOAT fX, FLOAT fY, FLOAT fZ)
 	return isValid;
 }
 
-BOOL WINAPI CameraRotate(HCAMERA hCamera, FLOAT fXRoll, FLOAT fYYaw, FLOAT fZPitch)
+BOOL WINAPI CameraRotate(HCAMERA hCamera, FLOAT fXRoll, FLOAT fZYaw, FLOAT fYPitch)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -415,7 +415,7 @@ BOOL WINAPI CameraRotate(HCAMERA hCamera, FLOAT fXRoll, FLOAT fYYaw, FLOAT fZPit
 
 	if (isValid)
 	{
-		((LPCAMERA3D)Master)->Rotate(fXRoll, fYYaw, fZPitch);
+		((LPCAMERA3D)Master)->Rotate(fXRoll, fYPitch, fZYaw);
 
 		thread_safety::UnlockObjectRegistered((size_t)hCamera, Master);
 	}
@@ -637,7 +637,6 @@ BOOL WINAPI CameraVerticalFOVGet(HCAMERA hCamera, FLOAT &fVFov)
 #define _EXTRACT_OBJECT_CLSID(scene_object)	(CLASS_ID)(((SCENE_OBJECT)scene_object) >> INDEX_BITCOUNT)
 #define _EXTRACT_OBJECT_INDEX(scene_object) (size_t)(((SCENE_OBJECT)scene_object) & _MAX_OBJECT_INDEX)
 
-
 HSCENE WINAPI SceneCreate() 
 {
 	return (HSCENE)CreateObject(new SCENE3D());
@@ -734,11 +733,15 @@ BOOL WINAPI SceneObjectRemove(HSCENE hScene, SCENE_OBJECT scObject)
 
 	if (isValid)
 	{
-		CLASS_ID	clsID		= _EXTRACT_OBJECT_CLSID(scObject);
-		size_t		uObjIndex	= _EXTRACT_OBJECT_INDEX(scObject);
+		CLASS_ID	clsID = _EXTRACT_OBJECT_CLSID(scObject);
+		size_t		objID = _EXTRACT_OBJECT_INDEX(scObject);
 
-		LPOBJECT3D victim = ((LPSCENE3D)Master)->DeleteObject(clsID, uObjIndex);
-		if (bResult = victim != NULL) delete victim;
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(objID));
+		if (bResult = victim != NULL) 
+		{
+			((LPSCENE3D)Master)->DeleteObject(victim);
+			delete victim;
+		}
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
 	}
@@ -777,7 +780,7 @@ BOOL WINAPI SceneObjectTranslate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fX,
 	return bResult;
 }
 
-BOOL WINAPI SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fXRoll, FLOAT fYYaw, FLOAT fZPitch)
+BOOL WINAPI SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fXRoll, FLOAT fZYaw, FLOAT fYPitch)
 {
 	BOOL bResult = FALSE;
 
@@ -799,7 +802,7 @@ BOOL WINAPI SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fXRoll
 		LPOBJECT3D victim = ((LPSCENE3D)Master)->getObject(clsID, uObjIndex);
 		if (bResult = victim != NULL)
 		{
-			victim->Translate(fXRoll, fYYaw, fZPitch);
+			victim->Rotate(fXRoll, fYPitch, fZYaw);
 		}		
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
@@ -940,7 +943,7 @@ BOOL WINAPI SceneObjectColorGet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF &
 
 SCENE_OBJECT SceneObjectAdd(HSCENE hScene, LPOBJECT3D lpObject)
 {
-	SCENE_OBJECT scoResult;
+	SCENE_OBJECT scoResult = NULL;
 
 	LPUNKNOWN Master = NULL;
 
@@ -958,7 +961,7 @@ SCENE_OBJECT SceneObjectAdd(HSCENE hScene, LPOBJECT3D lpObject)
 		{
 			size_t objIndex;
 			((LPSCENE3D)Master)->findObjectIndex(lpObject, &objIndex);
-			scoResult = _MAKE_SCENE_OBJECT(lpObject->getClassID(), objIndex);
+			scoResult = _MAKE_SCENE_OBJECT(lpObject->getClassID(), lpObject->getID());
 		}
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);

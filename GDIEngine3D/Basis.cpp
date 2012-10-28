@@ -116,19 +116,12 @@ VECTOR3D _tagPoly3D::Normal(const LPVECTOR3D vs, size_t startVert) {
 // ===========================================================================
 // _clsObject partial implementation:
 
-size_t _clsObject::Counter = 1;
-
 _clsObject::_clsObject(CLASS_ID clsID) 
-	: ClassID(clsID), ID(Counter++)
+	: ClassID(clsID)
 {
 	InitDefaultValues(this);
 
 	pos	= VECTOR3D(.0f, .0f, .0f);
-}
-
-_clsObject::~_clsObject() 
-{
-	Counter--;
 }
 
 void _clsObject::RotatePitch(float angle) 
@@ -194,23 +187,27 @@ void _clsObject::Rotate(float x, float y, float z)
 {
 	MATRIX3D M;
 
-	world.x = x;
-	world.y = y;
-	world.z = z;
+	rot.x = x;
+	rot.y = y;
+	rot.z = z;
 
-	Matrix3DRotateAxis(VECTOR3D(1.0f, .0f, .0f), world.x, M);
+	fWd = VECTOR3D(1.0F, .0F, .0F);
+	rWd = VECTOR3D(.0F, 1.0F, .0F);
+	uWd = VECTOR3D(.0F, .0F, 1.0F);
+
+	Matrix3DRotateAxis(VECTOR3D(1.0f, .0f, .0f), rot.x, M);
 	Matrix3DTransformNormal(M, fWd, fWd);
 	Matrix3DTransformNormal(M, rWd, rWd);
 	Matrix3DTransformNormal(M, uWd, uWd);
 	Matrix3DTransformCoord(M, pos, pos);
 
-	Matrix3DRotateAxis(VECTOR3D(.0f, 1.0f, .0f), world.y, M);
+	Matrix3DRotateAxis(VECTOR3D(.0f, 1.0f, .0f), rot.y, M);
 	Matrix3DTransformNormal(M, fWd, fWd);
 	Matrix3DTransformNormal(M, rWd, rWd);
 	Matrix3DTransformNormal(M, uWd, uWd);
 	Matrix3DTransformCoord(M, pos, pos);
 
-	Matrix3DRotateAxis(VECTOR3D(.0f, .0f, 1.0f), world.z, M);
+	Matrix3DRotateAxis(VECTOR3D(.0f, .0f, 1.0f), rot.z, M);
 	Matrix3DTransformNormal(M, fWd, fWd);
 	Matrix3DTransformNormal(M, rWd, rWd);
 	Matrix3DTransformNormal(M, uWd, uWd);

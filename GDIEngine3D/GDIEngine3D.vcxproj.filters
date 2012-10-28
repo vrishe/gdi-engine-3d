@@ -104,6 +104,9 @@
     <ClCompile Include="Primitives.cpp">
       <Filter>Файлы исходного кода\GDIEngine3D</Filter>
     </ClCompile>
+    <ClCompile Include="IUnknown.cpp">
+      <Filter>Файлы исходного кода\Service_internals</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basis.inl">

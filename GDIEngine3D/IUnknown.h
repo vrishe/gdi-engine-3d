@@ -2,15 +2,26 @@
 
 #pragma once
 
+typedef class IUnknown *LPUNKNOWN;
+typedef std::vector<LPUNKNOWN> GLOBAL_REGISTRY;
+
 class IUnknown
 {
+private:
+	static GLOBAL_REGISTRY  _registry;
+	size_t					_id;
+
 protected:
-	IUnknown() { };
+	IUnknown();
 
 public:
-	virtual ~IUnknown() { };
+	static LPUNKNOWN getByID(size_t objID);
+
+	virtual ~IUnknown();
+
+	size_t getID() const;
 };
-typedef IUnknown *LPUNKNOWN;
+
 
 bool operator==(const IUnknown &a, const IUnknown &b);
 bool operator!=(const IUnknown &a, const IUnknown &b);

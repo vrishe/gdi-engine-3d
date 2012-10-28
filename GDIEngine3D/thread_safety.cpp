@@ -78,29 +78,29 @@ namespace thread_safety
 
 		if (lpObj != NULL)
 		{
-			size_t uObjKey = alModuleObjects.size();
+			//size_t uObjKey = alModuleObjects.size();
 
-			if (alModuleObjects.find(uObjKey) != alModuleObjects.end())
-			{
-				uObjKey = 0;
+			//if (alModuleObjects.find(uObjKey) != alModuleObjects.end())
+			//{
+			//	uObjKey = 0;
 
-				__foreach(OBJECT_REGISTRY::iterator, entry, alModuleObjects)
-				{
-					OBJECT_REGISTRY::iterator entry_next = entry;
-					if (++entry_next == _end || (entry_next->first - entry->first) > 1) 
-					{
-						uObjKey = entry->first + 1;
-						break;
-					}
+			//	__foreach(OBJECT_REGISTRY::iterator, entry, alModuleObjects)
+			//	{
+			//		OBJECT_REGISTRY::iterator entry_next = entry;
+			//		if (++entry_next == _end || (entry_next->first - entry->first) > 1) 
+			//		{
+			//			uObjKey = entry->first + 1;
+			//			break;
+			//		}
 
-					//if (++uObjKey != entry->first) break;
-				}
-			}
+			//		//if (++uObjKey != entry->first) break;
+			//	}
+			//}
 
-			if (uObjKey != SIZE_MAX) 
-			{
+			//if (uObjKey != SIZE_MAX) 
+			//{
 				OBJECT_REGISTRY::_Pairib pbInsertResult 
-					= alModuleObjects.insert(OBJECT_REGISTRY::value_type(uObjKey, MUTUAL_ACCESSOR()));
+					= alModuleObjects.insert(OBJECT_REGISTRY::value_type(lpObj->getID(), MUTUAL_ACCESSOR()));
 				
 				if (pbInsertResult.second)
 				{
@@ -116,7 +116,7 @@ namespace thread_safety
 						return pbInsertResult.first->first;
 					}
 				}
-			}
+			//}
 		}
 		else
 		{
