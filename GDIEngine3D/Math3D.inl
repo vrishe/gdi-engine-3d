@@ -1,8 +1,5 @@
 #pragma once
 
-#include <memory.h>
-#include <cmath>
-
 // ============================================================================
 // Implementation of _tagVector3D struct:
 inline _tagVector3D::_tagVector3D() 
@@ -91,9 +88,9 @@ inline _tagVector3D _tagVector3D::operator- () const
 
 inline bool _tagVector3D::operator== (const _tagVector3D& u) const
 {
-	return abs(x - u.x) < EPS
-		&& abs(y - u.y) < EPS
-		&& abs(z - u.z) < EPS;
+	return abs(x - u.x) < .0
+		&& abs(y - u.y) < .0
+		&& abs(z - u.z) < .0;
 }
 
 inline bool _tagVector3D::operator!= (const _tagVector3D& u) const {	return !operator==(u); }
@@ -107,7 +104,7 @@ float Vector3DLength(const VECTOR3D &src) {
 }
 inline void Vector3DNormalize(const VECTOR3D &src, VECTOR3D &rslt) {
 	float vLen = Vector3DLength(src);
-	if ( vLen > EPS )
+	if ( vLen > .0 )
 		rslt = src / vLen;
 }
 inline void Vector3DMultV(const VECTOR3D &in1, const VECTOR3D &in2, VECTOR3D &out)
