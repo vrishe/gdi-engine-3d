@@ -221,17 +221,17 @@ void _clsObject::Rotate(float x, float y, float z)
 void _clsObject::LookAt(const VECTOR3D &lookAt, const LPVECTOR3D upOrient)
 {
 	VECTOR3D lookDir	= lookAt - pos;
-	VECTOR3D vUp		= abs(uWd.z) < EPS ? uWd : VECTOR3D(0, 0, 1) * uWd.z;
+	VECTOR3D vUp		= abs(uWd.z) < .0 ? uWd : VECTOR3D(0, 0, 1) * uWd.z;
 
-	if ( Vector3DLength(lookDir) > EPS )
+	if ( Vector3DLength(lookDir) > .0 )
 	{
-		if (upOrient != NULL && Vector3DLength(*upOrient) > EPS) Vector3DNormalize(*upOrient, vUp);
+		if (upOrient != NULL && Vector3DLength(*upOrient) > .0) Vector3DNormalize(*upOrient, vUp);
 
 		Vector3DNormalize(lookDir, fWd);
 		Vector3DMultV(vUp, fWd, rWd);
 		Vector3DNormalize(rWd, rWd);
 
-		if ( Vector3DLength(rWd) < EPS ) 
+		if ( Vector3DLength(rWd) < .0 ) 
 			rWd = VECTOR3D(0, 1, 0) * (FLOAT)((uWd.z >= 0) - (uWd.z < 0));
 
 		Vector3DMultV(fWd, rWd, uWd);
@@ -244,7 +244,7 @@ void _clsObject::ArbitraryOrbitMoveAround(
 	const VECTOR3D &vPivot, 
 	float units
 ) {
-	if (Vector3DLength(vAxis) > EPS)
+	if (Vector3DLength(vAxis) > .0)
 	{
 		MATRIX3D M(true);
 		float angle = units / obj->Distance(vPivot);

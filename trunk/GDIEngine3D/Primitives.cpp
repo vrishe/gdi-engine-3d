@@ -414,21 +414,15 @@ void _clsPipe::setPrecission(int n)		{ precision = n; }
 // ============================================================================
 // _clsSphere class implementation
 
-_clsSphere::_clsSphere(
-		float			Radius,
-		float			Crop,
-		float			From,
-		float			To,
-		unsigned int	Prec,
-		COLORREF		c
-) : MESH3D(MSH_PRIMITIVE, c) {
-	radius		= abs(Radius);
-	precision	= Prec;
-	cropMult	= Crop;
-	angleFrom	= From;
-	angleTo		= To;
-	if ( cropMult < EPS	)			cropMult = .0f;
-	if ( cropMult - 1.0f > EPS )	cropMult = 1.0f;
+_clsSphere::_clsSphere(float Radius, float Crop, float From, float To, unsigned int	Precision, COLORREF	c)
+	: MESH3D(MSH_PRIMITIVE, c) 
+{
+	setRadius(Radius);
+	setCrop(Crop);
+	setPrecision(Precision);
+
+	setSliceFrom(From);
+	setSliceTo(To);
 
 	Triangulate();
 }
@@ -441,22 +435,23 @@ void _clsSphere::Triangulate()
 		edges.clear();
 		polygons.clear();
 
-		float	cropZ	= radius *  (2 * cropMult - 1),
-				vAngle  = asin(cropZ / radius),
-				vDelta	= ((float)M_PI_2 - vAngle) / (float)(precision / 2),	
-				hDelta	= abs((angleTo - angleFrom) / precision);
+		bool isSliced = angleFrom != .0f || angleTo != .0f;
 
-		BOOL isSliced	= cos(angleFrom) != 1.0f || cos(angleTo) != 1.0f;
-		UINT perCircle	= isSliced ? precision + 2 : precision;
-		if ( abs(cropZ) < radius - EPS ) 
+		float cropZ	 = radius * (2 * cropMult - 1),
+			  vAngle = asin(cropZ / radius),
+			  vDelta = ((float)M_PI_2 - vAngle) / ((float)precision / 2),	
+			  hDelta = abs((isSliced ? (angleTo - angleFrom) : ((float)2 * M_PI)) / precision);
+
+		unsigned int perCircle = isSliced ? precision + 2 : precision;
+		if ( abs(cropZ) < radius ) 
 			vertices.push_back(VECTOR3D(.0f, .0f, cropZ));
 
-		while ( (float)M_PI_2 - vAngle > -EPS )
+		while ( (float)M_PI_2 - vAngle > .0 )
 		{
 			float cropX	= radius * cos(vAngle);
-			UINT vCount	= cropX > EPS ? perCircle : 1;
+			UINT vCount	= cropX > .0 ? perCircle : 1;
 
-			LPVECTOR3D v	= new VECTOR3D[vCount];
+			LPVECTOR3D v = new VECTOR3D[vCount];
 
 			float hAngle = angleFrom;
 			UINT max = isSliced ? vCount - 1 : vCount;
@@ -522,3 +517,15 @@ void _clsSphere::Triangulate()
 		polygons.shrink_to_fit();
 	}
 }
+
+void _clsSphere::setRadius(float Radius)		 { radius = Radius >= .0F ? Radius : .0F; }
+void _clsSphere::setCrop(float Crop)			 { cropMult = .0 <= Crop && Crop <= 1.0 ? Crop : .0F; }
+void _clsSphere::setPrecision(unsigned int Prec) { precision = Prec > 3 ? Prec : 4; }
+void _clsSphere::setSliceFrom(float from)		 { angleFrom = from - (float)(floor((double)from / (2 * M_PI)) * 2 * M_PI); }
+void _clsSphere::setSliceTo(float to)			 { angleTo = to - (float)(floor((double)to / (2 * M_PI)) * 2 * M_PI); }
+
+float _clsSphere::getRadius()			{ return radius; }
+float _clsSphere::getCrop()				{ return cropMult; }
+unsigned int _clsSphere::getPrecision() { return precision; }
+float _clsSphere::getSliceFrom()		{ return angleFrom; }
+float _clsSphere::getSliceTo()			{ return angleTo; }

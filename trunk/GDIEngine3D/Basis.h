@@ -65,12 +65,12 @@ class IColorable
 protected:
 	COLORREF color;
 
-	inline IColorable() { setColor(RGB(255, 255, 255)); }
-	inline IColorable(COLORREF c) { setColor(c); }
+	inline IColorable()				{ setColor(RGB(255, 255, 255)); }
+	inline IColorable(COLORREF c)	{ setColor(c); }
 
 public:
-	inline void setColor(COLORREF c) { color = c; }
-	inline COLORREF getColor() { return color; }
+	inline void setColor(COLORREF c)	{ color = c; }
+	inline COLORREF getColor()			{ return color; }
 };
 
 typedef std::basic_string<TCHAR> tstring;
@@ -101,7 +101,6 @@ enum CONSTRAINTS {
 typedef class _clsObject : public IUnknown {
 private: 	
 	CLASS_ID ClassID;
-	size_t	 ID;
 
 	static void InitDefaultValues(_clsObject *obj);
 
@@ -120,10 +119,6 @@ protected:
 	// Scaling
 	VECTOR3D	worldScale;
 	VECTOR3D	localScale;
-
-	CONSTRAINTS	moveConst;
-
-	//void PitchYawRoll();
 
 public:
 	_clsObject(CLASS_ID getClassID = CLS_OBJECT);

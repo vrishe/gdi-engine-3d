@@ -5,7 +5,13 @@
 // ============================================================================
 // _clsPyramid class declaration
 
-typedef class _clsPyramid : public MESH3D {
+class ITriangulable
+{
+public:
+	virtual void Triangulate() = 0;
+};
+
+typedef class _clsPyramid : public MESH3D, public ITriangulable {
 protected:
 	float h;		// height
 	float bL;		// base length
@@ -26,7 +32,6 @@ public:
 		float sh = 0
 	);
 
-	// functionality
 	virtual void Triangulate(); // generate vertices, edges and polygons lists
 
 	// getters
@@ -48,7 +53,7 @@ public:
 // ============================================================================
 // _clsCone class declaration
 
-typedef class _clsCone : public MESH3D {
+typedef class _clsCone : public MESH3D, public ITriangulable {
 protected:
 	float h;			// cone height
 	float bR;			// base radius
@@ -65,15 +70,13 @@ public:
 		COLORREF	c
 	);
 
-
-	// functionality
 	virtual void Triangulate(); // generate vertices, edges and polygons lists
 
 	// getters
 	float getHeight();
 	float getBRadius();
 	float getTRadius();
-	int getPrecision();
+	int   getPrecision();
 
 	// setters
 	void setHeight(float); 
@@ -86,7 +89,7 @@ public:
 // ============================================================================
 // _clsPipe class declaration
 
-typedef class _clsPipe : public MESH3D {
+typedef class _clsPipe : public MESH3D, public ITriangulable {
 protected:
 	float h;			// cone height
 	float bR;			// base radius
@@ -94,6 +97,8 @@ protected:
 	float tR;			// top radius
 	float tRh;			// top hole radius
 	int precision;	// precision of circle approximation in polygons
+
+	
 
 public:
 	_clsPipe(COLORREF c);
@@ -107,8 +112,7 @@ public:
 		COLORREF	c
 	);
 
-	// functionality
-	void Triangulate(); // generate vertices, edges and polygons lists
+	virtual void Triangulate(); // generate vertices, edges and polygons lists
 
 	// getters
 	float getHeight();
@@ -116,7 +120,7 @@ public:
 	float getTRadius();
 	float getBHoleRadius();
 	float getTHoleRadius();
-	int getPrecision();
+	int   getPrecision();
 
 	// setters
 	void setHeight(float); 
@@ -131,31 +135,29 @@ public:
 // ============================================================================
 // _clsSphere class declaration
 
-typedef class _clsSphere : public MESH3D {
+typedef class _clsSphere : public MESH3D, public ITriangulable {
 protected:
-	float			radius;
-	float			cropMult;
-	float			angleFrom;
-	float			angleTo;
-	unsigned int	precision;
+	float radius;
+	float cropMult;
+	float angleFrom;
+	float angleTo;
+	unsigned int precision;
 
-	void			Triangulate();
 public:
 	_clsSphere(COLORREF c);
-	_clsSphere(
-		float			Radius,
-		float			Crop,
-		float			From,
-		float			To,
-		unsigned int	Prec,
-		COLORREF		c
-	);
+	_clsSphere(float Radius, float Crop, float From, float To, unsigned int Precision, COLORREF c);
 
-	void	setRadius(float Radius);
-	void	setCrop(float Plane);
-	void	setPrecision(int Prec);
+	virtual void Triangulate();
 
-	float	getRadius();
-	float	getCrop();
-	int		getPrecision();
+	void setRadius(float Radius);
+	void setCrop(float Crop);
+	void setPrecision(unsigned int Precision);
+	void setSliceFrom(float from);
+	void setSliceTo(float to);
+
+	float getRadius();
+	float getCrop();
+	unsigned int getPrecision();
+	float getSliceFrom();
+	float getSliceTo();
 } SPHERE3D, *LPSPHERE3D;

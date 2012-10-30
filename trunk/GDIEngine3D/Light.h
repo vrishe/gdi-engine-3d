@@ -10,7 +10,7 @@
 
 typedef class _clsOmniLight : public OBJECT3D, public IColorable {
 private:
-	float		power;
+	float power;
 
 	static void InitDefaultValues(_clsOmniLight *obj);
 

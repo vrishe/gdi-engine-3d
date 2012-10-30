@@ -171,10 +171,10 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 						if ( power == 0 || lightColor == BLACK)
 							continue;
 						FLOAT ratio = Vector3DMultS(normal, lightToRender->getForwardLookDirection());
-						if (ratio < -EPS)
+						if (ratio < -.0)
 							ratio = power - ratio;
 						else
-							if (ratio < EPS)
+							if (ratio < .0)
 								ratio = max(power / 3.3f, (FLOAT)DARK_SIDE);
 							else
 								ratio = (FLOAT)DARK_SIDE;

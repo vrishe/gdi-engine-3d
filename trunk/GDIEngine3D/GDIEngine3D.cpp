@@ -625,18 +625,6 @@ BOOL WINAPI CameraVerticalFOVGet(HCAMERA hCamera, FLOAT &fVFov)
 // ============================================================================
 // CScene library interface implementation
 
-#define CLSID_BITCOUNT sizeof(SCENE_OBJECT)
-#define INDEX_BITCOUNT (7 * sizeof(SCENE_OBJECT))
-
-#define _MAX_OBJECT_CLSID (SIZE_MAX << INDEX_BITCOUNT)
-#define _MAX_OBJECT_INDEX (SIZE_MAX >> CLSID_BITCOUNT)
-
-#define _MAKE_SCENE_OBJECT(clsID, objIndex)	\
-	( (((SCENE_OBJECT)clsID) << INDEX_BITCOUNT) | (((SCENE_OBJECT)objIndex) & _MAX_OBJECT_INDEX) )
-
-#define _EXTRACT_OBJECT_CLSID(scene_object)	(CLASS_ID)(((SCENE_OBJECT)scene_object) >> INDEX_BITCOUNT)
-#define _EXTRACT_OBJECT_INDEX(scene_object) (size_t)(((SCENE_OBJECT)scene_object) & _MAX_OBJECT_INDEX)
-
 HSCENE WINAPI SceneCreate() 
 {
 	return (HSCENE)CreateObject(new SCENE3D());
@@ -733,11 +721,8 @@ BOOL WINAPI SceneObjectRemove(HSCENE hScene, SCENE_OBJECT scObject)
 
 	if (isValid)
 	{
-		CLASS_ID	clsID = _EXTRACT_OBJECT_CLSID(scObject);
-		size_t		objID = _EXTRACT_OBJECT_INDEX(scObject);
-
-		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(objID));
-		if (bResult = victim != NULL) 
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim)) 
 		{
 			((LPSCENE3D)Master)->DeleteObject(victim);
 			delete victim;
@@ -765,11 +750,8 @@ BOOL WINAPI SceneObjectTranslate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fX,
 
 	if (isValid)
 	{
-		CLASS_ID	clsID		= _EXTRACT_OBJECT_CLSID(scObject);
-		size_t		uObjIndex	= _EXTRACT_OBJECT_INDEX(scObject);
-
-		LPOBJECT3D victim = ((LPSCENE3D)Master)->getObject(clsID, uObjIndex);
-		if (bResult = victim != NULL)
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim)) 
 		{
 			victim->Translate(fX, fY, fZ);
 		}		
@@ -796,11 +778,8 @@ BOOL WINAPI SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fXRoll
 
 	if (isValid)
 	{
-		CLASS_ID	clsID		= _EXTRACT_OBJECT_CLSID(scObject);
-		size_t		uObjIndex	= _EXTRACT_OBJECT_INDEX(scObject);
-
-		LPOBJECT3D victim = ((LPSCENE3D)Master)->getObject(clsID, uObjIndex);
-		if (bResult = victim != NULL)
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim)) 
 		{
 			victim->Rotate(fXRoll, fYPitch, fZYaw);
 		}		
@@ -827,12 +806,8 @@ BOOL WINAPI SceneObjectNameSet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsN
 
 	if (isValid)
 	{
-		LPOBJECT3D victim = ((LPSCENE3D)Master)->getObject(
-			_EXTRACT_OBJECT_CLSID(scObject), 
-			_EXTRACT_OBJECT_INDEX(scObject)
-			);
-
-		if (bResult = victim != NULL)
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim)) 
 		{
 			victim->setName(tstring(tcsName != NULL ? tcsName : _T("")));
 		}
@@ -859,12 +834,8 @@ BOOL WINAPI SceneObjectNameGet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsN
 
 	if (isValid)
 	{
-		LPOBJECT3D victim = ((LPSCENE3D)Master)->getObject(
-			_EXTRACT_OBJECT_CLSID(scObject), 
-			_EXTRACT_OBJECT_INDEX(scObject)
-			);
-
-		if ( bResult = victim != NULL )
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim)) 
 		{
 			tcsCharCount = tcsName == NULL ?
 				victim->getName().length() :
@@ -893,14 +864,10 @@ BOOL WINAPI SceneObjectColorSet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF c
 
 	if (isValid)
 	{
-		LPOBJECT3D victim = ((LPSCENE3D)Master)->getObject(
-			_EXTRACT_OBJECT_CLSID(scObject), 
-			_EXTRACT_OBJECT_INDEX(scObject)
-			);
-
-		if (bResult = victim != NULL)
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim)) 
 		{
-			((IColorable*)victim)->setColor(color);
+			dynamic_cast<IColorable*>(victim)->setColor(color);
 		}
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
@@ -925,14 +892,10 @@ BOOL WINAPI SceneObjectColorGet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF &
 
 	if (isValid)
 	{
-		LPOBJECT3D victim = ((LPSCENE3D)Master)->getObject(
-			_EXTRACT_OBJECT_CLSID(scObject), 
-			_EXTRACT_OBJECT_INDEX(scObject)
-			);
-
-		if ( bResult = victim != NULL )
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim)) 
 		{
-			color = ((IColorable*)victim)->getColor();
+			color = dynamic_cast<IColorable*>(victim)->getColor();
 		}
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
@@ -961,7 +924,7 @@ SCENE_OBJECT SceneObjectAdd(HSCENE hScene, LPOBJECT3D lpObject)
 		{
 			size_t objIndex;
 			((LPSCENE3D)Master)->findObjectIndex(lpObject, &objIndex);
-			scoResult = _MAKE_SCENE_OBJECT(lpObject->getClassID(), lpObject->getID());
+			scoResult = lpObject->getID();
 		}
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
@@ -970,14 +933,363 @@ SCENE_OBJECT SceneObjectAdd(HSCENE hScene, LPOBJECT3D lpObject)
 	return scoResult;
 }
 
+SCENE_OBJECT WINAPI SceneSphereCreate(HSCENE hScene, FLOAT radius, FLOAT crop, FLOAT sliceFrom, FLOAT sliceTo, UINT Precision, COLORREF Color)
+{
+	return SceneObjectAdd(hScene, new SPHERE3D(radius, crop, sliceFrom, sliceTo, Precision, Color));
+}
+
+BOOL WINAPI SceneSphereRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT radius)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
+		{
+			((LPSPHERE3D)victim)->setRadius(radius);
+			((LPSPHERE3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneSphereRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &radius)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
+		{
+			radius = ((LPSPHERE3D)victim)->getRadius();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneSpherePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT precision)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
+		{
+			((LPSPHERE3D)victim)->setPrecision(precision);
+			((LPSPHERE3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneSpherePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &precision)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
+		{
+			precision = ((LPSPHERE3D)victim)->getPrecision();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneSphereCropSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT crop)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
+		{
+			((LPSPHERE3D)victim)->setCrop(crop);
+			((LPSPHERE3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneSphereCropGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &crop)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
+		{
+			crop = ((LPSPHERE3D)victim)->getCrop();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneSphereSliceFromSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT from)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
+		{
+			((LPSPHERE3D)victim)->setSliceFrom(from);
+			((LPSPHERE3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneSphereSliceFromGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &from)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
+		{
+			from = ((LPSPHERE3D)victim)->getSliceFrom();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneSphereSliceToSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT to)
+{
+		BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
+		{
+			((LPSPHERE3D)victim)->setSliceTo(to);
+			((LPSPHERE3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneSphereSliceToGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &to)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
+		{
+			to = ((LPSPHERE3D)victim)->getSliceTo();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
 SCENE_OBJECT WINAPI SceneOmniLightCreate(HSCENE hScene, FLOAT Power, COLORREF Color)
 {
 	return SceneObjectAdd(hScene, new OMNILIGHT3D(Color, Power));
 }
 
-SCENE_OBJECT WINAPI SceneSphereCreate(HSCENE hScene, FLOAT Radius, UINT Precision, COLORREF Color)
+BOOL WINAPI SceneLightPowerSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT power)
 {
-	return SceneObjectAdd(hScene, new SPHERE3D(Radius, 0, 0, float(2 * M_PI), Precision, Color));
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_LIGHT )
+		{
+			((LPOMNILIGHT3D)victim)->setPower(power);
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
 }
 
-// TODO: implement CScene findObjectIndex, getFirstObject, getObject methods
+BOOL WINAPI SceneLightPowerGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &power)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_LIGHT )
+		{
+			power = ((LPOMNILIGHT3D)victim)->getPower();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}

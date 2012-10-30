@@ -14,11 +14,11 @@ inline void _clsCamera::InitDefaultValues(_clsCamera *cam)
 }
 
 inline PROJECTION_TYPE	_clsCamera::getProjectionType()	{ return projectionType; }
-inline float			_clsCamera::getHFov()				{ return hFOV; }
-inline float			_clsCamera::getVFov()				{ return vFOV; }
-inline float			_clsCamera::getFDist()				{ return fDist; }
+inline float			_clsCamera::getHFov()			{ return hFOV; }
+inline float			_clsCamera::getVFov()			{ return vFOV; }
+inline float			_clsCamera::getFDist()			{ return fDist; }
 inline float			_clsCamera::getNearCP()			{ return nearClip; }
-inline float			_clsCamera::getFarCP()				{ return farClip; }
+inline float			_clsCamera::getFarCP()			{ return farClip; }
 
 inline void _clsCamera::Zoom(float aspect)
 {
@@ -34,33 +34,31 @@ inline void _clsCamera::setProjectionType(PROJECTION_TYPE projType)
 
 inline void _clsCamera::setHFov(float fieldOfViewHoriz) 
 { 
-	if (fieldOfViewHoriz > EPS 
-		&& (FLOAT)M_PI - fieldOfViewHoriz > EPS
-		) hFOV = fieldOfViewHoriz;
+	if (fieldOfViewHoriz > .0 && (FLOAT)M_PI - fieldOfViewHoriz > .0) hFOV = fieldOfViewHoriz;
 }
 
 inline void _clsCamera::setVFov(float fieldOfViewVert) 
 { 
-	if (fieldOfViewVert > EPS 
-		&& (FLOAT)M_PI - fieldOfViewVert > EPS
+	if (fieldOfViewVert > .0 
+		&& (FLOAT)M_PI - fieldOfViewVert > .0
 		) vFOV = fieldOfViewVert;
 }
 
 inline void _clsCamera::setFDist(float dist)
 {
-	if (dist - nearClip > EPS
-		&& farClip - dist > EPS
+	if (dist - nearClip > .0
+		&& farClip - dist > .0
 		) fDist = dist;
 }
 
 inline void _clsCamera::setNearCP(float nearCP) 
 { 
-	if (nearCP >= EPS 
-		&& farClip - nearClip > EPS
+	if (nearCP >= .0 
+		&& farClip - nearClip > .0
 		) nearClip = nearCP; 
 }
 
 inline void _clsCamera::setFarCP(float farCP) 
 { 
-	if ( farCP - nearClip > EPS ) farClip = farCP; 
+	if ( farCP - nearClip > .0 ) farClip = farCP; 
 }

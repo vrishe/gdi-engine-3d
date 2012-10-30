@@ -1,10 +1,6 @@
 
 #pragma once
 
-#ifndef EPS
-#define EPS .0001f
-#endif // EPS
-
 typedef struct _tagVector
 {
 	float x;
