@@ -88,12 +88,12 @@ inline _tagVector3D _tagVector3D::operator- () const
 
 inline bool _tagVector3D::operator== (const _tagVector3D& u) const
 {
-	return abs(x - u.x) < .0
-		&& abs(y - u.y) < .0
-		&& abs(z - u.z) < .0;
+	return abs(x - u.x) == .0
+		&& abs(y - u.y) == .0
+		&& abs(z - u.z) == .0;
 }
 
-inline bool _tagVector3D::operator!= (const _tagVector3D& u) const {	return !operator==(u); }
+inline bool _tagVector3D::operator!= (const _tagVector3D& u) const { return !operator==(u); }
 
 float Vector3DLength(const VECTOR3D &src) {
 	return sqrt(
