@@ -1176,7 +1176,7 @@ BOOL WINAPI SceneSphereSliceFromGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT 
 
 BOOL WINAPI SceneSphereSliceToSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT to)
 {
-		BOOL bResult = FALSE;
+	BOOL bResult = FALSE;
 
 	LPUNKNOWN Master = NULL;
 
@@ -1225,6 +1225,306 @@ BOOL WINAPI SceneSphereSliceToGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &t
 			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(SPHERE3D))
 		{
 			to = ((LPSPHERE3D)victim)->getSliceTo();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+SCENE_OBJECT WINAPI ScenePyramidCreate(HSCENE hScene, FLOAT height, FLOAT baseLength, FLOAT baseWidth, FLOAT topLength, FLOAT topWidth, COLORREF color)
+{
+	return SceneObjectAdd(hScene, new PYRAMID3D(height, baseLength, baseWidth, topLength, topWidth, color));
+}
+
+BOOL WINAPI ScenePyramidHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(PYRAMID3D))
+		{
+			((LPPYRAMID3D)victim)->setHeight(height);
+			((LPPYRAMID3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI ScenePyramidHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(PYRAMID3D))
+		{
+			height = ((LPPYRAMID3D)victim)->getHeight();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI ScenePyramidBaseLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseLength)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(PYRAMID3D))
+		{
+			((LPPYRAMID3D)victim)->setBLength(baseLength);
+			((LPPYRAMID3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI ScenePyramidBaseLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseLength)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(PYRAMID3D))
+		{
+			baseLength = ((LPPYRAMID3D)victim)->getBLength();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI ScenePyramidBaseWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseWidth)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(PYRAMID3D))
+		{
+			((LPPYRAMID3D)victim)->setBWidth(baseWidth);
+			((LPPYRAMID3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI ScenePyramidBaseWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseWidth)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(PYRAMID3D))
+		{
+			baseWidth = ((LPPYRAMID3D)victim)->getBWidth();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI ScenePyramidTopLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topLength)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(PYRAMID3D))
+		{
+			((LPPYRAMID3D)victim)->setTLength(topLength);
+			((LPPYRAMID3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI ScenePyramidTopLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topLength)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(PYRAMID3D))
+		{
+			topLength = ((LPPYRAMID3D)victim)->getTLength();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI ScenePyramidTopWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topWidth)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(PYRAMID3D))
+		{
+			((LPPYRAMID3D)victim)->setTWidth(topWidth);
+			((LPPYRAMID3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI ScenePyramidTopWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topWidth)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(PYRAMID3D))
+		{
+			topWidth = ((LPPYRAMID3D)victim)->getTWidth();
 		}
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);

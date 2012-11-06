@@ -199,6 +199,39 @@ GDIENGINE3D_USERAPI
 	BOOL WINAPI SceneSphereSliceToGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &to);
 
 GDIENGINE3D_USERAPI
+	SCENE_OBJECT WINAPI ScenePyramidCreate(HSCENE hScene, FLOAT height, FLOAT baseLength, FLOAT baseWidth, FLOAT topLength, FLOAT topWidth, COLORREF color);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI ScenePyramidHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI ScenePyramidHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI ScenePyramidBaseLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseLength);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI ScenePyramidBaseLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseLength);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI ScenePyramidBaseWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseWidth);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI ScenePyramidBaseWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseWidth);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI ScenePyramidTopLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topLength);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI ScenePyramidTopLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topLength);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI ScenePyramidTopWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topWidth);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI ScenePyramidTopWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topWidth);
+
+GDIENGINE3D_USERAPI
 	SCENE_OBJECT WINAPI SceneOmniLightCreate(HSCENE hScene, FLOAT Power, COLORREF color);
 
 GDIENGINE3D_USERAPI
