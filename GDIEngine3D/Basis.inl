@@ -49,8 +49,8 @@ inline bool _tagPoly3D::isContainingEdge(const EDGE3D &e)
 inline void _clsObject::InitDefaultValues(_clsObject *obj)
 {
 	obj->fWd		= VECTOR3D(1.0f, .0f, .0f);
-	obj->rWd		= VECTOR3D(.0f, 1.0f, .0f);
-	obj->uWd		= VECTOR3D(.0f, .0f, 1.0f);
+	obj->rWd		= VECTOR3D(.0f, .0f, 1.0f);
+	obj->uWd		= VECTOR3D(.0f, 1.0f, .0f);
 	obj->rot		= VECTOR3D();
 
 	obj->worldScale	= VECTOR3D(1.0f, 1.0f, 1.0f);
@@ -145,28 +145,28 @@ inline void _clsObject::MoveTo(float pX, float pY, float pZ, float units)
 	MoveTo(VECTOR3D(pX, pY, pZ), units);
 }
 
-inline void _clsObject::GetMoveMatrix(MATRIX3D &mOut) 
+inline void _clsObject::GetMoveMatrix(MATRIX4 &mOut) 
 {
 	mOut._41 = pos.x;
 	mOut._42 = pos.y;
 	mOut._43 = pos.z;
 }
 
-inline void _clsObject::GetLocalScaleMatrix(MATRIX3D &mOut)
+inline void _clsObject::GetLocalScaleMatrix(MATRIX4 &mOut)
 {
 	mOut._11 = localScale.x;
 	mOut._22 = localScale.y;
 	mOut._33 = localScale.z;
 }
 
-inline void _clsObject::GetScaleMatrix(MATRIX3D &mOut) 
+inline void _clsObject::GetScaleMatrix(MATRIX4 &mOut) 
 {
 	mOut._11 = worldScale.x;
 	mOut._22 = worldScale.y;
 	mOut._33 = worldScale.z;
 }
 
-inline void _clsObject::GetRotationMatrix(MATRIX3D &mOut) 
+inline void _clsObject::GetRotationMatrix(MATRIX4 &mOut) 
 {
 	mOut._11 = rWd.x;
 	mOut._21 = fWd.x;

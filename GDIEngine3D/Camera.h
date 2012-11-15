@@ -40,8 +40,8 @@ public:
 	void			setNearCP(float nearCP);
 	void			setFarCP(float farCP);
 
-	void			GetViewMatrix(MATRIX3D &mOut);
-	void			GetProjectionMatrix(MATRIX3D &mOutm);
+	void			GetViewMatrix(MATRIX4 &mOut);
+	void			GetProjectionMatrix(MATRIX4 &mOutm);
 } CAMERA3D, *LPCAMERA3D;
 
 #include "Camera.inl"

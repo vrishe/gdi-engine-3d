@@ -13,15 +13,15 @@ void _clsPyramid::Triangulate() {
 	polygons.clear();
 
 		// setting base vertices
-	vertices.push_back(VECTOR3D(-bL/2,-bW/2, 0));	// 0
-	vertices.push_back(VECTOR3D(-bL/2,bW/2, 0));	// 1
-	vertices.push_back(VECTOR3D(bL/2,bW/2, 0));		// 2
-	vertices.push_back(VECTOR3D(bL/2,-bW/2, 0));	// 3
+	vertices.push_back(VECTOR3D(-bL/2, 0, -bW/2));	// 0
+	vertices.push_back(VECTOR3D(-bL/2, 0,  bW/2));	// 1
+	vertices.push_back(VECTOR3D( bL/2, 0,  bW/2));	// 2
+	vertices.push_back(VECTOR3D( bL/2, 0, -bW/2));	// 3
 		// setting top vertices
-	vertices.push_back(VECTOR3D(-tL/2 + shift,-tW/2, h));	// 4
-	vertices.push_back(VECTOR3D(-tL/2 + shift,tW/2, h));	// 5
-	vertices.push_back(VECTOR3D(tL/2 + shift,tW/2, h));		// 6
-	vertices.push_back(VECTOR3D(tL/2 + shift,-tW/2, h));	// 7
+	vertices.push_back(VECTOR3D(-tL/2 + shift, h, -tW/2));	// 4
+	vertices.push_back(VECTOR3D(-tL/2 + shift, h,  tW/2));	// 5
+	vertices.push_back(VECTOR3D( tL/2 + shift, h,  tW/2));	// 6
+	vertices.push_back(VECTOR3D( tL/2 + shift, h, -tW/2));	// 7
 
 		// setting edges
 	// setting base edges
@@ -437,16 +437,16 @@ void _clsSphere::Triangulate()
 
 		bool isSliced = angleFrom != .0f || angleTo != .0f;
 
-		float cropZ	 = radius * (2 * cropMult - 1),
+		float cropZ	 = radius * (2.0F * cropMult - 1.0F),
 			  vAngle = asin(cropZ / radius),
-			  vDelta = ((float)M_PI_2 - vAngle) / ((float)precision / 2),	
+			  vDelta = ((float)M_PI_2 - vAngle) / ((float)precision / 2.0F),	
 			  hDelta = abs((isSliced ? (angleTo - angleFrom) : (2.0F * (float)M_PI)) / precision);
 
 		unsigned int perCircle = isSliced ? precision + 2 : precision;
 		if ( abs(cropZ) < radius ) 
 			vertices.push_back(VECTOR3D(.0f, .0f, cropZ));
 
-		while ( (float)M_PI_2 - vAngle > .0 )
+		while ( ((float)M_PI_2 - vAngle) >= .0 )
 		{
 			float cropX	= radius * cos(vAngle);
 			UINT vCount	= cropX > .0 ? perCircle : 1;
@@ -455,7 +455,7 @@ void _clsSphere::Triangulate()
 
 			float hAngle = angleFrom;
 			UINT max = isSliced ? vCount - 1 : vCount;
-			for( UINT	i	= 0; i < max; i++ ) 
+			for( UINT i = 0; i < max; i++ ) 
 			{
 				v[i].x = cropX * cos(hAngle);
 				v[i].y = cropX * sin(hAngle);
@@ -468,12 +468,10 @@ void _clsSphere::Triangulate()
 			
 			delete[] v;
 
-			vAngle += vDelta;
-			cropZ = radius * sin(vAngle); 
+			cropZ = radius * sin(vAngle += vDelta); 
 		}
 
-		UINT	i	= 1,
-				max = vertices.size();
+		UINT i = 1, max = vertices.size();
 		while ( i < max )
 		{
 			for ( UINT j = i, m = i + perCircle; j < m; j++ )
