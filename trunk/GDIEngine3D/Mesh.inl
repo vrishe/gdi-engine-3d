@@ -44,6 +44,12 @@ inline size_t		_clsMesh::getVerticesCount()		{ return vertices.size(); }
 inline size_t		_clsMesh::getEdgesCount()			{ return edges.size(); }
 inline size_t		_clsMesh::getPolygonsCount()		{ return polygons.size(); }
 
+inline void _clsMesh::setSelfIllumination(float self_illumination)
+{ 
+	self_illumination_coeff = self_illumination;
+}
+inline float _clsMesh::getSelfIllumination() const { return self_illumination_coeff; }
+
 inline void _clsMesh::getVertexData(VERT_LIST &vertices)
 {
 	vertices = this->vertices;

@@ -117,31 +117,45 @@ inline void Vector3DMultV(const VECTOR3D &in1, const VECTOR3D &in2, VECTOR3D &ou
 }
 inline float Vector3DMultS(const VECTOR3D &in1, const VECTOR3D &in2)
 {
-	return in1.x * in2.x 
-		+ in1.y * in2.y 
-		+ in1.z * in2.z;
+	return in1.x * in2.x + in1.y * in2.y + in1.z * in2.z;
 }
 
 // ============================================================================
-// Implementation of _tagMatrix3D struct:
+// Implementation of _tagMatrix3 struct:
 
-inline _tagMatrix3D::_tagMatrix3D(bool bSetIdentity) 
+inline _tagMatrix3::_tagMatrix3(
+	        float a11, float a12, float a13,
+            float a21, float a22, float a23,
+            float a31, float a32, float a33
+) {	memcpy_s(m, sizeof(m), &a11, sizeof(m)); }
+
+inline float _tagMatrix3::Determinant() const 
+{
+	return _11 * (_22 * _33 - _32 * _23)
+		 - _12 * (_21 * _33 - _31 * _23)
+		 + _13 * (_21 * _32 - _31 * _22);
+}
+
+// ============================================================================
+// Implementation of _tagMatrix4 struct:
+
+inline _tagMatrix4::_tagMatrix4(bool bSetIdentity) 
 { 
 	bSetIdentity ? SetIdentity() : Fill(0); 
 }
 
-inline _tagMatrix3D::_tagMatrix3D(int filler) { Fill(filler); }
+inline _tagMatrix4::_tagMatrix4(int filler) { Fill(filler); }
 
-inline _tagMatrix3D::_tagMatrix3D(
+inline _tagMatrix4::_tagMatrix4(
 	        float a11, float a12, float a13, float a14,
             float a21, float a22, float a23, float a24,
             float a31, float a32, float a33, float a34,
             float a41, float a42, float a43, float a44
 ) {	memcpy_s(m, sizeof(m), &a11, sizeof(m)); }
 
-inline void _tagMatrix3D::Fill(int filler) { memset(m, filler, sizeof(m)); }
+inline void _tagMatrix4::Fill(int filler) { memset(m, filler, sizeof(m)); }
 
-inline void _tagMatrix3D::SetIdentity() 
+inline void _tagMatrix4::SetIdentity() 
 { 
 	Fill(0);
 	for (
@@ -153,18 +167,18 @@ inline void _tagMatrix3D::SetIdentity()
 	) { *((float*)m + i) = 1.0; }
 }
 
-inline void Matrix3DRotateAxis(const VECTOR3D &axis, float rads, MATRIX3D &rslt)
+inline void Matrix3DRotateAxis(const VECTOR3D &axis, float rads, MATRIX4 &rslt)
 {
-	float	sinTheta	= sin(rads),
-			cosTheta	= cos(rads),
-			_1mCosTheta	= 1 - cosTheta;
+	float	sinTheta	= -sin(rads),
+			cosTheta	=  cos(rads),
+			_1mCosTheta	=  1 - cosTheta;
 
 	rslt._11 = _1mCosTheta * axis.x * axis.x + cosTheta;
 	rslt._12 = _1mCosTheta * axis.x * axis.y - axis.z * sinTheta;
 	rslt._13 = _1mCosTheta * axis.x * axis.z + axis.y * sinTheta;
 	rslt._14 = .0f;
 
-	rslt._21 = _1mCosTheta * axis.x * axis.y + axis.z * sinTheta;;
+	rslt._21 = _1mCosTheta * axis.x * axis.y + axis.z * sinTheta;
 	rslt._22 = _1mCosTheta * axis.y * axis.y + cosTheta;
 	rslt._23 = _1mCosTheta * axis.y * axis.z - axis.x * sinTheta;
 	rslt._24 = .0f;
@@ -179,38 +193,19 @@ inline void Matrix3DRotateAxis(const VECTOR3D &axis, float rads, MATRIX3D &rslt)
 	rslt._43 = .0f;
 	rslt._44 =	1.0f; 
 }
-inline void Matrix3DTransformCoord(const MATRIX3D &T, const VECTOR3D &in, VECTOR3D &out) 
+inline void Matrix3DTransformCoord(const MATRIX4 &T, const VECTOR3D &in, VECTOR3D &out) 
 {
 	out = VECTOR3D(
-			T._11 * in.x 
-			+ T._21 * in.y 
-			+ T._31 * in.z
-			+ T._41,
-
-			T._12 * in.x 
-			+ T._22 * in.y 
-			+ T._32 * in.z
-			+ T._42,
-
-			T._13 * in.x 
-			+ T._23 * in.y 
-			+ T._33 * in.z
-			+ T._43
+			T._11 * in.x + T._21 * in.y + T._31 * in.z + T._41,
+			T._12 * in.x + T._22 * in.y + T._32 * in.z + T._42,
+			T._13 * in.x + T._23 * in.y + T._33 * in.z + T._43
 		);
 }
-inline void Matrix3DTransformNormal(const MATRIX3D &T, const VECTOR3D &in, VECTOR3D &out) 
+inline void Matrix3DTransformNormal(const MATRIX4 &T, const VECTOR3D &in, VECTOR3D &out) 
 {
 	out = VECTOR3D(
-			T._11 * in.x 
-			+ T._21 * in.y 
-			+ T._31 * in.z,
-
-			T._12 * in.x 
-			+ T._22 * in.y 
-			+ T._32 * in.z,
-
-			T._13 * in.x 
-			+ T._23 * in.y 
-			+ T._33 * in.z
+			T._11 * in.x + T._21 * in.y + T._31 * in.z,
+			T._12 * in.x + T._22 * in.y + T._32 * in.z,
+			T._13 * in.x + T._23 * in.y + T._33 * in.z
 		);
 }

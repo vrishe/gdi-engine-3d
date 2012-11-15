@@ -399,7 +399,7 @@ BOOL WINAPI CameraTranslate(HCAMERA hCamera, FLOAT fX, FLOAT fY, FLOAT fZ)
 	return isValid;
 }
 
-BOOL WINAPI CameraRotate(HCAMERA hCamera, FLOAT fXRoll, FLOAT fZYaw, FLOAT fYPitch)
+BOOL WINAPI CameraRotate(HCAMERA hCamera, FLOAT Roll, FLOAT Yaw, FLOAT Pitch)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -415,7 +415,7 @@ BOOL WINAPI CameraRotate(HCAMERA hCamera, FLOAT fXRoll, FLOAT fZYaw, FLOAT fYPit
 
 	if (isValid)
 	{
-		((LPCAMERA3D)Master)->Rotate(fXRoll, fYPitch, fZYaw);
+		((LPCAMERA3D)Master)->LocalRotate(Roll, Yaw, Pitch, true);
 
 		thread_safety::UnlockObjectRegistered((size_t)hCamera, Master);
 	}
@@ -762,7 +762,7 @@ BOOL WINAPI SceneObjectTranslate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fX,
 	return bResult;
 }
 
-BOOL WINAPI SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fXRoll, FLOAT fZYaw, FLOAT fYPitch)
+BOOL WINAPI SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT Roll, FLOAT Yaw, FLOAT Pitch)
 {
 	BOOL bResult = FALSE;
 
@@ -781,7 +781,7 @@ BOOL WINAPI SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fXRoll
 		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
 		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim)) 
 		{
-			victim->Rotate(fXRoll, fYPitch, fZYaw);
+			victim->LocalRotate(Roll, Yaw, Pitch, true);
 		}		
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);

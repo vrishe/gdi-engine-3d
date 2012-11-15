@@ -49,8 +49,10 @@ typedef struct _tagPoly3D {
 
 	_tagPoly3D();
 	_tagPoly3D(size_t a, size_t b, size_t c);
-	VECTOR3D Normal(const LPVERT_LIST, size_t startVert);
-	VECTOR3D Normal(const LPVECTOR3D, size_t startVert);
+	VECTOR3D Normal(const LPVERT_LIST vs, size_t startVert)	const;
+	VECTOR3D Normal(const LPVECTOR3D vs, size_t startVert)	const;
+	bool CoordinateMassCenter(const LPVERT_LIST, VECTOR3D &out)		const;
+	bool CoordinateMassCenter(const LPVECTOR3D , VECTOR3D &out)		const;
 
 	_tagPoly3D& operator+= (const UINT& p);
 	bool operator==(const _tagPoly3D &b) const;
@@ -145,8 +147,7 @@ public:
 	void RotatePitch(float angle);
 	void RotateYaw(float angle);
 	void RotateRoll(float angle);
-	void LocalRotate(float roll, float yaw, float pitch);
-	void Rotate(float x, float y, float z);
+	void LocalRotate(float roll, float yaw, float pitch, bool reset_rotation);
 
 	float Distance(const VECTOR3D &vDst);
 	float Distance(const _clsObject &objDst);
@@ -175,10 +176,10 @@ public:
 	void MoveTo(const _clsObject &objPivot, float units);
 	void MoveTo(float pX, float pY, float pZ, float units);
 
-	void GetMoveMatrix(MATRIX3D &mOut);
-	void GetLocalScaleMatrix(MATRIX3D &mOut);
-	void GetScaleMatrix(MATRIX3D &mOut);
-	void GetRotationMatrix(MATRIX3D &mOut);
+	void GetMoveMatrix(MATRIX4 &mOut);
+	void GetLocalScaleMatrix(MATRIX4 &mOut);
+	void GetScaleMatrix(MATRIX4 &mOut);
+	void GetRotationMatrix(MATRIX4 &mOut);
 
 	CLASS_ID getClassID()	const;
 

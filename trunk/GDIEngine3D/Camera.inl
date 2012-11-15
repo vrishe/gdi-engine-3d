@@ -10,7 +10,7 @@ inline void _clsCamera::InitDefaultValues(_clsCamera *cam)
 	cam->vFOV			= (float)M_PI_2;
 	cam->nearClip		= 1.0F;
 	cam->farClip		= 1000.0F;
-	cam->fDist			= 499.5F; // (farClip - nearClip) / 2
+	cam->fDist			= 499.5F;
 }
 
 inline PROJECTION_TYPE	_clsCamera::getProjectionType()	{ return projectionType; }
@@ -34,14 +34,12 @@ inline void _clsCamera::setProjectionType(PROJECTION_TYPE projType)
 
 inline void _clsCamera::setHFov(float fieldOfViewHoriz) 
 { 
-	if (fieldOfViewHoriz > .0 && (FLOAT)M_PI - fieldOfViewHoriz > .0) hFOV = fieldOfViewHoriz;
+	if (fieldOfViewHoriz > .0 && ((FLOAT)M_PI - fieldOfViewHoriz) > .0) hFOV = fieldOfViewHoriz;
 }
 
 inline void _clsCamera::setVFov(float fieldOfViewVert) 
 { 
-	if (fieldOfViewVert > .0 
-		&& (FLOAT)M_PI - fieldOfViewVert > .0
-		) vFOV = fieldOfViewVert;
+	if (fieldOfViewVert > .0 && ((FLOAT)M_PI - fieldOfViewVert) > .0) vFOV = fieldOfViewVert;
 }
 
 inline void _clsCamera::setFDist(float dist)

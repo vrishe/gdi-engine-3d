@@ -102,7 +102,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 		LPEDGE3D		objEdgeBuffer;
 		LPPOLY3D		objPolyBuffer;
 
-		MATRIX3D		cameraMatrix,
+		MATRIX4		cameraMatrix,
 						projectionMatrix,
 						viewportMatrix;
 	
@@ -134,7 +134,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 		lpCamera->GetProjectionMatrix(projectionMatrix);
 
 		viewportMatrix.SetIdentity();
-		viewportMatrix._22 = -1.0f;
+		viewportMatrix._22 = -1.0F;
 		viewportMatrix._41 = (FLOAT)viewportRect.right / 2;
 		viewportMatrix._42 = (FLOAT)viewportRect.bottom / 2;
 
@@ -170,6 +170,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 						COLORREF lightColor	= lightToRender->getColor();
 						if ( power == 0 || lightColor == BLACK)
 							continue;
+
 						FLOAT ratio = Vector3DMultS(normal, lightToRender->getForwardLookDirection());
 						if (ratio < -.0)
 							ratio = power - ratio;
@@ -180,9 +181,9 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 								ratio = (FLOAT)DARK_SIDE;
 
 						COLORREF newColor = objToRender->getColor();								
-						UINT red	= (UINT)(min((RED(newColor) + RED(lightColor))/2, 255)     * ratio);
+						UINT red	= (UINT)(min((RED(newColor) + RED(lightColor))/2,     255) * ratio);
 						UINT green	= (UINT)(min((GREEN(newColor) + GREEN(lightColor))/2, 255) * ratio);
-						UINT blue	= (UINT)(min((BLUE(newColor) + BLUE(lightColor))/2, 255)   * ratio);
+						UINT blue	= (UINT)(min((BLUE(newColor) + BLUE(lightColor))/2,   255) * ratio);
 
 						if (scenePolyColorBuffer[j] != BLACK) {
 							newColor = RGB(
@@ -206,37 +207,13 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			// camera projection transformations
 			for ( UINT j = 0; j < objVertCount; j++ ) 
 			{
-				Matrix3DTransformCoord(
-						cameraMatrix,
-						objVertBuffer[j],
-						objVertBuffer[j]
-					);
+				Matrix3DTransformCoord(cameraMatrix, objVertBuffer[j], objVertBuffer[j]);
 				
 				float z = objVertBuffer[j].z;
+				Matrix3DTransformCoord(projectionMatrix, objVertBuffer[j],	objVertBuffer[j]);
+				objVertBuffer[j] *= projectionMatrix._34 / z;
 
-				Matrix3DTransformCoord(
-								projectionMatrix,
-								objVertBuffer[j],
-								objVertBuffer[j]
-							);
-				if ( projectionMatrix._44 < .0f ) {
-					objVertBuffer[j] /= objVertBuffer[j].z 
-									+ projectionMatrix._34;
-					if ( z > lpCamera->getFarCP() || z < lpCamera->getNearCP() )
-						objVertBuffer[j].z = 2;
-				}
-				else {
-					objVertBuffer[j].z /= objVertBuffer[j].z 
-									+ projectionMatrix._34;
-					if ( z > lpCamera->getFarCP() || z < lpCamera->getNearCP() )
-						objVertBuffer[j].z = 2;
-				}
-
-				Matrix3DTransformCoord(
-						viewportMatrix,
-						objVertBuffer[j],
-						objVertBuffer[j]
-					);
+				Matrix3DTransformCoord(viewportMatrix, objVertBuffer[j], objVertBuffer[j]);
 			}
 
 			if ( rMode != RM_WIREFRAME ) 
@@ -264,18 +241,18 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 				hPenOld		= (HPEN)SelectObject(hDCOutput, hPenCurrent);
 				for ( UINT j = 0; j < objEdgeCount; j++ ) 
 				{
-					if ( objVertBuffer[objEdgeBuffer[j].first].z >= 0
-						&& objVertBuffer[objEdgeBuffer[j].first].z <= 1
-						&& objVertBuffer[objEdgeBuffer[j].second].z >= 0
-						&& objVertBuffer[objEdgeBuffer[j].second].z <= 1 
-						&& objVertBuffer[objEdgeBuffer[j].first].x >= 0
-						&& objVertBuffer[objEdgeBuffer[j].first].x <= viewportRect.right
-						&& objVertBuffer[objEdgeBuffer[j].first].y >= 0
-						&& objVertBuffer[objEdgeBuffer[j].first].y <= viewportRect.bottom
-						&& objVertBuffer[objEdgeBuffer[j].second].x >= 0
-						&& objVertBuffer[objEdgeBuffer[j].second].x <= viewportRect.right
-						&& objVertBuffer[objEdgeBuffer[j].second].y >= 0
-						&& objVertBuffer[objEdgeBuffer[j].second].y <= viewportRect.bottom
+					if ( objVertBuffer[objEdgeBuffer[j].first].z	>= .0F
+						&& objVertBuffer[objEdgeBuffer[j].first].z	<= projectionMatrix._34
+						&& objVertBuffer[objEdgeBuffer[j].second].z >= .0F
+						&& objVertBuffer[objEdgeBuffer[j].second].z <= projectionMatrix._34
+						&& objVertBuffer[objEdgeBuffer[j].first].x	>= .0F
+						&& objVertBuffer[objEdgeBuffer[j].first].x	<= viewportRect.right
+						&& objVertBuffer[objEdgeBuffer[j].first].y	>= .0F
+						&& objVertBuffer[objEdgeBuffer[j].first].y	<= viewportRect.bottom
+						&& objVertBuffer[objEdgeBuffer[j].second].x	>= .0F
+						&& objVertBuffer[objEdgeBuffer[j].second].x	<= viewportRect.right
+						&& objVertBuffer[objEdgeBuffer[j].second].y	>= .0F
+						&& objVertBuffer[objEdgeBuffer[j].second].y	<= viewportRect.bottom
 					) { 
 						vert2DDrawBuffer[0].x 
 							= (LONG)objVertBuffer[objEdgeBuffer[j].first].x;
@@ -304,26 +281,26 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			scenePolyCount	= scenePolyBuffer.size();
 			for (UINT i = 0; i < scenePolyCount; i++ ) 
 			{
-				if ( scenePolyBuffer[i].first.first.z > 0
-					&& scenePolyBuffer[i].first.first.z < 1
-					&& scenePolyBuffer[i].first.second.z > 0
-					&& scenePolyBuffer[i].first.second.z < 1
-					&& scenePolyBuffer[i].first.third.z > 0
-					&& scenePolyBuffer[i].first.third.z < 1 
+				if ( scenePolyBuffer[i].first.first.z    > .0F
+					&& scenePolyBuffer[i].first.first.z  < projectionMatrix._34
+					&& scenePolyBuffer[i].first.second.z > .0F
+					&& scenePolyBuffer[i].first.second.z < projectionMatrix._34
+					&& scenePolyBuffer[i].first.third.z  > .0F
+					&& scenePolyBuffer[i].first.third.z  < projectionMatrix._34
 
-					&& scenePolyBuffer[i].first.first.x >= 0
-					&& scenePolyBuffer[i].first.first.x <= viewportRect.right
-					&& scenePolyBuffer[i].first.second.x >= 0
+					&& scenePolyBuffer[i].first.first.x  >= .0F
+					&& scenePolyBuffer[i].first.first.x  <= viewportRect.right
+					&& scenePolyBuffer[i].first.second.x >= .0F
 			   		&& scenePolyBuffer[i].first.second.x <= viewportRect.right
-					&& scenePolyBuffer[i].first.third.x >= 0
-			   		&& scenePolyBuffer[i].first.third.x <= viewportRect.right
+					&& scenePolyBuffer[i].first.third.x  >= .0F
+			   		&& scenePolyBuffer[i].first.third.x  <= viewportRect.right
 				  
-					&& scenePolyBuffer[i].first.first.y >= 0
-			   		&& scenePolyBuffer[i].first.first.y <= viewportRect.bottom
-					&& scenePolyBuffer[i].first.second.y >= 0
+					&& scenePolyBuffer[i].first.first.y  >= .0F
+			   		&& scenePolyBuffer[i].first.first.y  <= viewportRect.bottom
+					&& scenePolyBuffer[i].first.second.y >= .0F
 			   		&& scenePolyBuffer[i].first.second.y <= viewportRect.bottom
-					&& scenePolyBuffer[i].first.third.y >= 0
-			   		&& scenePolyBuffer[i].first.third.y <= viewportRect.bottom
+					&& scenePolyBuffer[i].first.third.y  >= .0F
+			   		&& scenePolyBuffer[i].first.third.y  <= viewportRect.bottom
 				) { 
 					objToRender	= (LPMESH3D)lpScene->getObject(
 												CLS_MESH, 

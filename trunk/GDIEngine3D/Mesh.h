@@ -21,6 +21,7 @@ protected:
 	POLY_LIST		polygons;	// list of polygons
 
 	COLORREF		color;
+	float			self_illumination_coeff;
 
 	void flushVertices();
 	size_t findVertex(const VECTOR3D &v);	// returns a vertex position
@@ -35,6 +36,9 @@ public:
 	size_t	getVerticesCount();
 	size_t	getEdgesCount();
 	size_t	getPolygonsCount();
+
+	void	setSelfIllumination(float self_illumination);
+	float	getSelfIllumination() const;
 
 	void	getVertexData(VERT_LIST &vertices);
 	void	getVertexDataRaw(LPVECTOR3D &lpVertexArray, size_t &uVertexCount);

@@ -51,38 +51,8 @@ _tagPoly3D::_tagPoly3D()
 _tagPoly3D::_tagPoly3D(size_t a, size_t b, size_t c) 
 	: first(a), second(b), third(c) { }
 
-VECTOR3D _tagPoly3D::Normal(const LPVERT_LIST vs, size_t startVert) {
-	VECTOR3D v1, v2, ans;
-	switch (startVert) {
-	case 1:
-		v1 = VECTOR3D(vs->at(second).x - vs->at(first).x,
-					vs->at(second).y - vs->at(first).y,
-					vs->at(second).z - vs->at(first).z);
-		v2 = VECTOR3D(vs->at(third).x - vs->at(first).x,
-					vs->at(third).y - vs->at(first).y,
-					vs->at(third).z - vs->at(first).z);
-		break;
-	case 2:
-		v1 = VECTOR3D(vs->at(first).x - vs->at(second).x,
-					vs->at(first).y - vs->at(second).y,
-					vs->at(first).z - vs->at(second).z);
-		v2 = VECTOR3D(vs->at(third).x - vs->at(second).x,
-					vs->at(third).y - vs->at(second).y,
-					vs->at(third).z - vs->at(second).z);
-		break;
-	case 3:
-		v1 = VECTOR3D(vs->at(first).x - vs->at(third).x,
-					vs->at(first).y - vs->at(third).y,
-					vs->at(first).z - vs->at(third).z);
-		v2 = VECTOR3D(vs->at(second).x - vs->at(third).x,
-					vs->at(second).y - vs->at(third).y,
-					vs->at(second).z - vs->at(third).z);
-	}
-	Vector3DMultV(v1, v2, ans);
-	return ans;
-}
-
-VECTOR3D _tagPoly3D::Normal(const LPVECTOR3D vs, size_t startVert) {
+VECTOR3D _tagPoly3D::Normal(const LPVECTOR3D vs, size_t startVert) const
+{
 	VECTOR3D v1, v2, ans;
 	switch (startVert) {
 	case 1:
@@ -112,6 +82,52 @@ VECTOR3D _tagPoly3D::Normal(const LPVECTOR3D vs, size_t startVert) {
 	Vector3DMultV(v1, v2, ans);
 	return ans;
 }
+VECTOR3D _tagPoly3D::Normal(const LPVERT_LIST vs, size_t startVert) const
+{
+	return Normal(vs->data(), startVert);
+}
+
+#define A(va, vb) (b.y * b.z - b.y * a.z + a.y * a.z - a.y * b.z)
+#define B(va, vb) (b.x * a.z + a.z * b.z - a.x * a.z - b.z * b.z)
+#define C(va, vb) (b.x * b.y - b.x * a.y - a.x * b.y + a.x * a.y)
+#define D(va, vb) (2 * a.x * b.y * a.z - a.x * b.y * b.z - a.x * a.y * a.z + b.x * a.y * b.z - b.z * b.y * a.z)
+bool _tagPoly3D::CoordinateMassCenter(const LPVECTOR3D vs, VECTOR3D &out) const
+{
+	VECTOR3D a(vs[first]);
+	VECTOR3D b(vs[third].x - vs[second].x, vs[third].y - vs[second].y, vs[third].z - vs[second].z);
+	float A1 = A(a,b), B1 = B(a,b), C1 = C(a,b), D1 = D(a,b);
+
+	a = vs[second];
+	b = VECTOR3D(vs[third].x - vs[first].x, vs[third].y - vs[first].y, vs[third].z - vs[first].z);
+	float A2 = A(a,b), B2 = B(a,b), C2 = C(a,b), D2 = D(a,b);
+
+	a = vs[third];
+	b = VECTOR3D(vs[second].x - vs[first].x, vs[second].y - vs[first].y, vs[second].z - vs[first].z);
+	float A3 = A(a,b), B3 = B(a,b), C3 = C(a,b), D3 = D(a,b);
+
+	float det_main = MATRIX3(A1, B1, C1, A2, B2, C2, A3, B3, C3).Determinant();
+	float det_x	   = MATRIX3(D1, B1, C1, D2, B2, C2, D3, B3, C3).Determinant();
+	float det_y	   = MATRIX3(A1, D1, C1, A2, D2, C2, A3, D3, C3).Determinant();
+	float det_z	   = MATRIX3(A1, B1, D1, A2, B2, D2, A3, B3, D3).Determinant();
+
+	if (det_main == .0F && (det_x != .0F || det_y != .0F || det_x != .0F)) return false;
+
+	if (!(det_main == .0F && det_x == .0F && det_y == .0F && det_x == .0F)) 
+	{
+		out = VECTOR3D(det_main / det_x, det_main / det_y, det_main / det_z);
+	}
+	else
+	{
+		out = vs[first];
+	}
+
+	return true;
+}
+bool _tagPoly3D::CoordinateMassCenter(const LPVERT_LIST vs, VECTOR3D &out) const
+{
+	return CoordinateMassCenter(vs->data(), out);
+}
+
 
 // ===========================================================================
 // _clsObject partial implementation:
@@ -126,7 +142,7 @@ _clsObject::_clsObject(CLASS_ID clsID)
 
 void _clsObject::RotatePitch(float angle) 
 {
-	MATRIX3D M;
+	MATRIX4 M;
 
 	Matrix3DRotateAxis(rWd, angle, M);
 	Matrix3DTransformNormal(M, fWd, fWd);
@@ -138,7 +154,7 @@ void _clsObject::RotatePitch(float angle)
 
 void _clsObject::RotateYaw(float angle) 
 {
-	MATRIX3D M;
+	MATRIX4 M;
 
 	Matrix3DRotateAxis(uWd, angle, M);
 	Matrix3DTransformNormal(M, fWd, fWd);
@@ -150,7 +166,7 @@ void _clsObject::RotateYaw(float angle)
 
 void _clsObject::RotateRoll(float angle) 
 {
-	MATRIX3D M;
+	MATRIX4 M;
 
 	Matrix3DRotateAxis(fWd, angle, M);
 	Matrix3DTransformNormal(M, rWd, rWd);
@@ -160,61 +176,33 @@ void _clsObject::RotateRoll(float angle)
 	Vector3DNormalize(uWd, uWd);
 }
 
-void _clsObject::LocalRotate(float roll, float yaw, float pitch)
+void _clsObject::LocalRotate(float roll, float yaw, float pitch, bool reset_rotation)
 {
-	MATRIX3D M;
+	MATRIX4 M;
+
+	if (reset_rotation)
+	{
+		fWd	= VECTOR3D(1.0f, .0f, .0f);
+		rWd	= VECTOR3D(.0f, .0f, 1.0f);
+		uWd	= VECTOR3D(.0f, 1.0f, .0f);
+	}
 
 	Matrix3DRotateAxis(rWd, pitch, M);
 	Matrix3DTransformNormal(M, fWd, fWd);
 	Vector3DNormalize(fWd, fWd);
-	Vector3DMultV(fWd, rWd, uWd);
+	Vector3DMultV(rWd, fWd, uWd);
 	Vector3DNormalize(uWd, uWd);
 
 	Matrix3DRotateAxis(uWd, yaw, M);
 	Matrix3DTransformNormal(M, fWd, fWd);
 	Vector3DNormalize(fWd, fWd);
-	Vector3DMultV(uWd, fWd, rWd);
+	Vector3DMultV(fWd, uWd, rWd);
 	Vector3DNormalize(rWd, rWd);
 
 	Matrix3DRotateAxis(fWd, roll, M);
 	Matrix3DTransformNormal(M, rWd, rWd);
-	Vector3DNormalize(fWd, fWd);
-	Vector3DMultV(fWd, rWd, uWd);
-	Vector3DNormalize(uWd, uWd);
-}
-
-void _clsObject::Rotate(float x, float y, float z)
-{
-	MATRIX3D M;
-
-	rot.x = x;
-	rot.y = y;
-	rot.z = z;
-
-	fWd = VECTOR3D(1.0F, .0F, .0F);
-	rWd = VECTOR3D(.0F, 1.0F, .0F);
-	uWd = VECTOR3D(.0F, .0F, 1.0F);
-
-	Matrix3DRotateAxis(VECTOR3D(1.0f, .0f, .0f), rot.x, M);
-	Matrix3DTransformNormal(M, fWd, fWd);
-	Matrix3DTransformNormal(M, rWd, rWd);
-	Matrix3DTransformNormal(M, uWd, uWd);
-	Matrix3DTransformCoord(M, pos, pos);
-
-	Matrix3DRotateAxis(VECTOR3D(.0f, 1.0f, .0f), rot.y, M);
-	Matrix3DTransformNormal(M, fWd, fWd);
-	Matrix3DTransformNormal(M, rWd, rWd);
-	Matrix3DTransformNormal(M, uWd, uWd);
-	Matrix3DTransformCoord(M, pos, pos);
-
-	Matrix3DRotateAxis(VECTOR3D(.0f, .0f, 1.0f), rot.z, M);
-	Matrix3DTransformNormal(M, fWd, fWd);
-	Matrix3DTransformNormal(M, rWd, rWd);
-	Matrix3DTransformNormal(M, uWd, uWd);
-	Matrix3DTransformCoord(M, pos, pos);
-
-	Vector3DNormalize(fWd, fWd);
 	Vector3DNormalize(rWd, rWd);
+	Vector3DMultV(rWd, fWd, uWd);
 	Vector3DNormalize(uWd, uWd);
 }
 
@@ -246,7 +234,7 @@ void _clsObject::ArbitraryOrbitMoveAround(
 ) {
 	if (Vector3DLength(vAxis) > .0)
 	{
-		MATRIX3D M(true);
+		MATRIX4 M(true);
 		float angle = units / obj->Distance(vPivot);
 
 		Matrix3DRotateAxis(vAxis, angle, M);

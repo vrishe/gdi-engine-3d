@@ -19,7 +19,7 @@ _clsCamera::_clsCamera(PROJECTION_TYPE projType, float horizFov, float vertFov)
 	vFOV			= vertFov;
 }
 
-void _clsCamera::GetViewMatrix(MATRIX3D &mOut)
+void _clsCamera::GetViewMatrix(MATRIX4 &mOut)
 {
 	mOut._11 = rWd.x;
 	mOut._12 = uWd.x;
@@ -42,19 +42,13 @@ void _clsCamera::GetViewMatrix(MATRIX3D &mOut)
 	mOut._44 = 1.0f;
 }
 
-void _clsCamera::GetProjectionMatrix(MATRIX3D &mOut)
+void _clsCamera::GetProjectionMatrix(MATRIX4 &mOut)
 {
-	mOut.SetIdentity();
+	mOut.Fill(0);
 
 	mOut._11 = 1 / tan(hFOV / 2.0f);
 	mOut._22 = 1 / tan(vFOV / 2.0f);
 	mOut._33 = farClip / (farClip - nearClip);
 	mOut._43 = mOut._33 * (-nearClip);
 	mOut._34 = fDist;
-	if ( projectionType == PT_CENTRAL ) 
-	{
-		mOut._11 *= mOut._34;
-		mOut._22 *= mOut._34;
-		mOut._44 = -mOut._44;
-	}
 }
