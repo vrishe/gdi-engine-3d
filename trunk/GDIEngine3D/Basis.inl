@@ -20,6 +20,16 @@ inline bool _tagEdge3D::isContianingVertex(size_t vi) const { return first == vi
 // ============================================================================
 // _tagPoly3D partial implementation:
 
+inline VECTOR3D _tagPoly3D::Normal(const LPVERT_LIST vs, size_t startVert) const
+{
+	return Normal(vs->data(), startVert);
+}
+
+inline bool _tagPoly3D::CoordinateMassCenter(const LPVERT_LIST vs, VECTOR3D &out) const
+{
+	return CoordinateMassCenter(vs->data(), out);
+}
+
 inline _tagPoly3D& _tagPoly3D::operator+= (const UINT& p) 
 {
 	first += p; second += p; third += p;

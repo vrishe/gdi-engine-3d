@@ -155,51 +155,18 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 				size_t lightTo	= sceneLightedPolyCount + objPolyCount; // number of polygons to light
 
 				for (size_t j = sceneLightedPolyCount; j < lightTo; j++) {
-					VECTOR3D normal(objPolyBuffer[j - sceneLightedPolyCount].Normal(objVertBuffer, 2));
-					Vector3DNormalize(normal, normal);
-					if ( !sceneLightCount ) {
+					if ( sceneLightCount == 0 ) {
 						scenePolyColorBuffer[j] = objToRender->getColor();
 						continue;
 					}
-					else
-						scenePolyColorBuffer[j] = 0;
 
+					scenePolyColorBuffer[j] = objToRender->getColor();
 					for (UINT k = 0; k < sceneLightCount; k++) 	{
 						lightToRender = (LPOMNILIGHT3D)lpScene->getObject(CLS_LIGHT, k);
-						FLOAT power = lightToRender->getPower();
-						COLORREF lightColor	= lightToRender->getColor();
-						if ( power == 0 || lightColor == BLACK)
-							continue;
-
-						FLOAT ratio = Vector3DMultS(normal, lightToRender->getForwardLookDirection());
-						if (ratio < -.0)
-							ratio = power - ratio;
-						else
-							if (ratio < .0)
-								ratio = max(power / 3.3f, (FLOAT)DARK_SIDE);
-							else
-								ratio = (FLOAT)DARK_SIDE;
-
-						COLORREF newColor = objToRender->getColor();								
-						UINT red	= (UINT)(min((RED(newColor) + RED(lightColor))/2,     255) * ratio);
-						UINT green	= (UINT)(min((GREEN(newColor) + GREEN(lightColor))/2, 255) * ratio);
-						UINT blue	= (UINT)(min((BLUE(newColor) + BLUE(lightColor))/2,   255) * ratio);
-
-						if (scenePolyColorBuffer[j] != BLACK) {
-							newColor = RGB(
-								(BYTE)min((red	+ RED(scenePolyColorBuffer[j])), 255),
-								(BYTE)min((green + GREEN(scenePolyColorBuffer[j])), 255),
-								(BYTE)min((blue + BLUE(scenePolyColorBuffer[j])), 255)
-							);
-						}
-						else {
-							newColor = RGB( 
-								red > 255	? 255 : red,
-								green > 255	? 255 : green,
-								blue > 255	? 255 : blue 
-							);
-						}
-						scenePolyColorBuffer[j] = newColor;
+						scenePolyColorBuffer[j] = lightToRender->PolygonLightedColor(
+							objPolyBuffer[j - sceneLightedPolyCount], 
+							objVertBuffer, scenePolyColorBuffer[j]
+						);
 					}
 				}
 			}
