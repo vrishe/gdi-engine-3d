@@ -32,7 +32,7 @@ void _clsMesh::Transform()
 	GetMoveMatrix(mTransScalePos);
 	GetScaleMatrix(mTransScalePos);
 	
-	__foreach(VERT_LIST::iterator, vertex, vertices)
+	__foreach(VERT_LIST::iterator, vertex, cache)
 	{
 		Matrix3DTransformNormal(mLocalScale, *vertex, *vertex);		
 		Matrix3DTransformNormal(mLocalRot, *vertex, *vertex);		

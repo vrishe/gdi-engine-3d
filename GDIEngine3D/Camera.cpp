@@ -46,9 +46,12 @@ void _clsCamera::GetProjectionMatrix(MATRIX4 &mOut)
 {
 	mOut.Fill(0);
 
-	mOut._11 = 1 / tan(hFOV / 2.0f);
-	mOut._22 = 1 / tan(vFOV / 2.0f);
-	mOut._33 = farClip / (farClip - nearClip);
+	mOut._11 = 1.0F / tan(hFOV / 2.0f);
+	mOut._22 = 1.0F / tan(vFOV / 2.0f);
+	mOut._33 = 1.0F / (farClip - nearClip);
 	mOut._43 = mOut._33 * (-nearClip);
-	mOut._34 = fDist;
+	if (projectionType == PT_CENTRAL)
+	{
+		mOut._34 = 1.0F / fDist;
+	}
 }
