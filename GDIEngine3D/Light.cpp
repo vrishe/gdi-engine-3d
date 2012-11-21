@@ -18,7 +18,7 @@ COLORREF _clsOmniLight::AffectPolygonColor(const POLY3D &poly_lighted, const LPV
 	VECTOR3D light_ray;
 	Vector3DNormalize(poly_lighted.CoordinateMassCenter(vs) - pos, light_ray);
 
-	FLOAT ratio = max(Vector3DMultS(poly_lighted.Normal(vs, 2), light_ray), .0) * power;
+	FLOAT ratio = max(Vector3DMultS(poly_lighted.Normal(vs, 2), light_ray), .0F) * power;
 	return RGB(
 			RED(color)   * RED(object_color)   / 255U * ratio,
 			GREEN(color) * GREEN(object_color) / 255U * ratio,
