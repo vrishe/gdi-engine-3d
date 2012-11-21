@@ -46,7 +46,7 @@ inline size_t		_clsMesh::getPolygonsCount()		{ return polygons.size(); }
 
 inline void _clsMesh::setSelfIllumination(float self_illumination)
 { 
-	self_illumination_coeff = self_illumination;
+	self_illumination_coeff = max(.0F, min(1.0F, self_illumination));
 }
 inline float _clsMesh::getSelfIllumination() const { return self_illumination_coeff; }
 

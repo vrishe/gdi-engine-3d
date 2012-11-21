@@ -165,14 +165,21 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 				objToRender->getPolygonDataRaw(objPolyBuffer, objPolyCount);
 				size_t lightTo	= sceneLightedPolyCount + objPolyCount; // number of polygons to light
 
-				for (size_t j = sceneLightedPolyCount; j < lightTo; j++) {
-					if ( sceneLightCount == 0 ) {
+				for (size_t j = sceneLightedPolyCount; j < lightTo; j++) 
+				{
+					if ( sceneLightCount == 0 ) 
+					{
 						scenePolyColorBuffer[j] = objToRender->getColor();
 						continue;
 					}
 
-					scenePolyColorBuffer[j] = BLACK;
-					for (UINT k = 0; k < sceneLightCount; k++) 	{
+					scenePolyColorBuffer[j] = RGB(
+						RED(objToRender->getColor())   * objToRender->getSelfIllumination(),
+						GREEN(objToRender->getColor()) * objToRender->getSelfIllumination(),
+						BLUE(objToRender->getColor())  * objToRender->getSelfIllumination()
+					);
+					for (UINT k = 0; k < sceneLightCount; k++) 	
+					{
 						lightToRender = (LPOMNILIGHT3D)lpScene->getObject(CLS_LIGHT, k);
 
 						scenePolyColorBuffer[j] = AddColor(

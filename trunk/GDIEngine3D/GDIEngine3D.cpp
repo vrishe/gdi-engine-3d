@@ -864,10 +864,12 @@ BOOL WINAPI SceneObjectColorSet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF c
 
 	if (isValid)
 	{
-		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
-		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim)) 
+		IColorable* operand = NULL;
+		LPOBJECT3D  victim  = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = (((LPSCENE3D)Master)->findObjectIndex(victim) 
+			&& (operand = dynamic_cast<IColorable*>(victim)) != NULL)) 
 		{
-			dynamic_cast<IColorable*>(victim)->setColor(color);
+			operand->setColor(color);
 		}
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
@@ -892,10 +894,72 @@ BOOL WINAPI SceneObjectColorGet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF &
 
 	if (isValid)
 	{
-		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
-		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim)) 
+		IColorable* operand = NULL;
+		LPOBJECT3D  victim  = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = (((LPSCENE3D)Master)->findObjectIndex(victim)
+			&& (operand = dynamic_cast<IColorable*>(victim)) != NULL)) 
 		{
-			color = dynamic_cast<IColorable*>(victim)->getColor();
+			color = operand->getColor();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneMeshSelfIlluminationSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT self_illumination)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPMESH3D   operand = NULL;
+		LPOBJECT3D victim  = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = (((LPSCENE3D)Master)->findObjectIndex(victim)
+			&& (operand = dynamic_cast<LPMESH3D>(victim)) != NULL)) 
+		{
+			operand->setSelfIllumination(self_illumination);
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneMeshSelfIlluminationGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &self_illumination)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPMESH3D   operand = NULL;
+		LPOBJECT3D victim  = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = (((LPSCENE3D)Master)->findObjectIndex(victim)
+			&& (operand = dynamic_cast<LPMESH3D>(victim)) != NULL)) 
+		{
+			self_illumination = operand->getSelfIllumination();
 		}
 
 		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);

@@ -166,6 +166,12 @@ GDIENGINE3D_USERAPI
 	BOOL WINAPI SceneObjectColorGet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF &color);
 
 GDIENGINE3D_USERAPI
+	BOOL WINAPI SceneMeshSelfIlluminationSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT self_illumination);
+
+GDIENGINE3D_USERAPI
+	BOOL WINAPI SceneMeshSelfIlluminationGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &self_illumination);
+
+GDIENGINE3D_USERAPI
 	SCENE_OBJECT WINAPI SceneSphereCreate(HSCENE hScene, FLOAT radius, FLOAT crop, FLOAT sliceFrom, FLOAT sliceTo, UINT precision, COLORREF color);
 
 GDIENGINE3D_USERAPI
