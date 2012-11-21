@@ -6,9 +6,9 @@
 #define BLACK 0
 
 // Macro-definitions for simple single-colored component extraction from COLORREF bit field 
-#define RED(c)		(BYTE)(c)
-#define GREEN(c)	(BYTE)(c>>8)
-#define BLUE(c)		(BYTE)(c>>16)
+#define RED(c)		((UINT)((c & 0x000000FFU)))
+#define GREEN(c)	((UINT)((c & 0x0000FF00U) >> 8))
+#define BLUE(c)		((UINT)((c & 0x00FF0000U) >> 16))
 
 using namespace std;
 
