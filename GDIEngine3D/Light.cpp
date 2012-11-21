@@ -15,10 +15,9 @@ _clsOmniLight::_clsOmniLight(COLORREF c, float p) : OBJECT3D(CLS_LIGHT)
 
 COLORREF _clsOmniLight::PolygonLightedColor(const POLY3D &poly_lighted, const LPVECTOR3D vs, COLORREF initial_color) const
 {
-	VECTOR3D light_ray;
-	if (!poly_lighted.CoordinateMassCenter(vs, light_ray)) return BLACK;
+	VECTOR3D light_ray(poly_lighted.CoordinateMassCenter(vs));
 
-	Vector3DNormalize(pos - light_ray, light_ray);
+	Vector3DNormalize(light_ray - pos, light_ray);
 	FLOAT ratio = Vector3DMultS(poly_lighted.Normal(vs, 2), light_ray);
 	if (ratio < .0F)
 	{

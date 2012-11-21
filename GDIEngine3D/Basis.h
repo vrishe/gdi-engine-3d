@@ -51,8 +51,7 @@ typedef struct _tagPoly3D {
 	_tagPoly3D(size_t a, size_t b, size_t c);
 	VECTOR3D Normal(const LPVERT_LIST vs, size_t startVert)	const;
 	VECTOR3D Normal(const LPVECTOR3D vs, size_t startVert)	const;
-	bool CoordinateMassCenter(const LPVERT_LIST, VECTOR3D &out)		const;
-	bool CoordinateMassCenter(const LPVECTOR3D , VECTOR3D &out)		const;
+	VECTOR3D CoordinateMassCenter(const LPVECTOR3D)	const;
 
 	_tagPoly3D& operator+= (const UINT& p);
 	bool operator==(const _tagPoly3D &b) const;
