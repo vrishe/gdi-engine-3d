@@ -10,4 +10,4 @@ inline void _clsOmniLight::InitDefaultValues(_clsOmniLight *obj)
 }
 
 inline float _clsOmniLight::getPower()			{ return power; }
-inline void _clsOmniLight::setPower(float p)	{ power = (p < .0F ? .0F : p); }
+inline void _clsOmniLight::setPower(float p)	{ power = max(.0F, min(p, 1.0F)); }

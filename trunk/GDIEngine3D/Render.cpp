@@ -76,6 +76,14 @@ bool ZDepthComparator(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY
 			> (b.first.first.z + b.first.second.z + b.first.third.z);
 }
 
+inline COLORREF AddColor(COLORREF a, COLORREF b)
+{
+	return RGB(
+			min(RED(a)   + RED(b)   , 255U), 
+			min(GREEN(a) + GREEN(b) , 255U), 
+			min(BLUE(a)  + BLUE(b)  , 255U)
+		);
+}
 BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const 
 {
 	BOOL bResult = hDCScreen != NULL && lpScene != NULL && lpCamera != NULL;
@@ -163,13 +171,16 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 						continue;
 					}
 
-					scenePolyColorBuffer[j] = objToRender->getColor();
+					scenePolyColorBuffer[j] = BLACK;
 					for (UINT k = 0; k < sceneLightCount; k++) 	{
 						lightToRender = (LPOMNILIGHT3D)lpScene->getObject(CLS_LIGHT, k);
-						scenePolyColorBuffer[j] = lightToRender->PolygonLightedColor(
-							objPolyBuffer[j - sceneLightedPolyCount], 
-							objVertBuffer, scenePolyColorBuffer[j]
-						);
+
+						scenePolyColorBuffer[j] = AddColor(
+							scenePolyColorBuffer[j],
+							lightToRender->AffectPolygonColor(
+								objPolyBuffer[j - sceneLightedPolyCount], objVertBuffer, objToRender->getColor()
+								)
+							);
 					}
 				}
 			}
@@ -194,14 +205,14 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			{
 				// filling a part of scene Buf
 				for (UINT j = 0; j < objPolyCount; j++) {
-					VECTOR3D normal(objPolyBuffer[j].Normal(objVertBuffer, 1));
-					float cosCam = Vector3DMultS(normal, VECTOR3D(0,0,1)) 
-													/ Vector3DLength(normal);
-					if (cosCam >= -1 && cosCam < 0) {
+					VECTOR3D normal = objPolyBuffer[j].Normal(objVertBuffer, 1);
+					float    cosCam = Vector3DMultS(normal, VECTOR3D(0,0,1));
+
+					if  (-1.0F <= cosCam && cosCam < .0F) {
 						DIRECTPOLY3D tmp;
-						tmp.first	= objVertBuffer[ objPolyBuffer[j].first ];
-						tmp.second	= objVertBuffer[ objPolyBuffer[j].second ];
-						tmp.third	= objVertBuffer[ objPolyBuffer[j].third ];
+						tmp.first	 = objVertBuffer[ objPolyBuffer[j].first ];
+						tmp.second	 = objVertBuffer[ objPolyBuffer[j].second ];
+						tmp.third	 = objVertBuffer[ objPolyBuffer[j].third ];
 						tmp.colorRef = scenePolyColorBuffer[j + sceneLightedPolyCount];
 						scenePolyBuffer.push_back(pair<DIRECTPOLY3D,int>(tmp,i));
 					}
@@ -220,13 +231,6 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 						&& objVertBuffer[objEdgeBuffer[j].second].z >=  .0F
 						&& objVertBuffer[objEdgeBuffer[j].second].z <= 1.0F
 						&& objVertBuffer[objEdgeBuffer[j].first].x	>=  .0F
-						//&& objVertBuffer[objEdgeBuffer[j].first].x	<= viewportRect.right
-						//&& objVertBuffer[objEdgeBuffer[j].first].y	>= .0F
-						//&& objVertBuffer[objEdgeBuffer[j].first].y	<= viewportRect.bottom
-						//&& objVertBuffer[objEdgeBuffer[j].second].x	>= .0F
-						//&& objVertBuffer[objEdgeBuffer[j].second].x	<= viewportRect.right
-						//&& objVertBuffer[objEdgeBuffer[j].second].y	>= .0F
-						//&& objVertBuffer[objEdgeBuffer[j].second].y	<= viewportRect.bottom
 					) { 
 						vert2DDrawBuffer[0].x 
 							= (LONG)objVertBuffer[objEdgeBuffer[j].first].x;
@@ -261,26 +265,8 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 					&& scenePolyBuffer[i].first.second.z < 1.0F
 					&& scenePolyBuffer[i].first.third.z  >  .0F
 					&& scenePolyBuffer[i].first.third.z  < 1.0F
-
-					//&& scenePolyBuffer[i].first.first.x  >= .0F
-					//&& scenePolyBuffer[i].first.first.x  <= viewportRect.right
-					//&& scenePolyBuffer[i].first.second.x >= .0F
-			  // 		&& scenePolyBuffer[i].first.second.x <= viewportRect.right
-					//&& scenePolyBuffer[i].first.third.x  >= .0F
-			  // 		&& scenePolyBuffer[i].first.third.x  <= viewportRect.right
-				 // 
-					//&& scenePolyBuffer[i].first.first.y  >= .0F
-			  // 		&& scenePolyBuffer[i].first.first.y  <= viewportRect.bottom
-					//&& scenePolyBuffer[i].first.second.y >= .0F
-			  // 		&& scenePolyBuffer[i].first.second.y <= viewportRect.bottom
-					//&& scenePolyBuffer[i].first.third.y  >= .0F
-			  // 		&& scenePolyBuffer[i].first.third.y  <= viewportRect.bottom
 				) { 
-					objToRender	= (LPMESH3D)lpScene->getObject(
-												CLS_MESH, 
-												scenePolyBuffer[i].second
-											);
-
+					objToRender	= (LPMESH3D)lpScene->getObject(CLS_MESH, scenePolyBuffer[i].second);
 					hBrCurrent = CreateSolidBrush(scenePolyBuffer[i].first.colorRef);
 					if ( rMode == RM_SHADEDWF ) 
 						hPenCurrent = CreatePen(PS_SOLID, 1, objToRender->getColor());

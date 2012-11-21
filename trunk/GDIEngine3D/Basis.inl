@@ -25,6 +25,11 @@ inline VECTOR3D _tagPoly3D::Normal(const LPVERT_LIST vs, size_t startVert) const
 	return Normal(vs->data(), startVert);
 }
 
+inline VECTOR3D _tagPoly3D::CoordinateMassCenter(const LPVECTOR3D vs) const
+{
+	return (vs[first] + vs[second] + vs[third]) / 3.0f;
+}
+
 inline _tagPoly3D& _tagPoly3D::operator+= (const UINT& p) 
 {
 	first += p; second += p; third += p;

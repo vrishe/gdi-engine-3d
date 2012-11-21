@@ -11,7 +11,7 @@
 class IAffectPolygonColor
 {
 public:
-	virtual COLORREF PolygonLightedColor(const POLY3D &poly_lighted, const LPVECTOR3D vs, COLORREF initial_color) const = 0;
+	virtual COLORREF AffectPolygonColor(const POLY3D &poly_lighted, const LPVECTOR3D vs, COLORREF initial_color) const = 0;
 };
 
 typedef class _clsOmniLight : public OBJECT3D, public IColorable, public IAffectPolygonColor {
@@ -27,7 +27,7 @@ public:
 	virtual float getPower();
 	void setPower(float);
 
-	COLORREF PolygonLightedColor(const POLY3D &poly_lighted, const LPVECTOR3D vs, COLORREF initial_color) const;
+	COLORREF AffectPolygonColor(const POLY3D &poly_lighted, const LPVECTOR3D vs, COLORREF initial_color) const;
 } OMNILIGHT3D, *LPOMNILIGHT3D;
 
 #include "Light.inl"
