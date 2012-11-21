@@ -84,15 +84,15 @@ VECTOR3D _tagPoly3D::Normal(const LPVECTOR3D vs, size_t startVert) const
 	return ans;
 }
 
-#define _A(va, vb) (b.y * b.z - b.y * a.z + a.y * a.z - a.y * b.z)
+/*#define _A(va, vb) (b.y * b.z - b.y * a.z + a.y * a.z - a.y * b.z)
 #define _B(va, vb) (b.x * a.z + a.z * b.z - a.x * a.z - b.z * b.z)
 #define _C(va, vb) (b.x * b.y - b.x * a.y - a.x * b.y + a.x * a.y)
 #define _D(va, vb) (2.0F * a.x * b.y * a.z - a.x * b.y * b.z - a.x * a.y * a.z + b.x * a.y * b.z - b.z * b.y * a.z)
 #define _polygon_vector(b, e) VECTOR3D((e).x - (b).x, (e).y - (b).y, (e).z - (b).z)
-#define _center_point(cx, lv, x0) VECTOR3D((cx), (x0).y + (lv).y * ((cx) - (x0).x) / (lv).x, (x0).z + (lv).z * ((cx) - (x0).x) / (lv).x)
-bool _tagPoly3D::CoordinateMassCenter(const LPVECTOR3D vs, VECTOR3D &out) const
+#define _center_point(cx, lv, x0) VECTOR3D((cx), (x0).y + (lv).y * ((cx) - (x0).x) / (lv).x, (x0).z + (lv).z * ((cx) - (x0).x) / (lv).x)*/
+VECTOR3D _tagPoly3D::CoordinateMassCenter(const LPVECTOR3D vs) const
 {
-	VECTOR3D a(vs[first]);
+	/*VECTOR3D a(vs[first]);
 	VECTOR3D l = _polygon_vector(vs[second], vs[third]);
 	VECTOR3D b = _center_point((vs[third].x + vs[second].x) / 2.0F, l, vs[second]);
 	float A1 = _A(a,b), B1 = _B(a,b), C1 = _C(a,b), D1 = _D(a,b);
@@ -121,9 +121,17 @@ bool _tagPoly3D::CoordinateMassCenter(const LPVECTOR3D vs, VECTOR3D &out) const
 	else
 	{
 		out = vs[first];
-	}
-
-	return true;
+	} */
+	VECTOR3D v1 = VECTOR3D(vs[second].x - vs[first].x,
+				vs[second].y - vs[first].y,
+				vs[second].z - vs[first].z);
+	VECTOR3D v2 = VECTOR3D(vs[third].x - vs[first].x,
+				vs[third].y - vs[first].y,
+				vs[third].z - vs[first].z);
+	VECTOR3D v3 = VECTOR3D(vs[third].x - vs[second].x,
+				vs[third].y - vs[second].y,
+				vs[third].z - vs[second].z);
+	return (v1 + v2 + v3) * (1 / 3.0f);
 }
 
 
