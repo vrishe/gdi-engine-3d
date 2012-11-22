@@ -69,12 +69,6 @@ BOOL _clsViewport::setSize(LONG uVpWidth, LONG uVpHeight)
 	return TRUE;
 }
 
-// Is used as predicate for std::sort algorithm; provides a > b comparison
-bool ZDepthComparator(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY3D, UINT> &b) 
-{
-	return (a.first.first.z + a.first.second.z + a.first.third.z) 
-			> (b.first.first.z + b.first.second.z + b.first.third.z);
-}
 
 inline COLORREF AddColor(COLORREF a, COLORREF b)
 {
@@ -83,6 +77,12 @@ inline COLORREF AddColor(COLORREF a, COLORREF b)
 			min(GREEN(a) + GREEN(b) , 255U), 
 			min(BLUE(a)  + BLUE(b)  , 255U)
 		);
+}
+// Is used as predicate for std::sort algorithm; provides a > b comparison
+bool ZDepthComparator(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY3D, UINT> &b) 
+{
+	return (a.first.first.z + a.first.second.z + a.first.third.z) 
+			> (b.first.first.z + b.first.second.z + b.first.third.z);
 }
 BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const 
 {
