@@ -20,13 +20,6 @@ inline float			_clsCamera::getFDist()			{ return fDist; }
 inline float			_clsCamera::getNearCP()			{ return nearClip; }
 inline float			_clsCamera::getFarCP()			{ return farClip; }
 
-inline void _clsCamera::Zoom(float aspect)
-{
-	float rel = vFOV / hFOV;
-	setHFov(hFOV + aspect);
-	vFOV = hFOV * rel;
-}
-
 inline void _clsCamera::setProjectionType(PROJECTION_TYPE projType) 
 { 
 	projectionType = projType; 

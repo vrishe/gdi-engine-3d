@@ -474,7 +474,7 @@ BOOL WINAPI CameraNameGet(HCAMERA hCamera, LPTSTR tcsName, UINT &tcsCharCount)
 	return isValid;
 }
 
-BOOL WINAPI CameraFocalDistanceSet(HCAMERA hCamera, FLOAT fFd)
+BOOL WINAPI CameraFocalDistanceSet(HCAMERA hCamera, FLOAT fd)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -490,7 +490,7 @@ BOOL WINAPI CameraFocalDistanceSet(HCAMERA hCamera, FLOAT fFd)
 
 	if (isValid)
 	{
-		((LPCAMERA3D)Master)->setFDist(fFd);
+		((LPCAMERA3D)Master)->setFDist(fd);
 
 		thread_safety::UnlockObjectRegistered((size_t)hCamera, Master);
 	}
@@ -515,6 +515,102 @@ BOOL WINAPI CameraFocalDistanceGet(HCAMERA hCamera, FLOAT &fd)
 	if (isValid)
 	{
 		fd = ((LPCAMERA3D)Master)->getFDist();
+
+		thread_safety::UnlockObjectRegistered((size_t)hCamera, Master);
+	}
+
+	return isValid;
+}
+
+BOOL WINAPI CameraNearClipSet(HCAMERA hCamera, FLOAT zn)
+{
+	thread_safety::LockModule(INFINITE);
+
+	LPUNKNOWN Master = NULL;
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hCamera, typeid(CAMERA3D)))
+	{
+		thread_safety::LockObjectRegistered((size_t)hCamera, Master);
+	}
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		((LPCAMERA3D)Master)->setNearCP(zn);
+
+		thread_safety::UnlockObjectRegistered((size_t)hCamera, Master);
+	}
+
+	return isValid;
+}
+
+BOOL WINAPI CameraNearClipGet(HCAMERA hCamera, FLOAT &zn)
+{
+	thread_safety::LockModule(INFINITE);
+
+	LPUNKNOWN Master = NULL;
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hCamera, typeid(CAMERA3D)))
+	{
+		thread_safety::LockObjectRegistered((size_t)hCamera, Master);
+	}
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		zn = ((LPCAMERA3D)Master)->getNearCP();
+
+		thread_safety::UnlockObjectRegistered((size_t)hCamera, Master);
+	}
+
+	return isValid;
+}
+
+BOOL WINAPI CameraFarClipSet(HCAMERA hCamera, FLOAT zf)
+{
+	thread_safety::LockModule(INFINITE);
+
+	LPUNKNOWN Master = NULL;
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hCamera, typeid(CAMERA3D)))
+	{
+		thread_safety::LockObjectRegistered((size_t)hCamera, Master);
+	}
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		((LPCAMERA3D)Master)->setFarCP(zf);
+
+		thread_safety::UnlockObjectRegistered((size_t)hCamera, Master);
+	}
+
+	return isValid;
+}
+
+BOOL WINAPI CameraFarClipGet(HCAMERA hCamera, FLOAT &zf)
+{
+	thread_safety::LockModule(INFINITE);
+
+	LPUNKNOWN Master = NULL;
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hCamera, typeid(CAMERA3D)))
+	{
+		thread_safety::LockObjectRegistered((size_t)hCamera, Master);
+	}
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		zf = ((LPCAMERA3D)Master)->getFarCP();
 
 		thread_safety::UnlockObjectRegistered((size_t)hCamera, Master);
 	}

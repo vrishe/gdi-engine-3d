@@ -197,13 +197,9 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			{
 				Matrix3DTransformCoord(cameraMatrix, objVertBuffer[j], objVertBuffer[j]);
 				
-				float z = objVertBuffer[j].z;
+				float w = projectionMatrix._34 != .0F ? objVertBuffer[j].z / projectionMatrix._34 : 1.0F;
 				Matrix3DTransformCoord(projectionMatrix, objVertBuffer[j],	objVertBuffer[j]);
-
-				if (projectionMatrix._34 != .0F)
-				{
-					objVertBuffer[j] /= (fabs(z) * projectionMatrix._34);
-				}
+				objVertBuffer[j] /= w;
 
 				Matrix3DTransformCoord(viewportMatrix, objVertBuffer[j], objVertBuffer[j]);
 			}
@@ -233,11 +229,10 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 				hPenOld		= (HPEN)SelectObject(hDCOutput, hPenCurrent);
 				for ( UINT j = 0; j < objEdgeCount; j++ ) 
 				{
-					if ( objVertBuffer[objEdgeBuffer[j].first].z	>=  .0F
-						&& objVertBuffer[objEdgeBuffer[j].first].z	<= 1.0F
+					if (   objVertBuffer[objEdgeBuffer[j].first].z	>=  .0F
+						&& objVertBuffer[objEdgeBuffer[j].first].z	<= projectionMatrix._34
 						&& objVertBuffer[objEdgeBuffer[j].second].z >=  .0F
-						&& objVertBuffer[objEdgeBuffer[j].second].z <= 1.0F
-						&& objVertBuffer[objEdgeBuffer[j].first].x	>=  .0F
+						&& objVertBuffer[objEdgeBuffer[j].second].z <= projectionMatrix._34
 					) { 
 						vert2DDrawBuffer[0].x 
 							= (LONG)objVertBuffer[objEdgeBuffer[j].first].x;
@@ -266,12 +261,12 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			scenePolyCount	= scenePolyBuffer.size();
 			for (UINT i = 0; i < scenePolyCount; i++ ) 
 			{
-				if ( scenePolyBuffer[i].first.first.z    >  .0F
-					&& scenePolyBuffer[i].first.first.z  < 1.0F
-					&& scenePolyBuffer[i].first.second.z >  .0F
-					&& scenePolyBuffer[i].first.second.z < 1.0F
-					&& scenePolyBuffer[i].first.third.z  >  .0F
-					&& scenePolyBuffer[i].first.third.z  < 1.0F
+				if (   scenePolyBuffer[i].first.first.z  >=  .0F
+					&& scenePolyBuffer[i].first.first.z  <= projectionMatrix._34
+					&& scenePolyBuffer[i].first.second.z >=  .0F
+					&& scenePolyBuffer[i].first.second.z <= projectionMatrix._34
+					&& scenePolyBuffer[i].first.third.z  >=  .0F
+					&& scenePolyBuffer[i].first.third.z  <= projectionMatrix._34
 				) { 
 					objToRender	= (LPMESH3D)lpScene->getObject(CLS_MESH, scenePolyBuffer[i].second);
 					hBrCurrent = CreateSolidBrush(scenePolyBuffer[i].first.colorRef);
