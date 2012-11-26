@@ -31,8 +31,6 @@ public:
 	float			getNearCP();
 	float			getFarCP();
 
-	void			Zoom(float aspect);
-
 	void			setProjectionType(PROJECTION_TYPE projType);
 	void			setHFov(float fieldOfViewHoriz);
 	void			setVFov(float fieldOfViewVert);
