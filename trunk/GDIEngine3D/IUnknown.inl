@@ -14,13 +14,7 @@ inline LPUNKNOWN IUnknown::getByID(size_t objID)
 
 inline IUnknown::IUnknown()
 {
-	// TODO: Make binary search here
-	size_t prediction = 1;
-	__foreach(GLOBAL_REGISTRY::iterator, entry, _registry)
-	{
-		if ((*entry)->_id != prediction++) break;		
-	}
-	_id = prediction;
+	_id = ~reinterpret_cast<size_t>(this) + 1;
 	_registry.push_back(this);
 }
 

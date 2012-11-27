@@ -78,45 +78,23 @@ namespace thread_safety
 
 		if (lpObj != NULL)
 		{
-			//size_t uObjKey = alModuleObjects.size();
-
-			//if (alModuleObjects.find(uObjKey) != alModuleObjects.end())
-			//{
-			//	uObjKey = 0;
-
-			//	__foreach(OBJECT_REGISTRY::iterator, entry, alModuleObjects)
-			//	{
-			//		OBJECT_REGISTRY::iterator entry_next = entry;
-			//		if (++entry_next == _end || (entry_next->first - entry->first) > 1) 
-			//		{
-			//			uObjKey = entry->first + 1;
-			//			break;
-			//		}
-
-			//		//if (++uObjKey != entry->first) break;
-			//	}
-			//}
-
-			//if (uObjKey != SIZE_MAX) 
-			//{
-				OBJECT_REGISTRY::_Pairib pbInsertResult 
-					= alModuleObjects.insert(OBJECT_REGISTRY::value_type(lpObj->getID(), MUTUAL_ACCESSOR()));
+			OBJECT_REGISTRY::_Pairib pbInsertResult 
+				= alModuleObjects.insert(OBJECT_REGISTRY::value_type(lpObj->getID(), MUTUAL_ACCESSOR()));
 				
-				if (pbInsertResult.second)
-				{
-					pbInsertResult.first->second._lpObject	= lpObj;
-					pbInsertResult.first->second._hMutex	= CreateMutex(NULL, FALSE, NULL);
+			if (pbInsertResult.second)
+			{
+				pbInsertResult.first->second._lpObject	= lpObj;
+				pbInsertResult.first->second._hMutex	= CreateMutex(NULL, FALSE, NULL);
 					
-					if (pbInsertResult.first->second._hMutex == NULL)
-					{
-						alModuleObjects.erase(pbInsertResult.first);
-					}
-					else
-					{
-						return pbInsertResult.first->first;
-					}
+				if (pbInsertResult.first->second._hMutex == NULL)
+				{
+					alModuleObjects.erase(pbInsertResult.first);
 				}
-			//}
+				else
+				{
+					return pbInsertResult.first->first;
+				}
+			}
 		}
 		else
 		{
