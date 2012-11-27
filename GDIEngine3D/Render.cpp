@@ -127,7 +127,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 
 		sceneObjCount	= lpScene->getObjectClassCount(CLS_MESH);
 
-		if ( rMode != RM_WIREFRAME ) 
+		if ( (rMode & RM_SHADED) != 0 ) 
 		{
 			scenePolyCount = 0;
 			for (size_t i = 0; i < sceneObjCount; i++) 
@@ -160,7 +160,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			CopyMemory(objVertBuffer, objVertBufferRaw, objVertCount * sizeof(VECTOR3D));
 
 			// calculate lighting here
-			if ( rMode != RM_WIREFRAME ) 
+			if ( (rMode & RM_SHADED) != 0 ) 
 			{
 				objToRender->getPolygonDataRaw(objPolyBuffer, objPolyCount);
 				size_t lightTo	= sceneLightedPolyCount + objPolyCount; // number of polygons to light
@@ -204,7 +204,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 				Matrix3DTransformCoord(viewportMatrix, objVertBuffer[j], objVertBuffer[j]);
 			}
 
-			if ( rMode != RM_WIREFRAME ) 
+			if ( (rMode & RM_SHADED) != 0 ) 
 			{
 				// filling a part of scene Buf
 				for (UINT j = 0; j < objPolyCount; j++) {
@@ -222,7 +222,8 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 				}
 				sceneLightedPolyCount += objPolyCount;
 			}
-			else 
+			
+			if ( (rMode & RM_WIREFRAME) != 0 )
 			{
 				objToRender->getEdgeDataRaw(objEdgeBuffer, objEdgeCount);
 				hPenCurrent	= CreatePen(PS_SOLID, 1, objToRender->getColor());
@@ -254,7 +255,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 			delete[] objVertBuffer;
 		}
 
-		if ( rMode != RM_WIREFRAME ) 
+		if ( (rMode & RM_SHADED) != 0 ) 
 		{
 			sort(scenePolyBuffer.begin(), scenePolyBuffer.end(), ZDepthComparator);
 
@@ -270,10 +271,10 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 				) { 
 					objToRender	= (LPMESH3D)lpScene->getObject(CLS_MESH, scenePolyBuffer[i].second);
 					hBrCurrent = CreateSolidBrush(scenePolyBuffer[i].first.colorRef);
-					if ( rMode == RM_SHADEDWF ) 
-						hPenCurrent = CreatePen(PS_SOLID, 1, objToRender->getColor());
-					else
-						hPenCurrent = CreatePen(PS_SOLID, 1, scenePolyBuffer[i].first.colorRef);
+					//if ( rMode == RM_SHADEDWF ) 
+					//	hPenCurrent = CreatePen(PS_SOLID, 1, objToRender->getColor());
+					//else
+					hPenCurrent = CreatePen(PS_SOLID, 1, scenePolyBuffer[i].first.colorRef);
 					
 					hPenOld = (HPEN)SelectObject(hDCOutput, hPenCurrent);
 					hBrOld	= (HBRUSH)SelectObject(hDCOutput, hBrCurrent);

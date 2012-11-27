@@ -1693,6 +1693,251 @@ BOOL WINAPI ScenePyramidTopWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT 
 	return bResult;
 }
 
+// EDITING
+
+SCENE_OBJECT WINAPI SceneConeCreate(HSCENE hScene, FLOAT height, FLOAT baseRadius, FLOAT topRadius, UINT precision, COLORREF color)
+{
+	return SceneObjectAdd(hScene, new CONE3D(height, baseRadius, topRadius, precision, color));
+}
+
+BOOL WINAPI SceneConeBaseRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseRadius)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(CONE3D))
+		{
+			((LPCONE3D)victim)->setBRadius(baseRadius);
+			((LPCONE3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneConeBaseRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseRadius)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(CONE3D))
+		{
+			baseRadius = ((LPCONE3D)victim)->getBRadius();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneConeTopRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topRadius)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(CONE3D))
+		{
+			((LPCONE3D)victim)->setTRadius(topRadius);
+			((LPCONE3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneConeTopRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topRadius)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(CONE3D))
+		{
+			topRadius = ((LPCONE3D)victim)->getTRadius();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneConeHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(CONE3D))
+		{
+			((LPCONE3D)victim)->setHeight(height);
+			((LPCONE3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneConeHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(CONE3D))
+		{
+			height = ((LPCONE3D)victim)->getHeight();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneConePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT precision)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(CONE3D))
+		{
+			((LPCONE3D)victim)->setPrecision(precision);
+			((LPCONE3D)victim)->Triangulate();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+BOOL WINAPI SceneConePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &precision)
+{
+	BOOL bResult = FALSE;
+
+	LPUNKNOWN Master = NULL;
+
+	thread_safety::LockModule(INFINITE);
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hScene, typeid(SCENE3D)))
+		thread_safety::LockObjectRegistered((size_t)hScene, Master);
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		LPOBJECT3D victim = dynamic_cast<LPOBJECT3D>(IUnknown::getByID(scObject));
+		if (bResult = ((LPSCENE3D)Master)->findObjectIndex(victim) && victim->getClassID() == CLS_MESH 
+			&& ((LPMESH3D)victim)->getMeshID() == MSH_PRIMITIVE && typeid(*victim) == typeid(CONE3D))
+		{
+			precision = ((LPCONE3D)victim)->getPrecision();
+		}
+
+		thread_safety::UnlockObjectRegistered((size_t)hScene, Master);
+	}
+
+	return bResult;
+}
+
+// EDITING END
+
 SCENE_OBJECT WINAPI SceneOmniLightCreate(HSCENE hScene, FLOAT Power, COLORREF Color)
 {
 	return SceneObjectAdd(hScene, new OMNILIGHT3D(Color, Power));
