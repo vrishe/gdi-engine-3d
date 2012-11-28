@@ -17,7 +17,7 @@ private:
 protected:
 	VERT_LIST		vertices;	// list of vertexes
 	VERT_LIST		cache;		// list of transformed vertices
-	EDGE_LIST		edges;		// list of edges
+
 	POLY_LIST		polygons;	// list of polygons
 
 	COLORREF		color;
@@ -34,7 +34,6 @@ public:
 
 	MESH_ID	getMeshID();
 	size_t	getVerticesCount();
-	size_t	getEdgesCount();
 	size_t	getPolygonsCount();
 
 	void	setSelfIllumination(float self_illumination);
@@ -44,9 +43,6 @@ public:
 	void	getVertexDataRaw(LPVECTOR3D &lpVertexArray, size_t &uVertexCount);
 	void	getVertexCacheData(VERT_LIST &vertices);
 	void	getVertexCacheDataRaw(LPVECTOR3D &lpVertexArray, size_t &uVertexCount);
-
-	void	getEdgeData(EDGE_LIST &edges);
-	void	getEdgeDataRaw(LPEDGE3D &lpEdgeArray, size_t &uEdgeCount);
 
 	void	getPolygonData(POLY_LIST &polygons);
 	void	getPolygonDataRaw(LPPOLY3D &lpPolyArray, size_t &uPolyCount);

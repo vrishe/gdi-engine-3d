@@ -37,7 +37,8 @@ typedef struct _tagNormalPolygon {
 	VECTOR3D second;
 	VECTOR3D third;
 
-	DWORD colorRef;
+	DWORD fillColorRef;
+	DWORD strokeColorRef;
 
 	VECTOR3D Normal(size_t startVert);
 } DIRECTPOLY3D, *LPDIRECTPOLY3D;

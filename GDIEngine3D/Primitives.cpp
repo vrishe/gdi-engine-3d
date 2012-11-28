@@ -9,50 +9,26 @@
 
 void _clsPyramid::Triangulate() {
 	vertices.clear();
-	edges.clear();
 	polygons.clear();
 
-		// setting base vertices
+	// setting base vertices
 	vertices.push_back(VECTOR3D(-bL/2, 0, -bW/2));	// 0
 	vertices.push_back(VECTOR3D(-bL/2, 0,  bW/2));	// 1
 	vertices.push_back(VECTOR3D( bL/2, 0,  bW/2));	// 2
 	vertices.push_back(VECTOR3D( bL/2, 0, -bW/2));	// 3
-		// setting top vertices
+	// setting top vertices
 	vertices.push_back(VECTOR3D(-tL/2 + shift, h, -tW/2));	// 4
 	vertices.push_back(VECTOR3D(-tL/2 + shift, h,  tW/2));	// 5
 	vertices.push_back(VECTOR3D( tL/2 + shift, h,  tW/2));	// 6
 	vertices.push_back(VECTOR3D( tL/2 + shift, h, -tW/2));	// 7
 
-		// setting edges
-	// setting base edges
-	edges.push_back(EDGE3D(0,1));	
-	edges.push_back(EDGE3D(1,2));
-	edges.push_back(EDGE3D(2,3));
-	edges.push_back(EDGE3D(3,0));
-	edges.push_back(EDGE3D(0,2));
-		// setting top edges
-	edges.push_back(EDGE3D(4,5));	
-	edges.push_back(EDGE3D(5,6));
-	edges.push_back(EDGE3D(6,7));
-	edges.push_back(EDGE3D(7,4));
-	edges.push_back(EDGE3D(4,6));	
-		// setting side edges
-	edges.push_back(EDGE3D(0,4));
-	edges.push_back(EDGE3D(0,5));
-	edges.push_back(EDGE3D(1,5));
-	edges.push_back(EDGE3D(1,6));
-	edges.push_back(EDGE3D(2,6));	
-	edges.push_back(EDGE3D(2,7));	
-	edges.push_back(EDGE3D(3,7));	
-	edges.push_back(EDGE3D(3,4));
-
-		// setting base polygons
+	// setting base polygons
 	polygons.push_back(POLY3D(0,1,2)); // 0
 	polygons.push_back(POLY3D(0,2,3)); // 1
-		// setting top polygons
+	// setting top polygons
 	polygons.push_back(POLY3D(5,4,6)); // 2
 	polygons.push_back(POLY3D(6,4,7)); // 3
-		// setting side polygons
+	// setting side polygons
 	polygons.push_back(POLY3D(4,0,3));	// 4
 	polygons.push_back(POLY3D(7,4,3));	// 5
 	polygons.push_back(POLY3D(7,3,2));	// 6
@@ -64,7 +40,6 @@ void _clsPyramid::Triangulate() {
 
 	flushVertices();
 	vertices.shrink_to_fit();
-	edges.shrink_to_fit();
 	polygons.shrink_to_fit();
 }
 
@@ -107,7 +82,6 @@ void _clsPyramid::setTWidth(float tWidth)	{ tW = max(tWidth, .0F);  }
 
 void _clsCone::Triangulate() {
 	vertices.clear();
-	edges.clear();
 	polygons.clear();
 
 	if (bR > .0F || tR > .0F)
@@ -133,13 +107,6 @@ void _clsCone::Triangulate() {
 		{
 			size_t next_index = i < (max - 3) ? i : 0;
 
-			edges.push_back(EDGE3D(0, i));
-			edges.push_back(EDGE3D(i, next_index + 2));
-			edges.push_back(EDGE3D(i, i + 1));
-			edges.push_back(EDGE3D(i, next_index + 3));
-			edges.push_back(EDGE3D(i + 1, next_index + 3));
-			edges.push_back(EDGE3D(1, i + 1));
-
 			polygons.push_back(POLY3D(i, 0, next_index + 2));
 			polygons.push_back(POLY3D(i + 1, i, next_index + 3));
 			polygons.push_back(POLY3D(next_index + 2, next_index + 3, i));
@@ -152,10 +119,6 @@ void _clsCone::Triangulate() {
 		{
 			size_t next_index = i < (max - 1) ? i + 1 : 2;
 
-			edges.push_back(EDGE3D(0, i));
-			edges.push_back(EDGE3D(i, next_index));
-			edges.push_back(EDGE3D(i, 1));
-
 			polygons.push_back(POLY3D(i, 0, next_index));
 			polygons.push_back(POLY3D(1, i, next_index));
 		}
@@ -163,7 +126,6 @@ void _clsCone::Triangulate() {
 
 	flushVertices();
 	vertices.shrink_to_fit();
-	edges.shrink_to_fit();
 	polygons.shrink_to_fit();
 }
 
@@ -203,7 +165,6 @@ void _clsSphere::Triangulate()
 	if ( cropMult < 1.0f )
 	{
 		vertices.clear();
-		edges.clear();
 		polygons.clear();
 
 		bool isSliced = angleFrom != .0f || angleTo != .0f;
@@ -262,11 +223,9 @@ void _clsSphere::Triangulate()
 				}
 				else
 				{
-					edges.push_back(EDGE3D(current, forward));
 					if ( diagonal != 0 )
 					{
 						if ( diagonal == i ) diagonal = i - perCircle;
-						edges.push_back(EDGE3D(current, diagonal));
 						polygons.push_back(POLY3D(current, diagonal, forward));
 						polygons.push_back(POLY3D(upward, diagonal, current));
 					}
@@ -275,14 +234,12 @@ void _clsSphere::Triangulate()
 						polygons.push_back(POLY3D(upward, forward, current));
 					}
 				}
-				edges.push_back(EDGE3D(current, upward));
 			}
 			i += perCircle;
 		}
 
 		flushVertices();
 		vertices.shrink_to_fit();
-		edges.shrink_to_fit();
 		polygons.shrink_to_fit();
 	}
 }

@@ -19,16 +19,6 @@ inline size_t _clsMesh::findVertex(const VECTOR3D &v)
 	return SIZE_MAX;
 }
 
-inline size_t _clsMesh::findEdge(const EDGE3D &e) 
-{
-	for (size_t i = 0, max = edges.size(); i < max; i++)
-	{
-		if (edges[i] == e) return i;
-	}
-
-	return SIZE_MAX;
-}
-
 inline size_t _clsMesh::findPolygon(const POLY3D &p) 
 {
 	for (size_t i = 0, max = polygons.size(); i < max; i++)
@@ -41,7 +31,6 @@ inline size_t _clsMesh::findPolygon(const POLY3D &p)
 
 inline MESH_ID		_clsMesh::getMeshID()				{ return _mTypeID; }
 inline size_t		_clsMesh::getVerticesCount()		{ return vertices.size(); }
-inline size_t		_clsMesh::getEdgesCount()			{ return edges.size(); }
 inline size_t		_clsMesh::getPolygonsCount()		{ return polygons.size(); }
 
 inline void _clsMesh::setSelfIllumination(float self_illumination)
@@ -69,16 +58,6 @@ inline void _clsMesh::getVertexCacheDataRaw(LPVECTOR3D &lpVertexArray, size_t &u
 	uVertexCount	= cache.size();
 }
 
-inline void _clsMesh::getEdgeData(EDGE_LIST &edges)
-{
-	edges = this->edges;
-}
-inline void _clsMesh::getEdgeDataRaw(LPEDGE3D &lpEdgeArray, size_t &uEdgeCount)
-{
-	lpEdgeArray	= edges.begin()._Ptr;
-	uEdgeCount	= edges.size();
-}
-
 inline void _clsMesh::getPolygonData(POLY_LIST &polygons)
 {
 	polygons = this->polygons;
@@ -94,6 +73,5 @@ inline void	_clsMesh::setMeshID(MESH_ID mTypeID) { _mTypeID = mTypeID; }
 inline void _clsMesh::ClearHullData() 
 {
 	vertices.clear();
-	edges.clear();
 	polygons.clear();
 }
