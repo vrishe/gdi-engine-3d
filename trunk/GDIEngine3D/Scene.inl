@@ -78,6 +78,18 @@ inline LPOBJECT3D _clsScene::getObject(CLASS_ID clsID, size_t objIndex) const
 	return NULL;
 }
 
+inline void _clsScene::getObjects(OBJECTS_LIST &ov, CLASS_ID clsID) const
+{
+	CONTENT::const_iterator finder = objects.find(clsID);
+
+	if ( finder != objects.end() )
+	{
+		ov = finder->second;
+		return;
+	}
+	ov.clear();
+}
+
 inline size_t _clsScene::getObjectClassCount(CLASS_ID clsID) const 
 { 
 	CONTENT::const_iterator finder = objects.find(clsID);

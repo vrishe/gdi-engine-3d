@@ -79,10 +79,9 @@ inline COLORREF AddColor(COLORREF a, COLORREF b)
 		);
 }
 // Is used as predicate for std::sort algorithm; provides a > b comparison
-bool ZDepthComparator(const pair <DIRECTPOLY3D, UINT> &a, const pair <DIRECTPOLY3D, UINT> &b) 
+bool ZDepthComparator(const DIRECTPOLY3D &a, const DIRECTPOLY3D &b) 
 {
-	return (a.first.first.z + a.first.second.z + a.first.third.z) 
-			> (b.first.first.z + b.first.second.z + b.first.third.z);
+	return (a.first.z + a.second.z + a.third.z) > (b.first.z + b.second.z + b.third.z);
 }
 BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen) const 
 {
@@ -90,212 +89,132 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 
 	if (bResult)
 	{
-		HPEN			hPenCurrent				= NULL, 
-						hPenOld					= NULL;
-		HBRUSH			hBrCurrent				= NULL,
-						hBrOld					= NULL;	
+		SCENEPOLY scenePolygonData;
 
-		RECT			viewportRect			= {0, 0, getWidth(), getHeight()};
-		size_t			sceneObjCount			= 0,
-						sceneLightCount			= 0,
-						scenePolyCount			= 0,
-						sceneLightedPolyCount	= 0,
-						objVertCount			= 0,
-						objPolyCount			= 0;
+		MATRIX4	cameraMatrix; 	  lpCamera->GetViewMatrix(cameraMatrix);
+		MATRIX4	projectionMatrix; lpCamera->GetProjectionMatrix(projectionMatrix);
 
-		LPOMNILIGHT3D	lightToRender			= NULL;
-		LPMESH3D		objToRender				= NULL;
-		LPVECTOR3D		objVertBuffer			= NULL;
-		LPPOLY3D		objPolyBuffer			= NULL;
+		OBJECTS_LIST lightData; lpScene->getObjects(lightData, CLS_LIGHT);
+		OBJECTS_LIST meshData;  lpScene->getObjects(meshData, CLS_MESH);
+		__foreach(OBJECTS_LIST::const_iterator, mesh_object, meshData)
+		{
+			LPMESH3D mesh = static_cast<LPMESH3D>(*mesh_object);
+			mesh->Transform();
 
-		MATRIX4			cameraMatrix,
-						projectionMatrix,
-						viewportMatrix;
-	
-		SCENEPOLY		scenePolyBuffer;
-		LPCOLORREF		scenePolyColorBuffer	= NULL;
+			VERT_LIST transformedVertexData;
+			VERT_LIST projectedVertexData;
 
-		// Filling lpViewport with scene ambient color
-		hBrCurrent	= CreateSolidBrush(lpScene->getAmbientColor());
-		hBrOld		= (HBRUSH)SelectObject(hDCOutput, hBrCurrent);
+			mesh->getVertexCacheData(transformedVertexData);
+
+			// camera projection transformations
+			projectedVertexData = transformedVertexData;
+			__foreach(VERT_LIST::iterator, vertex, projectedVertexData)
+			{
+				Matrix3DTransformCoord(cameraMatrix, *vertex, *vertex);
+				
+				float w = projectionMatrix._34 != .0F ? vertex->z / projectionMatrix._34 : 1.0F;
+				Matrix3DTransformCoord(projectionMatrix, *vertex, *vertex);
+				*vertex /= w;
+			}
+
+			// Polygon filtering
+			POLY_LIST polygonData;
+
+			mesh->getPolygonData(polygonData);
+			__foreach(POLY_LIST::const_iterator, polygon, polygonData)
+			{
+				DIRECTPOLY3D outputPolygonData;
+
+				outputPolygonData.first  = projectedVertexData[polygon->first];
+				outputPolygonData.second = projectedVertexData[polygon->second];
+				outputPolygonData.third  = projectedVertexData[polygon->third];
+				if ( (-1.0F <= outputPolygonData.first.x  && outputPolygonData.first.x  <= 1.0F && -1.0F <= outputPolygonData.first.y  && outputPolygonData.first.y  <= 1.0F 
+				||	  -1.0F <= outputPolygonData.second.x && outputPolygonData.second.x <= 1.0F && -1.0F <= outputPolygonData.second.y && outputPolygonData.second.y <= 1.0F
+				||    -1.0F <= outputPolygonData.third.x  && outputPolygonData.third.x  <= 1.0F && -1.0F <= outputPolygonData.third.y  && outputPolygonData.third.y  <= 1.0F)
+				&&	    .0F <= outputPolygonData.first.z  && outputPolygonData.first.z  <= projectionMatrix._34
+				&&	    .0F <= outputPolygonData.second.z && outputPolygonData.second.z <= projectionMatrix._34
+				&&      .0F <= outputPolygonData.third.z  && outputPolygonData.third.z  <= projectionMatrix._34
+				) {
+					if ((rMode & RM_SHADED) != 0)
+					{
+						float cosCam = Vector3DMultS(polygon->Normal(projectedVertexData, 2), VECTOR3D(.0F, .0F, 1.0F));
+						if (!(-1.0F <= cosCam && cosCam < .0F)) continue;
+					}
+
+					outputPolygonData.fillColorRef = mesh->getColor();
+					if (!lightData.empty())
+					{
+						outputPolygonData.fillColorRef = RGB(
+							RED(mesh->getColor())   * mesh->getSelfIllumination(),
+							GREEN(mesh->getColor()) * mesh->getSelfIllumination(),
+							BLUE(mesh->getColor())  * mesh->getSelfIllumination()
+						  );
+						__foreach(OBJECTS_LIST::const_iterator, light_object, lightData)
+						{
+							LPOMNILIGHT3D light = static_cast<LPOMNILIGHT3D>(*light_object); 
+
+							outputPolygonData.fillColorRef = AddColor(outputPolygonData.fillColorRef, 
+								light->AffectPolygonColor(*polygon, transformedVertexData, mesh->getColor())
+								);
+						}
+					}
+					outputPolygonData.strokeColorRef = (rMode & RM_WIREFRAME) != 0 ? mesh->getColor() : outputPolygonData.fillColorRef;
+
+					scenePolygonData.push_back(outputPolygonData);
+				}
+			}
+		}
+		sort(scenePolygonData.begin(), scenePolygonData.end(), ZDepthComparator);
+
+		// Rasterizing
+		RECT viewportRect = {0, 0, getWidth(), getHeight()};
+		HBRUSH hBrCurrent = CreateSolidBrush(lpScene->getAmbientColor());
+		HBRUSH hBrOld	  = (HBRUSH)SelectObject(hDCOutput, hBrCurrent);
+
 		FillRect(hDCOutput, &viewportRect, hBrCurrent);
+
 		SelectObject(hDCOutput, hBrOld);
 		DeleteObject(hBrCurrent);
 
-		sceneObjCount  = lpScene->getObjectClassCount(CLS_MESH);
-		//if ( (rMode & RM_SHADED) != 0 ) 
-		//{
-			for (size_t i = 0; i < sceneObjCount; i++) 
-				scenePolyCount += ((LPMESH3D)lpScene->getObject(CLS_MESH, i))->getPolygonsCount();
-
-			sceneLightCount			= lpScene->getObjectClassCount(CLS_LIGHT);
-			scenePolyColorBuffer	= new COLORREF[scenePolyCount];
-		//}
-
-		lpCamera->GetViewMatrix(cameraMatrix);
-		lpCamera->GetProjectionMatrix(projectionMatrix);
-
+		MATRIX4 viewportMatrix;
 		viewportMatrix.SetIdentity();
 		viewportMatrix._41 = (FLOAT)viewportRect.right / 2;
 		viewportMatrix._42 = (FLOAT)viewportRect.bottom / 2;
 		viewportMatrix._11 =  viewportMatrix._41;
 		viewportMatrix._22 = -viewportMatrix._42;
 
-		// Drawing objects
-		for ( UINT i = 0; i < sceneObjCount; i++ ) 
+		__foreach(SCENEPOLY::iterator, polygon, scenePolygonData)
 		{
-			objToRender	= (LPMESH3D)lpScene->getObject(CLS_MESH, i);
-			objToRender->Transform();
-
-			LPVECTOR3D objVertBufferRaw;
-			objToRender->getVertexCacheDataRaw(objVertBufferRaw, objVertCount);
-			objToRender->getPolygonDataRaw(objPolyBuffer, objPolyCount);
-			
-			objVertBuffer = new VECTOR3D[objVertCount];
-			CopyMemory(objVertBuffer, objVertBufferRaw, objVertCount * sizeof(VECTOR3D));
-
-			// calculate lighting here
-			if ( (rMode & RM_SHADED) != 0 ) 
-			{
-				size_t lightTo	= sceneLightedPolyCount + objPolyCount; // number of polygons to light
-
-				for (size_t j = sceneLightedPolyCount; j < lightTo; j++) 
-				{
-					if ( sceneLightCount == 0 ) 
-					{
-						scenePolyColorBuffer[j] = objToRender->getColor();
-						continue;
-					}
-
-					scenePolyColorBuffer[j] = RGB(
-						RED(objToRender->getColor())   * objToRender->getSelfIllumination(),
-						GREEN(objToRender->getColor()) * objToRender->getSelfIllumination(),
-						BLUE(objToRender->getColor())  * objToRender->getSelfIllumination()
-					);
-					for (UINT k = 0; k < sceneLightCount; k++) 	
-					{
-						lightToRender = (LPOMNILIGHT3D)lpScene->getObject(CLS_LIGHT, k);
-
-						scenePolyColorBuffer[j] = AddColor(
-							scenePolyColorBuffer[j],
-							lightToRender->AffectPolygonColor(
-								objPolyBuffer[j - sceneLightedPolyCount], objVertBuffer, objToRender->getColor()
-								)
-							);
-					}
-				}
-			}
-
-			// camera projection transformations
-			for ( UINT j = 0; j < objVertCount; j++ ) 
-			{
-				Matrix3DTransformCoord(cameraMatrix, objVertBuffer[j], objVertBuffer[j]);
-				
-				float w = projectionMatrix._34 != .0F ? objVertBuffer[j].z / projectionMatrix._34 : 1.0F;
-				Matrix3DTransformCoord(projectionMatrix, objVertBuffer[j],	objVertBuffer[j]);
-				objVertBuffer[j] /= w;
-
-				Matrix3DTransformCoord(viewportMatrix, objVertBuffer[j], objVertBuffer[j]);
-			}
-
-			//if ( (rMode & RM_SHADED) != 0 ) 
-			//{
-				// filling a part of scene Buf
-				for (UINT j = 0; j < objPolyCount; j++) 
-				{
-					if ((rMode & RM_SHADED) != 0)
-					{
-						VECTOR3D normal = objPolyBuffer[j].Normal(objVertBuffer, 1);
-						float    cosCam = Vector3DMultS(normal, VECTOR3D(0,0,1));
-						if (!(-1.0F <= cosCam && cosCam < .0F)) continue;
-					}
-
-					DIRECTPOLY3D tmp;
-					tmp.first	 = objVertBuffer[ objPolyBuffer[j].first ];
-					tmp.second	 = objVertBuffer[ objPolyBuffer[j].second ];
-					tmp.third	 = objVertBuffer[ objPolyBuffer[j].third ];
-
-					tmp.fillColorRef   = scenePolyColorBuffer[j + sceneLightedPolyCount];
-					tmp.strokeColorRef = (rMode & RM_WIREFRAME) != 0 ? objToRender->getColor() : tmp.fillColorRef;
-
-					scenePolyBuffer.push_back(pair<DIRECTPOLY3D,int>(tmp,i));
-				}
-				sceneLightedPolyCount += objPolyCount;
-			//}
-			
-			//if ( (rMode & RM_WIREFRAME) != 0 )
-			//{
-			//	objToRender->getEdgeDataRaw(objEdgeBuffer, objEdgeCount);
-			//	hPenCurrent	= CreatePen(PS_SOLID, 1, objToRender->getColor());
-			//	hPenOld		= (HPEN)SelectObject(hDCOutput, hPenCurrent);
-			//	for ( UINT j = 0; j < objEdgeCount; j++ ) 
-			//	{
-			//		if (   objVertBuffer[objEdgeBuffer[j].first].z	>=  .0F
-			//			&& objVertBuffer[objEdgeBuffer[j].first].z	<= projectionMatrix._34
-			//			&& objVertBuffer[objEdgeBuffer[j].second].z >=  .0F
-			//			&& objVertBuffer[objEdgeBuffer[j].second].z <= projectionMatrix._34
-			//		) { 
-			//			vert2DDrawBuffer[0].x 
-			//				= (LONG)objVertBuffer[objEdgeBuffer[j].first].x;
-			//			vert2DDrawBuffer[0].y 
-			//				= (LONG)objVertBuffer[objEdgeBuffer[j].first].y;
-			//	
-			//			vert2DDrawBuffer[1].x 
-			//				= (LONG)objVertBuffer[objEdgeBuffer[j].second].x;
-			//			vert2DDrawBuffer[1].y 
-			//				= (LONG)objVertBuffer[objEdgeBuffer[j].second].y;
-
-			//			Polyline(hDCOutput, vert2DDrawBuffer, 2);
-			//		}
-			//	}
-			//	SelectObject(hDCOutput, hPenOld);
-			//	DeleteObject(hPenCurrent);
-			//}
-
-			delete[] objVertBuffer;
-		}
-		delete[] scenePolyColorBuffer;
-
-		//if ( (rMode & RM_SHADED) != 0 ) 
-		//{
-			sort(scenePolyBuffer.begin(), scenePolyBuffer.end(), ZDepthComparator);
-			scenePolyCount = scenePolyBuffer.size();
+			Matrix3DTransformCoord(viewportMatrix, polygon->first,  polygon->first);
+			Matrix3DTransformCoord(viewportMatrix, polygon->second, polygon->second);
+			Matrix3DTransformCoord(viewportMatrix, polygon->third,  polygon->third);
 
 			POINT vert2DDrawBuffer[3];
-			for (UINT i = 0; i < scenePolyCount; i++ ) 
-			{
-				if (   scenePolyBuffer[i].first.first.z  >=  .0F
-					&& scenePolyBuffer[i].first.first.z  <= projectionMatrix._34
-					&& scenePolyBuffer[i].first.second.z >=  .0F
-					&& scenePolyBuffer[i].first.second.z <= projectionMatrix._34
-					&& scenePolyBuffer[i].first.third.z  >=  .0F
-					&& scenePolyBuffer[i].first.third.z  <= projectionMatrix._34
-				) {
-					vert2DDrawBuffer[0].x = (LONG)scenePolyBuffer[i].first.first.x;
-					vert2DDrawBuffer[0].y = (LONG)scenePolyBuffer[i].first.first.y;
 
-					vert2DDrawBuffer[1].x = (LONG)scenePolyBuffer[i].first.second.x;
-					vert2DDrawBuffer[1].y = (LONG)scenePolyBuffer[i].first.second.y;
+			vert2DDrawBuffer[0].x = (LONG)polygon->first.x;
+			vert2DDrawBuffer[0].y = (LONG)polygon->first.y;
 
-					vert2DDrawBuffer[2].x = (LONG)scenePolyBuffer[i].first.third.x;
-					vert2DDrawBuffer[2].y = (LONG)scenePolyBuffer[i].first.third.y;
+			vert2DDrawBuffer[1].x = (LONG)polygon->second.x;
+			vert2DDrawBuffer[1].y = (LONG)polygon->second.y;
 
-					hBrCurrent  = (rMode & RM_SHADED) != 0 
-						? CreateSolidBrush(scenePolyBuffer[i].first.fillColorRef) 
-						: (HBRUSH)GetStockObject(NULL_BRUSH);
-					hPenCurrent = CreatePen(PS_SOLID, 1, scenePolyBuffer[i].first.strokeColorRef);		
-					hBrOld	    = (HBRUSH)SelectObject(hDCOutput, hBrCurrent);
-					hPenOld     = (HPEN)SelectObject(hDCOutput, hPenCurrent);
+			vert2DDrawBuffer[2].x = (LONG)polygon->third.x;
+			vert2DDrawBuffer[2].y = (LONG)polygon->third.y;
 
-					Polygon(hDCOutput, vert2DDrawBuffer, 3);
+			hBrCurrent  = (rMode & RM_SHADED) != 0 
+									? CreateSolidBrush(polygon->fillColorRef) 
+									: (HBRUSH)GetStockObject(NULL_BRUSH);
+			hBrOld	   = (HBRUSH)SelectObject(hDCOutput, hBrCurrent);
+			
+			HPEN   hPenCurrent = CreatePen(PS_SOLID, 1, polygon->strokeColorRef);		
+			HPEN   hPenOld     = (HPEN)SelectObject(hDCOutput, hPenCurrent);
 
-					SelectObject(hDCOutput, hBrOld);
-					SelectObject(hDCOutput, hPenOld);
-					DeleteObject(hBrCurrent);
-					DeleteObject(hPenCurrent);
-				}
-			}
-		//}
+			Polygon(hDCOutput, vert2DDrawBuffer, 3);
+
+			SelectObject(hDCOutput, hBrOld);
+			SelectObject(hDCOutput, hPenOld);
+			if ((rMode & RM_SHADED) != 0) DeleteObject(hBrCurrent);
+			DeleteObject(hPenCurrent);
+		}
 
 		BITMAP info;
 		bResult &= (GetObject(GetCurrentObject(hDCScreen, OBJ_BITMAP), sizeof(BITMAP), &info) == sizeof(BITMAP))
@@ -304,55 +223,6 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 
 	return bResult;
 }
-
-//VOID SetViewportDefaultView(LPVIEWPORT vp, VIEW_TYPE vt)
-//{
-//	VECTOR3D		defCamPos;
-//	FLOAT			perspCoords = VIEW_DISTANCE_DEFAULT;
-//
-//	if ( vp != NULL )
-//	{
-//		LPCAMERA3D cam = vp->getCamera();
-//		switch ( vt )
-//		{
-//			case VIEW_LEFT:
-//				defCamPos.y = perspCoords;
-//				break;
-//
-//			case VIEW_RIGHT:
-//
-//				defCamPos.y = -perspCoords;
-//				break;
-//
-//			case VIEW_FRONT:
-//				defCamPos.x = perspCoords;
-//				break;	
-//
-//			case VIEW_BACK:
-//				defCamPos.x = -perspCoords;
-//				break;	
-//
-//			case VIEW_TOP:
-//				defCamPos.z = perspCoords;
-//				break;
-//
-//			case VIEW_BOTTOM:
-//
-//				defCamPos.z = -perspCoords;
-//				break;
-//
-//			case VIEW_PERSPECTIVE:
-//				perspCoords = sqrt((perspCoords * perspCoords) / 3);
-//				defCamPos.x = perspCoords;
-//				defCamPos.y = perspCoords;
-//				defCamPos.z = perspCoords;
-//				cam->setProjectionType(PT_CENTRAL);
-//				break;
-//		}
-//
-//		cam->Translate(defCamPos);
-//	}
-//}
 
 // ============================================================================
 // _clsRenderPool class partial implementation:

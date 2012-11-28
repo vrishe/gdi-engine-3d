@@ -25,7 +25,6 @@ protected:
 
 	void flushVertices();
 	size_t findVertex(const VECTOR3D &v);	// returns a vertex position
-	size_t findEdge(const EDGE3D &e);
 	size_t findPolygon(const POLY3D &p);	// returns a Polygon_ position
 
 public:

@@ -24,10 +24,11 @@ public:
 	bool findObjectIndex(const LPOBJECT3D lpObject, size_t *objIndex = NULL) const;
 	void getObjectsBulkVector(OBJECTS_LIST &bulk, bool preClean)			 const;
 
-	size_t		getObjectClassCount(CLASS_ID clsID)			const;
-	LPOBJECT3D	getFirstObject(CLASS_ID clsID)				const;
-	LPOBJECT3D	getObject(CLASS_ID objID, size_t objIndex)	const;
-	COLORREF	getAmbientColor()							const;
+	size_t		getObjectClassCount(CLASS_ID clsID)			 const;
+	LPOBJECT3D	getFirstObject(CLASS_ID clsID)				 const;
+	LPOBJECT3D	getObject(CLASS_ID clsID, size_t objIndex)	 const;
+	void		getObjects(OBJECTS_LIST &ov, CLASS_ID clsID) const;
+	COLORREF	getAmbientColor()							 const;
 
 	VOID		setAmbientColor(COLORREF color);
 } SCENE3D, *LPSCENE3D;

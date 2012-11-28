@@ -1693,8 +1693,6 @@ BOOL WINAPI ScenePyramidTopWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT 
 	return bResult;
 }
 
-// EDITING
-
 SCENE_OBJECT WINAPI SceneConeCreate(HSCENE hScene, FLOAT height, FLOAT baseRadius, FLOAT topRadius, UINT precision, COLORREF color)
 {
 	return SceneObjectAdd(hScene, new CONE3D(height, baseRadius, topRadius, precision, color));
@@ -1935,8 +1933,6 @@ BOOL WINAPI SceneConePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &pr
 
 	return bResult;
 }
-
-// EDITING END
 
 SCENE_OBJECT WINAPI SceneOmniLightCreate(HSCENE hScene, FLOAT Power, COLORREF Color)
 {
