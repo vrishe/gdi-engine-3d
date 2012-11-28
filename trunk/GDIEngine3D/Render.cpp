@@ -90,33 +90,30 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 
 	if (bResult)
 	{
-		HPEN			hPenCurrent, 
-						hPenOld;
-		HBRUSH			hBrCurrent,
-						hBrOld;
+		HPEN			hPenCurrent				= NULL, 
+						hPenOld					= NULL;
+		HBRUSH			hBrCurrent				= NULL,
+						hBrOld					= NULL;	
 
 		RECT			viewportRect			= {0, 0, getWidth(), getHeight()};
-		size_t			sceneObjCount,
-						sceneLightCount,
-						scenePolyCount,
-						sceneLightedPolyCount,
-						objVertCount,
-						objEdgeCount,
-						objPolyCount;
+		size_t			sceneObjCount			= 0,
+						sceneLightCount			= 0,
+						scenePolyCount			= 0,
+						sceneLightedPolyCount	= 0,
+						objVertCount			= 0,
+						objPolyCount			= 0;
 
-		LPOMNILIGHT3D	lightToRender;
-		LPMESH3D		objToRender;
-		LPVECTOR3D		objVertBuffer;
-		LPEDGE3D		objEdgeBuffer;
-		LPPOLY3D		objPolyBuffer;
+		LPOMNILIGHT3D	lightToRender			= NULL;
+		LPMESH3D		objToRender				= NULL;
+		LPVECTOR3D		objVertBuffer			= NULL;
+		LPPOLY3D		objPolyBuffer			= NULL;
 
-		MATRIX4		cameraMatrix,
+		MATRIX4			cameraMatrix,
 						projectionMatrix,
 						viewportMatrix;
 	
 		SCENEPOLY		scenePolyBuffer;
-		LPCOLORREF		scenePolyColorBuffer;
-		POINT			vert2DDrawBuffer[3];
+		LPCOLORREF		scenePolyColorBuffer	= NULL;
 
 		// Filling lpViewport with scene ambient color
 		hBrCurrent	= CreateSolidBrush(lpScene->getAmbientColor());
@@ -125,18 +122,15 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 		SelectObject(hDCOutput, hBrOld);
 		DeleteObject(hBrCurrent);
 
-		sceneObjCount	= lpScene->getObjectClassCount(CLS_MESH);
-
-		if ( (rMode & RM_SHADED) != 0 ) 
-		{
-			scenePolyCount = 0;
+		sceneObjCount  = lpScene->getObjectClassCount(CLS_MESH);
+		//if ( (rMode & RM_SHADED) != 0 ) 
+		//{
 			for (size_t i = 0; i < sceneObjCount; i++) 
 				scenePolyCount += ((LPMESH3D)lpScene->getObject(CLS_MESH, i))->getPolygonsCount();
 
 			sceneLightCount			= lpScene->getObjectClassCount(CLS_LIGHT);
 			scenePolyColorBuffer	= new COLORREF[scenePolyCount];
-			sceneLightedPolyCount	= 0;
-		}
+		//}
 
 		lpCamera->GetViewMatrix(cameraMatrix);
 		lpCamera->GetProjectionMatrix(projectionMatrix);
@@ -147,7 +141,6 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 		viewportMatrix._11 =  viewportMatrix._41;
 		viewportMatrix._22 = -viewportMatrix._42;
 
-
 		// Drawing objects
 		for ( UINT i = 0; i < sceneObjCount; i++ ) 
 		{
@@ -156,13 +149,14 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 
 			LPVECTOR3D objVertBufferRaw;
 			objToRender->getVertexCacheDataRaw(objVertBufferRaw, objVertCount);
+			objToRender->getPolygonDataRaw(objPolyBuffer, objPolyCount);
+			
 			objVertBuffer = new VECTOR3D[objVertCount];
 			CopyMemory(objVertBuffer, objVertBufferRaw, objVertCount * sizeof(VECTOR3D));
 
 			// calculate lighting here
 			if ( (rMode & RM_SHADED) != 0 ) 
 			{
-				objToRender->getPolygonDataRaw(objPolyBuffer, objPolyCount);
 				size_t lightTo	= sceneLightedPolyCount + objPolyCount; // number of polygons to light
 
 				for (size_t j = sceneLightedPolyCount; j < lightTo; j++) 
@@ -204,62 +198,70 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 				Matrix3DTransformCoord(viewportMatrix, objVertBuffer[j], objVertBuffer[j]);
 			}
 
-			if ( (rMode & RM_SHADED) != 0 ) 
-			{
+			//if ( (rMode & RM_SHADED) != 0 ) 
+			//{
 				// filling a part of scene Buf
-				for (UINT j = 0; j < objPolyCount; j++) {
-					VECTOR3D normal = objPolyBuffer[j].Normal(objVertBuffer, 1);
-					float    cosCam = Vector3DMultS(normal, VECTOR3D(0,0,1));
-
-					if  (-1.0F <= cosCam && cosCam < .0F) {
-						DIRECTPOLY3D tmp;
-						tmp.first	 = objVertBuffer[ objPolyBuffer[j].first ];
-						tmp.second	 = objVertBuffer[ objPolyBuffer[j].second ];
-						tmp.third	 = objVertBuffer[ objPolyBuffer[j].third ];
-						tmp.colorRef = scenePolyColorBuffer[j + sceneLightedPolyCount];
-						scenePolyBuffer.push_back(pair<DIRECTPOLY3D,int>(tmp,i));
+				for (UINT j = 0; j < objPolyCount; j++) 
+				{
+					if ((rMode & RM_SHADED) != 0)
+					{
+						VECTOR3D normal = objPolyBuffer[j].Normal(objVertBuffer, 1);
+						float    cosCam = Vector3DMultS(normal, VECTOR3D(0,0,1));
+						if (!(-1.0F <= cosCam && cosCam < .0F)) continue;
 					}
+
+					DIRECTPOLY3D tmp;
+					tmp.first	 = objVertBuffer[ objPolyBuffer[j].first ];
+					tmp.second	 = objVertBuffer[ objPolyBuffer[j].second ];
+					tmp.third	 = objVertBuffer[ objPolyBuffer[j].third ];
+
+					tmp.fillColorRef   = scenePolyColorBuffer[j + sceneLightedPolyCount];
+					tmp.strokeColorRef = (rMode & RM_WIREFRAME) != 0 ? objToRender->getColor() : tmp.fillColorRef;
+
+					scenePolyBuffer.push_back(pair<DIRECTPOLY3D,int>(tmp,i));
 				}
 				sceneLightedPolyCount += objPolyCount;
-			}
+			//}
 			
-			if ( (rMode & RM_WIREFRAME) != 0 )
-			{
-				objToRender->getEdgeDataRaw(objEdgeBuffer, objEdgeCount);
-				hPenCurrent	= CreatePen(PS_SOLID, 1, objToRender->getColor());
-				hPenOld		= (HPEN)SelectObject(hDCOutput, hPenCurrent);
-				for ( UINT j = 0; j < objEdgeCount; j++ ) 
-				{
-					if (   objVertBuffer[objEdgeBuffer[j].first].z	>=  .0F
-						&& objVertBuffer[objEdgeBuffer[j].first].z	<= projectionMatrix._34
-						&& objVertBuffer[objEdgeBuffer[j].second].z >=  .0F
-						&& objVertBuffer[objEdgeBuffer[j].second].z <= projectionMatrix._34
-					) { 
-						vert2DDrawBuffer[0].x 
-							= (LONG)objVertBuffer[objEdgeBuffer[j].first].x;
-						vert2DDrawBuffer[0].y 
-							= (LONG)objVertBuffer[objEdgeBuffer[j].first].y;
-				
-						vert2DDrawBuffer[1].x 
-							= (LONG)objVertBuffer[objEdgeBuffer[j].second].x;
-						vert2DDrawBuffer[1].y 
-							= (LONG)objVertBuffer[objEdgeBuffer[j].second].y;
+			//if ( (rMode & RM_WIREFRAME) != 0 )
+			//{
+			//	objToRender->getEdgeDataRaw(objEdgeBuffer, objEdgeCount);
+			//	hPenCurrent	= CreatePen(PS_SOLID, 1, objToRender->getColor());
+			//	hPenOld		= (HPEN)SelectObject(hDCOutput, hPenCurrent);
+			//	for ( UINT j = 0; j < objEdgeCount; j++ ) 
+			//	{
+			//		if (   objVertBuffer[objEdgeBuffer[j].first].z	>=  .0F
+			//			&& objVertBuffer[objEdgeBuffer[j].first].z	<= projectionMatrix._34
+			//			&& objVertBuffer[objEdgeBuffer[j].second].z >=  .0F
+			//			&& objVertBuffer[objEdgeBuffer[j].second].z <= projectionMatrix._34
+			//		) { 
+			//			vert2DDrawBuffer[0].x 
+			//				= (LONG)objVertBuffer[objEdgeBuffer[j].first].x;
+			//			vert2DDrawBuffer[0].y 
+			//				= (LONG)objVertBuffer[objEdgeBuffer[j].first].y;
+			//	
+			//			vert2DDrawBuffer[1].x 
+			//				= (LONG)objVertBuffer[objEdgeBuffer[j].second].x;
+			//			vert2DDrawBuffer[1].y 
+			//				= (LONG)objVertBuffer[objEdgeBuffer[j].second].y;
 
-						Polyline(hDCOutput, vert2DDrawBuffer, 2);
-					}
-				}
-				SelectObject(hDCOutput, hPenOld);
-				DeleteObject(hPenCurrent);
-			}
+			//			Polyline(hDCOutput, vert2DDrawBuffer, 2);
+			//		}
+			//	}
+			//	SelectObject(hDCOutput, hPenOld);
+			//	DeleteObject(hPenCurrent);
+			//}
 
 			delete[] objVertBuffer;
 		}
+		delete[] scenePolyColorBuffer;
 
-		if ( (rMode & RM_SHADED) != 0 ) 
-		{
+		//if ( (rMode & RM_SHADED) != 0 ) 
+		//{
 			sort(scenePolyBuffer.begin(), scenePolyBuffer.end(), ZDepthComparator);
+			scenePolyCount = scenePolyBuffer.size();
 
-			scenePolyCount	= scenePolyBuffer.size();
+			POINT vert2DDrawBuffer[3];
 			for (UINT i = 0; i < scenePolyCount; i++ ) 
 			{
 				if (   scenePolyBuffer[i].first.first.z  >=  .0F
@@ -268,17 +270,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 					&& scenePolyBuffer[i].first.second.z <= projectionMatrix._34
 					&& scenePolyBuffer[i].first.third.z  >=  .0F
 					&& scenePolyBuffer[i].first.third.z  <= projectionMatrix._34
-				) { 
-					objToRender	= (LPMESH3D)lpScene->getObject(CLS_MESH, scenePolyBuffer[i].second);
-					hBrCurrent = CreateSolidBrush(scenePolyBuffer[i].first.colorRef);
-					//if ( rMode == RM_SHADEDWF ) 
-					//	hPenCurrent = CreatePen(PS_SOLID, 1, objToRender->getColor());
-					//else
-					hPenCurrent = CreatePen(PS_SOLID, 1, scenePolyBuffer[i].first.colorRef);
-					
-					hPenOld = (HPEN)SelectObject(hDCOutput, hPenCurrent);
-					hBrOld	= (HBRUSH)SelectObject(hDCOutput, hBrCurrent);
-
+				) {
 					vert2DDrawBuffer[0].x = (LONG)scenePolyBuffer[i].first.first.x;
 					vert2DDrawBuffer[0].y = (LONG)scenePolyBuffer[i].first.first.y;
 
@@ -288,6 +280,13 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 					vert2DDrawBuffer[2].x = (LONG)scenePolyBuffer[i].first.third.x;
 					vert2DDrawBuffer[2].y = (LONG)scenePolyBuffer[i].first.third.y;
 
+					hBrCurrent  = (rMode & RM_SHADED) != 0 
+						? CreateSolidBrush(scenePolyBuffer[i].first.fillColorRef) 
+						: (HBRUSH)GetStockObject(NULL_BRUSH);
+					hPenCurrent = CreatePen(PS_SOLID, 1, scenePolyBuffer[i].first.strokeColorRef);		
+					hBrOld	    = (HBRUSH)SelectObject(hDCOutput, hBrCurrent);
+					hPenOld     = (HPEN)SelectObject(hDCOutput, hPenCurrent);
+
 					Polygon(hDCOutput, vert2DDrawBuffer, 3);
 
 					SelectObject(hDCOutput, hBrOld);
@@ -296,8 +295,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 					DeleteObject(hPenCurrent);
 				}
 			}
-			delete[] scenePolyColorBuffer;
-		}
+		//}
 
 		BITMAP info;
 		bResult &= (GetObject(GetCurrentObject(hDCScreen, OBJ_BITMAP), sizeof(BITMAP), &info) == sizeof(BITMAP))
