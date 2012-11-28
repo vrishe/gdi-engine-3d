@@ -8,7 +8,7 @@
 #include "SharedDef.h"
 
 // first - index of a polygon in mesh, second - index of a mesh in scene
-typedef vector <pair<DIRECTPOLY3D, UINT>> SCENEPOLY;
+typedef vector <DIRECTPOLY3D> SCENEPOLY;
 typedef vector <VECTOR3D> SCENEVERT;
 
 // ============================================================================

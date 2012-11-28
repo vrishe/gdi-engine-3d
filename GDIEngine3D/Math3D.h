@@ -29,6 +29,7 @@ public:
 	bool		operator== (const _tagVector3D& u) const;
 	bool		operator!= (const _tagVector3D& u) const;
 } VECTOR3D, *LPVECTOR3D;
+typedef const _tagVector3D* LPCVECTOR3D; 
 
 extern inline float Vector3DLength(const VECTOR3D &src);
 extern inline void Vector3DNormalize(const VECTOR3D &in, VECTOR3D &out);

@@ -5,8 +5,8 @@
 // ============================================================================
 // _tagEdge3D partial implementation:
 
-_tagEdge3D::_tagEdge3D() : first(-1), second(-1) { }
-_tagEdge3D::_tagEdge3D(size_t a, size_t b) : first(a), second(b) { }
+//_tagEdge3D::_tagEdge3D() : first(-1), second(-1) { }
+//_tagEdge3D::_tagEdge3D(size_t a, size_t b) : first(a), second(b) { }
 
 // ============================================================================
 // _tagNormalPolygon implementation:
@@ -51,7 +51,7 @@ _tagPoly3D::_tagPoly3D()
 _tagPoly3D::_tagPoly3D(size_t a, size_t b, size_t c) 
 	: first(a), second(b), third(c) { }
 
-VECTOR3D _tagPoly3D::Normal(const LPVECTOR3D vs, size_t startVert) const
+VECTOR3D _tagPoly3D::Normal(LPCVECTOR3D vs, size_t startVert) const
 {
 	VECTOR3D v1, v2, ans;
 	switch (startVert) {
@@ -142,17 +142,17 @@ void _clsObject::LocalRotate(float roll, float yaw, float pitch, bool reset_rota
 		uWd	= VECTOR3D(.0f, 1.0f, .0f);
 	}
 
-	Matrix3DRotateAxis(rWd, pitch, M);
-	Matrix3DTransformNormal(M, fWd, fWd);
-	Vector3DNormalize(fWd, fWd);
-	Vector3DMultV(rWd, fWd, uWd);
-	Vector3DNormalize(uWd, uWd);
-
 	Matrix3DRotateAxis(uWd, yaw, M);
 	Matrix3DTransformNormal(M, fWd, fWd);
 	Vector3DNormalize(fWd, fWd);
 	Vector3DMultV(fWd, uWd, rWd);
 	Vector3DNormalize(rWd, rWd);
+
+	Matrix3DRotateAxis(rWd, pitch, M);
+	Matrix3DTransformNormal(M, fWd, fWd);
+	Vector3DNormalize(fWd, fWd);
+	Vector3DMultV(rWd, fWd, uWd);
+	Vector3DNormalize(uWd, uWd);
 
 	Matrix3DRotateAxis(fWd, roll, M);
 	Matrix3DTransformNormal(M, rWd, rWd);

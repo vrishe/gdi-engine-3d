@@ -17,20 +17,20 @@ using namespace std;
 // Also here is declared IColorable interface that allows you to define 
 // a type for an object that has it's own color.
 
-typedef vector<VECTOR3D> VERT_LIST, *LPVERT_LIST;
-typedef struct _tagEdge3D {
-	size_t first;
-	size_t second;
-
-	_tagEdge3D();
-	_tagEdge3D(size_t nFirst, size_t nSecond);
-
-	_tagEdge3D& operator+= (const UINT& p);
-	bool operator==(const _tagEdge3D &b) const;
-	bool operator!=(const _tagEdge3D &b) const;
-	bool isContianingVertex(size_t vi) const;
-} EDGE3D, *LPEDGE3D;
-typedef vector<EDGE3D> EDGE_LIST, *LPEDGE_LIST;
+typedef vector<VECTOR3D> VERT_LIST;
+//typedef struct _tagEdge3D {
+//	size_t first;
+//	size_t second;
+//
+//	_tagEdge3D();
+//	_tagEdge3D(size_t nFirst, size_t nSecond);
+//
+//	_tagEdge3D& operator+= (const UINT& p);
+//	bool operator==(const _tagEdge3D &b) const;
+//	bool operator!=(const _tagEdge3D &b) const;
+//	bool isContianingVertex(size_t vi) const;
+//} EDGE3D, *LPEDGE3D;
+//typedef vector<EDGE3D> EDGE_LIST;
 
 typedef struct _tagNormalPolygon {
 	VECTOR3D first;
@@ -50,17 +50,16 @@ typedef struct _tagPoly3D {
 
 	_tagPoly3D();
 	_tagPoly3D(size_t a, size_t b, size_t c);
-	VECTOR3D Normal(const LPVERT_LIST vs, size_t startVert)	const;
-	VECTOR3D Normal(const LPVECTOR3D vs, size_t startVert)	const;
-	VECTOR3D CoordinateMassCenter(const LPVECTOR3D)	const;
+	VECTOR3D Normal(LPCVECTOR3D vs, size_t startVert)	   const;
+	VECTOR3D Normal(const VERT_LIST &vs, size_t startVert) const;
+	VECTOR3D CoordinateMassCenter(LPCVECTOR3D)	const;
 
 	_tagPoly3D& operator+= (const UINT& p);
 	bool operator==(const _tagPoly3D &b) const;
 	bool operator!=(const _tagPoly3D &b) const;
-	bool isContainingEdge (const EDGE3D &e);
 	bool isContainingVertex (size_t vi);
 } POLY3D, *LPPOLY3D;
-typedef vector<POLY3D> POLY_LIST, *LPPOLY_LIST;
+typedef vector<POLY3D> POLY_LIST;
 
 class IColorable
 {

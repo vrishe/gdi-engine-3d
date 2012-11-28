@@ -175,19 +175,18 @@ void _clsSphere::Triangulate()
 			  hDelta = abs((isSliced ? (angleTo - angleFrom) : (2.0F * (float)M_PI)) / precision);
 
 		unsigned int perCircle = isSliced ? precision + 2 : precision;
-		if ( abs(cropZ) < radius ) 
-			vertices.push_back(VECTOR3D(.0f, .0f, cropZ));
-
+		
+		if (abs(cropZ) < radius) vertices.push_back(VECTOR3D(.0f, .0f, cropZ));
 		while ( ((float)M_PI_2 - vAngle) >= .0 )
 		{
-			float cropX	= radius * cos(vAngle);
-			UINT vCount	= cropX > .0 ? perCircle : 1;
+			float  cropX  = radius * cos(vAngle);
+			size_t vCount = cropX > .0 ? perCircle : 1;
 
 			LPVECTOR3D v = new VECTOR3D[vCount];
 
-			float hAngle = angleFrom;
-			UINT max = isSliced ? vCount - 1 : vCount;
-			for( UINT i = 0; i < max; i++ ) 
+			float  hAngle = angleFrom;
+			size_t max    = isSliced ? vCount - 1 : vCount;
+			for( size_t i = 0; i < max; ++i ) 
 			{
 				v[i].x = cropX * cos(hAngle);
 				v[i].y = cropX * sin(hAngle);
@@ -202,11 +201,13 @@ void _clsSphere::Triangulate()
 
 			cropZ = radius * sin(vAngle += vDelta); 
 		}
+		if (vertices.empty()) return;
+		vertices.push_back(VECTOR3D(.0f, .0f, radius));
 
 		size_t i = 1, max = vertices.size();
 		while ( i < max )
 		{
-			for ( size_t j = i, m = i + perCircle; j < m; j++ )
+			for ( size_t j = i, m = i + perCircle; j < m; ++j )
 			{
 				size_t current	= j >= max ? max - 1 : j,
 					   upward	= ((INT)(current - perCircle)) <= 0 
@@ -259,7 +260,7 @@ _clsSphere::_clsSphere(float Radius, float Crop, float From, float To, unsigned 
 
 void _clsSphere::setRadius(float Radius)		 { radius    = max(Radius, .0F); }
 void _clsSphere::setCrop(float Crop)			 { cropMult  = max(min(Crop, 1.0F), .0F); }
-void _clsSphere::setPrecision(unsigned int Prec) { precision = max(Prec, 3); }
+void _clsSphere::setPrecision(unsigned int Prec) { precision = max(Prec, 4); }
 void _clsSphere::setSliceFrom(float from)		 { angleFrom = from - (float)(floor((double)from / (2 * M_PI)) * 2 * M_PI); }
 void _clsSphere::setSliceTo(float to)			 { angleTo   = to - (float)(floor((double)to / (2 * M_PI)) * 2 * M_PI); }
 

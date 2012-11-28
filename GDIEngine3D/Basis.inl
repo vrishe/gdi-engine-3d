@@ -3,29 +3,29 @@
 // ============================================================================
 // _tagEdge3D partial implementation:
 
-inline _tagEdge3D& _tagEdge3D::operator+= (const UINT& p) 
-{
-	first += p;	second += p;
-	return *this;
-}
-
-inline bool _tagEdge3D::operator== (const _tagEdge3D &b) const 
-{
-	return (first == b.first && second == b.second)	|| (first == b.second && second == b.first);
-}
-
-inline bool _tagEdge3D::operator!= (const _tagEdge3D &b) const { return !operator==(b); }
-inline bool _tagEdge3D::isContianingVertex(size_t vi) const { return first == vi || second == vi; }
+//inline _tagEdge3D& _tagEdge3D::operator+= (const UINT& p) 
+//{
+//	first += p;	second += p;
+//	return *this;
+//}
+//
+//inline bool _tagEdge3D::operator== (const _tagEdge3D &b) const 
+//{
+//	return (first == b.first && second == b.second)	|| (first == b.second && second == b.first);
+//}
+//
+//inline bool _tagEdge3D::operator!= (const _tagEdge3D &b) const { return !operator==(b); }
+//inline bool _tagEdge3D::isContianingVertex(size_t vi) const { return first == vi || second == vi; }
 
 // ============================================================================
 // _tagPoly3D partial implementation:
 
-inline VECTOR3D _tagPoly3D::Normal(const LPVERT_LIST vs, size_t startVert) const
+inline VECTOR3D _tagPoly3D::Normal(const VERT_LIST &vs, size_t startVert) const
 {
-	return Normal(vs->data(), startVert);
+	return Normal(vs.data(), startVert);
 }
 
-inline VECTOR3D _tagPoly3D::CoordinateMassCenter(const LPVECTOR3D vs) const
+inline VECTOR3D _tagPoly3D::CoordinateMassCenter(LPCVECTOR3D vs) const
 {
 	return (vs[first] + vs[second] + vs[third]) / 3.0f;
 }
@@ -48,10 +48,6 @@ inline bool _tagPoly3D::isContainingVertex(size_t vi)
 	return first	== vi || second	== vi || third	== vi; 
 }
 
-inline bool _tagPoly3D::isContainingEdge(const EDGE3D &e)
-{
-	return isContainingVertex(e.first) && isContainingVertex(e.second);
-}
 
 // ===========================================================================
 // _clsObject partial implementation:
