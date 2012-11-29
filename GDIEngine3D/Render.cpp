@@ -144,19 +144,30 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 					outputPolygonData.fillColorRef = mesh->getColor();
 					if (!lightData.empty())
 					{
-						outputPolygonData.fillColorRef = RGB(
-							RED(mesh->getColor())   * mesh->getSelfIllumination(),
-							GREEN(mesh->getColor()) * mesh->getSelfIllumination(),
-							BLUE(mesh->getColor())  * mesh->getSelfIllumination()
-						  );
+
+						COLORREF lightedSummaryColor = RGB(0, 0, 0);
 						__foreach(OBJECTS_LIST::const_iterator, light_object, lightData)
 						{
 							LPOMNILIGHT3D light = static_cast<LPOMNILIGHT3D>(*light_object); 
 
-							outputPolygonData.fillColorRef = AddColor(outputPolygonData.fillColorRef, 
+							lightedSummaryColor = AddColor(lightedSummaryColor,
 								light->AffectPolygonColor(*polygon, transformedVertexData, mesh->getColor())
 								);
 						}
+
+						float indicentIllumination = 1.0F - mesh->getSelfIllumination();
+						outputPolygonData.fillColorRef = AddColor(
+								RGB(
+									RED(lightedSummaryColor)   * indicentIllumination,
+									GREEN(lightedSummaryColor) * indicentIllumination,
+									BLUE(lightedSummaryColor)  * indicentIllumination
+								),
+								RGB(
+									RED(mesh->getColor())   * mesh->getSelfIllumination(),
+									GREEN(mesh->getColor()) * mesh->getSelfIllumination(),
+									BLUE(mesh->getColor())  * mesh->getSelfIllumination(),
+								)
+							);
 					}
 					outputPolygonData.strokeColorRef = (rMode & RM_WIREFRAME) != 0 ? mesh->getColor() : outputPolygonData.fillColorRef;
 
