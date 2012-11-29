@@ -165,7 +165,7 @@ BOOL _clsViewport::Render(LPSCENE3D lpScene, LPCAMERA3D lpCamera, HDC hDCScreen)
 								RGB(
 									RED(mesh->getColor())   * mesh->getSelfIllumination(),
 									GREEN(mesh->getColor()) * mesh->getSelfIllumination(),
-									BLUE(mesh->getColor())  * mesh->getSelfIllumination(),
+									BLUE(mesh->getColor())  * mesh->getSelfIllumination()
 								)
 							);
 					}
