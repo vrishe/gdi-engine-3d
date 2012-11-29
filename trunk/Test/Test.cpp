@@ -157,13 +157,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SceneObjectTranslate(scene, test_omni3, 90.0F, 300.0F,     .0F);
 
 			SCENE_OBJECT test_sphere1 = SceneSphereCreate(scene, 15.5F, .0F, .0F, .0F, 16, RGB(255, 255, 255));
-			SCENE_OBJECT test_sphere2 = SceneSphereCreate(scene,   .5F, .0F, .0F, .0F,  6, RGB(255, 255, 255));
+			SCENE_OBJECT test_sphere2 = SceneSphereCreate(scene,   .5F, .0F, .0F, .0F,  6, RGB(  0, 255,   0));
 			SCENE_OBJECT test_sphere3 = SceneSphereCreate(scene, 50.2F, .0F, .0F, .0F, 25, RGB(255, 255, 255));
 			SCENE_OBJECT test_sphere4 = SceneSphereCreate(scene, 88.0F, .0F, .0F, .0F, 48, RGB(255, 255, 255));
 			SceneObjectTranslate(scene, test_sphere1,  90.0F,   .0F,    .0F);
 			SceneObjectTranslate(scene, test_sphere2,   2.0F, -1.0F,    .0F);
 			SceneObjectTranslate(scene, test_sphere3, 150.0F, 20.0F,  50.0F);
 			SceneObjectTranslate(scene, test_sphere4, 250.0F, 40.0F, -70.0F);
+
+			SceneMeshSelfIlluminationSet(scene, test_sphere2, 1.0F);
 		}
 		break;
 	case WM_COMMAND:
