@@ -12,15 +12,15 @@ void _clsPyramid::Triangulate() {
 	polygons.clear();
 
 	// setting base vertices
-	vertices.push_back(VECTOR3D(-bL/2, 0, -bW/2));	// 0
-	vertices.push_back(VECTOR3D(-bL/2, 0,  bW/2));	// 1
-	vertices.push_back(VECTOR3D( bL/2, 0,  bW/2));	// 2
-	vertices.push_back(VECTOR3D( bL/2, 0, -bW/2));	// 3
+	vertices.push_back(VECTOR3D(-bL/2, -bW/2, 0));	// 0
+	vertices.push_back(VECTOR3D(-bL/2,  bW/2, 0));	// 1
+	vertices.push_back(VECTOR3D( bL/2,  bW/2, 0));	// 2
+	vertices.push_back(VECTOR3D( bL/2, -bW/2, 0));	// 3
 	// setting top vertices
-	vertices.push_back(VECTOR3D(-tL/2 + shift, h, -tW/2));	// 4
-	vertices.push_back(VECTOR3D(-tL/2 + shift, h,  tW/2));	// 5
-	vertices.push_back(VECTOR3D( tL/2 + shift, h,  tW/2));	// 6
-	vertices.push_back(VECTOR3D( tL/2 + shift, h, -tW/2));	// 7
+	vertices.push_back(VECTOR3D(-tL/2 + shift, -tW/2, h));	// 4
+	vertices.push_back(VECTOR3D(-tL/2 + shift,  tW/2, h));	// 5
+	vertices.push_back(VECTOR3D( tL/2 + shift,  tW/2, h));	// 6
+	vertices.push_back(VECTOR3D( tL/2 + shift, -tW/2, h));	// 7
 
 	// setting base polygons
 	polygons.push_back(POLY3D(0,1,2)); // 0
