@@ -335,6 +335,7 @@ DWORD _clsRenderPool::addViewport(
 			if (thData->tcEvents.jobDone == NULL || thData->tcEvents.shutDown == NULL) throw E_FAIL;
 
 			thData->hThread = CreateThread(0, 0, Render, thData, CREATE_SUSPENDED, &dwResultID);
+			thData->dwThreadId = dwResultID;
 			if(thData->hThread == NULL) throw E_FAIL;
 
 			evTrigger = thData->tcEvents.doRender;

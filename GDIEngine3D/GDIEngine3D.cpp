@@ -33,7 +33,7 @@ inline LPUNKNOWN ReleaseObject(size_t uObjectIndex)
 // ============================================================================
 // Common object interface implementation
 
-BOOL WINAPI EngineObjectRelease(HGDIENGINE3DOBJ hGDIEngineObject)
+BOOL EngineObjectRelease(HGDIENGINE3DOBJ hGDIEngineObject)
 {
 	LPUNKNOWN lpObject;
 
@@ -46,12 +46,12 @@ BOOL WINAPI EngineObjectRelease(HGDIENGINE3DOBJ hGDIEngineObject)
 // ============================================================================
 // CRenderPool library interface implementation
 
-HRENDERPOOL WINAPI RenderPoolCreate()
+HRENDERPOOL RenderPoolCreate()
 {
 	return (HRENDERPOOL)CreateObject(new RENDER_POOL());
 }
 
-DWORD WINAPI RenderPoolViewportAdd(
+DWORD RenderPoolViewportAdd(
 	HRENDERPOOL hRenderPool,
 	HVIEWPORT	hViewport,
 	HCAMERA		hCamera, 
@@ -90,7 +90,7 @@ DWORD WINAPI RenderPoolViewportAdd(
 	return dwResult;
 }
 
-BOOL WINAPI RenderPoolViewportRemoveByIndex(HRENDERPOOL hRenderPool, UINT uViewportIndex)
+BOOL RenderPoolViewportRemoveByIndex(HRENDERPOOL hRenderPool, UINT uViewportIndex)
 {
 	BOOL bResult = FALSE;
 
@@ -116,7 +116,7 @@ BOOL WINAPI RenderPoolViewportRemoveByIndex(HRENDERPOOL hRenderPool, UINT uViewp
 	return bResult;
 }
 
-BOOL WINAPI RenderPoolViewportRemoveByID(HRENDERPOOL hRenderPool, DWORD dwViewportID)
+BOOL RenderPoolViewportRemoveByID(HRENDERPOOL hRenderPool, DWORD dwViewportID)
 {
 	BOOL bResult = FALSE;
 
@@ -142,7 +142,7 @@ BOOL WINAPI RenderPoolViewportRemoveByID(HRENDERPOOL hRenderPool, DWORD dwViewpo
 	return bResult;
 }
 
-BOOL WINAPI RenderPoolViewportScreenSetByIndex(
+BOOL RenderPoolViewportScreenSetByIndex(
 	HRENDERPOOL hRenderPool, 
 	UINT uViewportIndex, 
 	HDC hDcNew,
@@ -172,7 +172,7 @@ BOOL WINAPI RenderPoolViewportScreenSetByIndex(
 	return bResult;
 }
 
-BOOL WINAPI RenderPoolViewportScreenSetByID(
+BOOL RenderPoolViewportScreenSetByID(
 	HRENDERPOOL hRenderPool, 
 	DWORD dwViewportID, 
 	HDC hDcNew,
@@ -202,7 +202,7 @@ BOOL WINAPI RenderPoolViewportScreenSetByID(
 	return bResult;
 }
 
-BOOL WINAPI RenderPoolViewportGetCount(HRENDERPOOL hRenderPool, UINT &uVpCount)
+BOOL RenderPoolViewportGetCount(HRENDERPOOL hRenderPool, UINT &uVpCount)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -226,7 +226,7 @@ BOOL WINAPI RenderPoolViewportGetCount(HRENDERPOOL hRenderPool, UINT &uVpCount)
 	return isValid;
 }
 
-BOOL WINAPI RenderPoolRenderWorld(HRENDERPOOL hRenderPool, DWORD &dwResult)
+BOOL RenderPoolRenderWorld(HRENDERPOOL hRenderPool, DWORD &dwResult)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -243,17 +243,17 @@ BOOL WINAPI RenderPoolRenderWorld(HRENDERPOOL hRenderPool, DWORD &dwResult)
 // ============================================================================
 // CViewport library interface implementation
 
-//HVIEWPORT WINAPI ViewportCreate(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode)
+//HVIEWPORT ViewportCreate(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode)
 //{
 //	return (HVIEWPORT)CreateObject(new VIEWPORT(uVpWidth, uVpHeight, rMode));
 //}
 
-HVIEWPORT WINAPI ViewportCreate(RENDER_MODE rMode)
+HVIEWPORT ViewportCreate(RENDER_MODE rMode)
 {
 	return (HVIEWPORT)CreateObject(new VIEWPORT(rMode));
 }
 
-BOOL WINAPI ViewportSizeSet(HVIEWPORT hViewport, LONG uVpWidth, LONG uVpHeight)
+BOOL ViewportSizeSet(HVIEWPORT hViewport, LONG uVpWidth, LONG uVpHeight)
 {
 	BOOL bResult = FALSE;
 
@@ -279,7 +279,7 @@ BOOL WINAPI ViewportSizeSet(HVIEWPORT hViewport, LONG uVpWidth, LONG uVpHeight)
 	return bResult;
 }
 
-BOOL WINAPI ViewportSizeGet(HVIEWPORT hViewport, LONG &uVpWidth, LONG &uVpHeight)
+BOOL ViewportSizeGet(HVIEWPORT hViewport, LONG &uVpWidth, LONG &uVpHeight)
 {
 	BOOL bResult = FALSE;
 
@@ -306,7 +306,7 @@ BOOL WINAPI ViewportSizeGet(HVIEWPORT hViewport, LONG &uVpWidth, LONG &uVpHeight
 	return bResult;
 }
 
-BOOL WINAPI ViewportRenderModeSet(HVIEWPORT hViewport, RENDER_MODE rMode)
+BOOL ViewportRenderModeSet(HVIEWPORT hViewport, RENDER_MODE rMode)
 {
 	BOOL bResult = FALSE;
 
@@ -333,7 +333,7 @@ BOOL WINAPI ViewportRenderModeSet(HVIEWPORT hViewport, RENDER_MODE rMode)
 	return bResult;
 }
 
-BOOL WINAPI ViewportRender(HVIEWPORT hViewport, HSCENE hScene, HCAMERA hCam, HDC hDcScreen)
+BOOL ViewportRender(HVIEWPORT hViewport, HSCENE hScene, HCAMERA hCam, HDC hDcScreen)
 {
 	BOOL bResult = FALSE;
 
@@ -370,12 +370,12 @@ BOOL WINAPI ViewportRender(HVIEWPORT hViewport, HSCENE hScene, HCAMERA hCam, HDC
 // ============================================================================
 // CCamera library interface implementation
 
-HCAMERA WINAPI CameraCreate(PROJECTION_TYPE pt, FLOAT hFOV, FLOAT vFOV)
+HCAMERA CameraCreate(PROJECTION_TYPE pt, FLOAT hFOV, FLOAT vFOV)
 {
 	return (HCAMERA)CreateObject(new CAMERA3D(pt, hFOV, vFOV));
 }
 
-BOOL WINAPI CameraTranslate(HCAMERA hCamera, FLOAT fX, FLOAT fY, FLOAT fZ)
+BOOL CameraTranslate(HCAMERA hCamera, FLOAT fX, FLOAT fY, FLOAT fZ)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -399,7 +399,7 @@ BOOL WINAPI CameraTranslate(HCAMERA hCamera, FLOAT fX, FLOAT fY, FLOAT fZ)
 	return isValid;
 }
 
-BOOL WINAPI CameraRotate(HCAMERA hCamera, FLOAT Roll, FLOAT Yaw, FLOAT Pitch)
+BOOL CameraRotate(HCAMERA hCamera, FLOAT Roll, FLOAT Yaw, FLOAT Pitch)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -423,7 +423,7 @@ BOOL WINAPI CameraRotate(HCAMERA hCamera, FLOAT Roll, FLOAT Yaw, FLOAT Pitch)
 	return isValid;
 }
 
-BOOL WINAPI CameraNameSet(HCAMERA hCamera, LPTSTR tcsName)
+BOOL CameraNameSet(HCAMERA hCamera, LPTSTR tcsName)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -447,7 +447,7 @@ BOOL WINAPI CameraNameSet(HCAMERA hCamera, LPTSTR tcsName)
 	return isValid;
 }
 
-BOOL WINAPI CameraNameGet(HCAMERA hCamera, LPTSTR tcsName, UINT &tcsCharCount)
+BOOL CameraNameGet(HCAMERA hCamera, LPTSTR tcsName, UINT &tcsCharCount)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -474,7 +474,7 @@ BOOL WINAPI CameraNameGet(HCAMERA hCamera, LPTSTR tcsName, UINT &tcsCharCount)
 	return isValid;
 }
 
-BOOL WINAPI CameraFocalDistanceSet(HCAMERA hCamera, FLOAT fd)
+BOOL CameraFocalDistanceSet(HCAMERA hCamera, FLOAT fd)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -498,7 +498,7 @@ BOOL WINAPI CameraFocalDistanceSet(HCAMERA hCamera, FLOAT fd)
 	return isValid;
 }
 
-BOOL WINAPI CameraFocalDistanceGet(HCAMERA hCamera, FLOAT &fd)
+BOOL CameraFocalDistanceGet(HCAMERA hCamera, FLOAT &fd)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -522,7 +522,7 @@ BOOL WINAPI CameraFocalDistanceGet(HCAMERA hCamera, FLOAT &fd)
 	return isValid;
 }
 
-BOOL WINAPI CameraNearClipSet(HCAMERA hCamera, FLOAT zn)
+BOOL CameraNearClipSet(HCAMERA hCamera, FLOAT zn)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -546,7 +546,7 @@ BOOL WINAPI CameraNearClipSet(HCAMERA hCamera, FLOAT zn)
 	return isValid;
 }
 
-BOOL WINAPI CameraNearClipGet(HCAMERA hCamera, FLOAT &zn)
+BOOL CameraNearClipGet(HCAMERA hCamera, FLOAT &zn)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -570,7 +570,7 @@ BOOL WINAPI CameraNearClipGet(HCAMERA hCamera, FLOAT &zn)
 	return isValid;
 }
 
-BOOL WINAPI CameraFarClipSet(HCAMERA hCamera, FLOAT zf)
+BOOL CameraFarClipSet(HCAMERA hCamera, FLOAT zf)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -594,7 +594,7 @@ BOOL WINAPI CameraFarClipSet(HCAMERA hCamera, FLOAT zf)
 	return isValid;
 }
 
-BOOL WINAPI CameraFarClipGet(HCAMERA hCamera, FLOAT &zf)
+BOOL CameraFarClipGet(HCAMERA hCamera, FLOAT &zf)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -618,7 +618,7 @@ BOOL WINAPI CameraFarClipGet(HCAMERA hCamera, FLOAT &zf)
 	return isValid;
 }
 
-BOOL WINAPI CameraHorizontalFOVSet(HCAMERA hCamera, FLOAT fHFov)
+BOOL CameraHorizontalFOVSet(HCAMERA hCamera, FLOAT fHFov)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -642,7 +642,7 @@ BOOL WINAPI CameraHorizontalFOVSet(HCAMERA hCamera, FLOAT fHFov)
 	return isValid;
 }
 
-BOOL WINAPI CameraHorizontalFOVGet(HCAMERA hCamera, FLOAT &fHFov)
+BOOL CameraHorizontalFOVGet(HCAMERA hCamera, FLOAT &fHFov)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -666,7 +666,7 @@ BOOL WINAPI CameraHorizontalFOVGet(HCAMERA hCamera, FLOAT &fHFov)
 	return isValid;
 }
 
-BOOL WINAPI CameraVerticalFOVSet(HCAMERA hCamera, FLOAT fVFov)
+BOOL CameraVerticalFOVSet(HCAMERA hCamera, FLOAT fVFov)
 {
 	BOOL bResult = FALSE;
 
@@ -694,7 +694,7 @@ BOOL WINAPI CameraVerticalFOVSet(HCAMERA hCamera, FLOAT fVFov)
 	return bResult;
 }
 
-BOOL WINAPI CameraVerticalFOVGet(HCAMERA hCamera, FLOAT &fVFov)
+BOOL CameraVerticalFOVGet(HCAMERA hCamera, FLOAT &fVFov)
 {
 	thread_safety::LockModule(INFINITE);
 
@@ -721,12 +721,12 @@ BOOL WINAPI CameraVerticalFOVGet(HCAMERA hCamera, FLOAT &fVFov)
 // ============================================================================
 // CScene library interface implementation
 
-HSCENE WINAPI SceneCreate() 
+HSCENE SceneCreate() 
 {
 	return (HSCENE)CreateObject(new SCENE3D());
 }
 
-BOOL WINAPI SceneClear(HSCENE hScene)
+BOOL SceneClear(HSCENE hScene)
 {
 	BOOL bResult = FALSE;
 
@@ -754,7 +754,7 @@ BOOL WINAPI SceneClear(HSCENE hScene)
 	return bResult;
 }
 
-BOOL WINAPI SceneAmbientColorSet(HSCENE hScene, COLORREF color)
+BOOL SceneAmbientColorSet(HSCENE hScene, COLORREF color)
 {
 	BOOL bResult = FALSE;
 
@@ -779,7 +779,7 @@ BOOL WINAPI SceneAmbientColorSet(HSCENE hScene, COLORREF color)
 	return bResult;
 }
 
-BOOL WINAPI SceneAmbientColorGet(HSCENE hScene, COLORREF &color)
+BOOL SceneAmbientColorGet(HSCENE hScene, COLORREF &color)
 {
 	LPUNKNOWN Master = NULL;
 
@@ -801,7 +801,7 @@ BOOL WINAPI SceneAmbientColorGet(HSCENE hScene, COLORREF &color)
 	return isValid;
 }
 
-BOOL WINAPI SceneObjectRemove(HSCENE hScene, SCENE_OBJECT scObject)
+BOOL SceneObjectRemove(HSCENE hScene, SCENE_OBJECT scObject)
 {
 	BOOL bResult = FALSE;
 
@@ -830,7 +830,7 @@ BOOL WINAPI SceneObjectRemove(HSCENE hScene, SCENE_OBJECT scObject)
 	return bResult;
 }
 
-BOOL WINAPI SceneObjectTranslate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fX, FLOAT fY, FLOAT fZ)
+BOOL SceneObjectTranslate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fX, FLOAT fY, FLOAT fZ)
 {
 	BOOL bResult = FALSE;
 
@@ -858,7 +858,7 @@ BOOL WINAPI SceneObjectTranslate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fX,
 	return bResult;
 }
 
-BOOL WINAPI SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT Roll, FLOAT Yaw, FLOAT Pitch)
+BOOL SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT Roll, FLOAT Yaw, FLOAT Pitch)
 {
 	BOOL bResult = FALSE;
 
@@ -886,7 +886,7 @@ BOOL WINAPI SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT Roll, 
 	return bResult;
 }
 
-BOOL WINAPI SceneObjectNameSet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsName)
+BOOL SceneObjectNameSet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsName)
 {
 	BOOL bResult = FALSE;
 
@@ -914,7 +914,7 @@ BOOL WINAPI SceneObjectNameSet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsN
 	return bResult;
 }
 
-BOOL WINAPI SceneObjectNameGet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsName, UINT &tcsCharCount)
+BOOL SceneObjectNameGet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsName, UINT &tcsCharCount)
 {
 	BOOL bResult = FALSE;
 
@@ -944,7 +944,7 @@ BOOL WINAPI SceneObjectNameGet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsN
 	return bResult;
 }
 
-BOOL WINAPI SceneObjectColorSet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF color)
+BOOL SceneObjectColorSet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF color)
 {
 	BOOL bResult = FALSE;
 
@@ -974,7 +974,7 @@ BOOL WINAPI SceneObjectColorSet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF c
 	return bResult;
 }
 
-BOOL WINAPI SceneObjectColorGet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF &color)
+BOOL SceneObjectColorGet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF &color)
 {
 	BOOL bResult = FALSE;
 
@@ -1004,7 +1004,7 @@ BOOL WINAPI SceneObjectColorGet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF &
 	return bResult;
 }
 
-BOOL WINAPI SceneMeshSelfIlluminationSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT self_illumination)
+BOOL SceneMeshSelfIlluminationSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT self_illumination)
 {
 	BOOL bResult = FALSE;
 
@@ -1034,7 +1034,7 @@ BOOL WINAPI SceneMeshSelfIlluminationSet(HSCENE hScene, SCENE_OBJECT scObject, F
 	return bResult;
 }
 
-BOOL WINAPI SceneMeshSelfIlluminationGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &self_illumination)
+BOOL SceneMeshSelfIlluminationGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &self_illumination)
 {
 	BOOL bResult = FALSE;
 
@@ -1093,12 +1093,12 @@ SCENE_OBJECT SceneObjectAdd(HSCENE hScene, LPOBJECT3D lpObject)
 	return scoResult;
 }
 
-SCENE_OBJECT WINAPI SceneSphereCreate(HSCENE hScene, FLOAT radius, FLOAT crop, FLOAT sliceFrom, FLOAT sliceTo, UINT Precision, COLORREF Color)
+SCENE_OBJECT SceneSphereCreate(HSCENE hScene, FLOAT radius, FLOAT crop, FLOAT sliceFrom, FLOAT sliceTo, UINT Precision, COLORREF Color)
 {
 	return SceneObjectAdd(hScene, new SPHERE3D(radius, crop, sliceFrom, sliceTo, Precision, Color));
 }
 
-BOOL WINAPI SceneSphereRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT radius)
+BOOL SceneSphereRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT radius)
 {
 	BOOL bResult = FALSE;
 
@@ -1128,7 +1128,7 @@ BOOL WINAPI SceneSphereRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT rad
 	return bResult;
 }
 
-BOOL WINAPI SceneSphereRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &radius)
+BOOL SceneSphereRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &radius)
 {
 	BOOL bResult = FALSE;
 
@@ -1157,7 +1157,7 @@ BOOL WINAPI SceneSphereRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &ra
 	return bResult;
 }
 
-BOOL WINAPI SceneSpherePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT precision)
+BOOL SceneSpherePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT precision)
 {
 	BOOL bResult = FALSE;
 
@@ -1187,7 +1187,7 @@ BOOL WINAPI SceneSpherePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT p
 	return bResult;
 }
 
-BOOL WINAPI SceneSpherePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &precision)
+BOOL SceneSpherePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &precision)
 {
 	BOOL bResult = FALSE;
 
@@ -1216,7 +1216,7 @@ BOOL WINAPI SceneSpherePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &
 	return bResult;
 }
 
-BOOL WINAPI SceneSphereCropSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT crop)
+BOOL SceneSphereCropSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT crop)
 {
 	BOOL bResult = FALSE;
 
@@ -1246,7 +1246,7 @@ BOOL WINAPI SceneSphereCropSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT crop)
 	return bResult;
 }
 
-BOOL WINAPI SceneSphereCropGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &crop)
+BOOL SceneSphereCropGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &crop)
 {
 	BOOL bResult = FALSE;
 
@@ -1275,7 +1275,7 @@ BOOL WINAPI SceneSphereCropGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &crop
 	return bResult;
 }
 
-BOOL WINAPI SceneSphereSliceFromSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT from)
+BOOL SceneSphereSliceFromSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT from)
 {
 	BOOL bResult = FALSE;
 
@@ -1305,7 +1305,7 @@ BOOL WINAPI SceneSphereSliceFromSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT 
 	return bResult;
 }
 
-BOOL WINAPI SceneSphereSliceFromGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &from)
+BOOL SceneSphereSliceFromGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &from)
 {
 	BOOL bResult = FALSE;
 
@@ -1334,7 +1334,7 @@ BOOL WINAPI SceneSphereSliceFromGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT 
 	return bResult;
 }
 
-BOOL WINAPI SceneSphereSliceToSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT to)
+BOOL SceneSphereSliceToSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT to)
 {
 	BOOL bResult = FALSE;
 
@@ -1364,7 +1364,7 @@ BOOL WINAPI SceneSphereSliceToSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT to
 	return bResult;
 }
 
-BOOL WINAPI SceneSphereSliceToGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &to)
+BOOL SceneSphereSliceToGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &to)
 {
 	BOOL bResult = FALSE;
 
@@ -1393,12 +1393,12 @@ BOOL WINAPI SceneSphereSliceToGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &t
 	return bResult;
 }
 
-SCENE_OBJECT WINAPI ScenePyramidCreate(HSCENE hScene, FLOAT height, FLOAT baseLength, FLOAT baseWidth, FLOAT topLength, FLOAT topWidth, COLORREF color)
+SCENE_OBJECT ScenePyramidCreate(HSCENE hScene, FLOAT height, FLOAT baseLength, FLOAT baseWidth, FLOAT topLength, FLOAT topWidth, COLORREF color)
 {
 	return SceneObjectAdd(hScene, new PYRAMID3D(height, baseLength, baseWidth, topLength, topWidth, color));
 }
 
-BOOL WINAPI ScenePyramidHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height)
+BOOL ScenePyramidHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height)
 {
 	BOOL bResult = FALSE;
 
@@ -1428,7 +1428,7 @@ BOOL WINAPI ScenePyramidHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT he
 	return bResult;
 }
 
-BOOL WINAPI ScenePyramidHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height)
+BOOL ScenePyramidHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height)
 {
 	BOOL bResult = FALSE;
 
@@ -1457,7 +1457,7 @@ BOOL WINAPI ScenePyramidHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &h
 	return bResult;
 }
 
-BOOL WINAPI ScenePyramidBaseLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseLength)
+BOOL ScenePyramidBaseLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseLength)
 {
 	BOOL bResult = FALSE;
 
@@ -1487,7 +1487,7 @@ BOOL WINAPI ScenePyramidBaseLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOA
 	return bResult;
 }
 
-BOOL WINAPI ScenePyramidBaseLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseLength)
+BOOL ScenePyramidBaseLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseLength)
 {
 	BOOL bResult = FALSE;
 
@@ -1516,7 +1516,7 @@ BOOL WINAPI ScenePyramidBaseLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOA
 	return bResult;
 }
 
-BOOL WINAPI ScenePyramidBaseWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseWidth)
+BOOL ScenePyramidBaseWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseWidth)
 {
 	BOOL bResult = FALSE;
 
@@ -1546,7 +1546,7 @@ BOOL WINAPI ScenePyramidBaseWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT
 	return bResult;
 }
 
-BOOL WINAPI ScenePyramidBaseWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseWidth)
+BOOL ScenePyramidBaseWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseWidth)
 {
 	BOOL bResult = FALSE;
 
@@ -1575,7 +1575,7 @@ BOOL WINAPI ScenePyramidBaseWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT
 	return bResult;
 }
 
-BOOL WINAPI ScenePyramidTopLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topLength)
+BOOL ScenePyramidTopLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topLength)
 {
 	BOOL bResult = FALSE;
 
@@ -1605,7 +1605,7 @@ BOOL WINAPI ScenePyramidTopLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT
 	return bResult;
 }
 
-BOOL WINAPI ScenePyramidTopLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topLength)
+BOOL ScenePyramidTopLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topLength)
 {
 	BOOL bResult = FALSE;
 
@@ -1634,7 +1634,7 @@ BOOL WINAPI ScenePyramidTopLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT
 	return bResult;
 }
 
-BOOL WINAPI ScenePyramidTopWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topWidth)
+BOOL ScenePyramidTopWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topWidth)
 {
 	BOOL bResult = FALSE;
 
@@ -1664,7 +1664,7 @@ BOOL WINAPI ScenePyramidTopWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT 
 	return bResult;
 }
 
-BOOL WINAPI ScenePyramidTopWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topWidth)
+BOOL ScenePyramidTopWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topWidth)
 {
 	BOOL bResult = FALSE;
 
@@ -1693,12 +1693,12 @@ BOOL WINAPI ScenePyramidTopWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT 
 	return bResult;
 }
 
-SCENE_OBJECT WINAPI SceneConeCreate(HSCENE hScene, FLOAT height, FLOAT baseRadius, FLOAT topRadius, UINT precision, COLORREF color)
+SCENE_OBJECT SceneConeCreate(HSCENE hScene, FLOAT height, FLOAT baseRadius, FLOAT topRadius, UINT precision, COLORREF color)
 {
 	return SceneObjectAdd(hScene, new CONE3D(height, baseRadius, topRadius, precision, color));
 }
 
-BOOL WINAPI SceneConeBaseRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseRadius)
+BOOL SceneConeBaseRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseRadius)
 {
 	BOOL bResult = FALSE;
 
@@ -1728,7 +1728,7 @@ BOOL WINAPI SceneConeBaseRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT b
 	return bResult;
 }
 
-BOOL WINAPI SceneConeBaseRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseRadius)
+BOOL SceneConeBaseRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseRadius)
 {
 	BOOL bResult = FALSE;
 
@@ -1757,7 +1757,7 @@ BOOL WINAPI SceneConeBaseRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &
 	return bResult;
 }
 
-BOOL WINAPI SceneConeTopRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topRadius)
+BOOL SceneConeTopRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topRadius)
 {
 	BOOL bResult = FALSE;
 
@@ -1787,7 +1787,7 @@ BOOL WINAPI SceneConeTopRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT to
 	return bResult;
 }
 
-BOOL WINAPI SceneConeTopRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topRadius)
+BOOL SceneConeTopRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topRadius)
 {
 	BOOL bResult = FALSE;
 
@@ -1816,7 +1816,7 @@ BOOL WINAPI SceneConeTopRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &t
 	return bResult;
 }
 
-BOOL WINAPI SceneConeHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height)
+BOOL SceneConeHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height)
 {
 	BOOL bResult = FALSE;
 
@@ -1846,7 +1846,7 @@ BOOL WINAPI SceneConeHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT heigh
 	return bResult;
 }
 
-BOOL WINAPI SceneConeHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height)
+BOOL SceneConeHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height)
 {
 	BOOL bResult = FALSE;
 
@@ -1875,7 +1875,7 @@ BOOL WINAPI SceneConeHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &heig
 	return bResult;
 }
 
-BOOL WINAPI SceneConePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT precision)
+BOOL SceneConePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT precision)
 {
 	BOOL bResult = FALSE;
 
@@ -1905,7 +1905,7 @@ BOOL WINAPI SceneConePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT pre
 	return bResult;
 }
 
-BOOL WINAPI SceneConePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &precision)
+BOOL SceneConePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &precision)
 {
 	BOOL bResult = FALSE;
 
@@ -1934,12 +1934,12 @@ BOOL WINAPI SceneConePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &pr
 	return bResult;
 }
 
-SCENE_OBJECT WINAPI SceneOmniLightCreate(HSCENE hScene, FLOAT Power, COLORREF Color)
+SCENE_OBJECT SceneOmniLightCreate(HSCENE hScene, FLOAT Power, COLORREF Color)
 {
 	return SceneObjectAdd(hScene, new OMNILIGHT3D(Color, Power));
 }
 
-BOOL WINAPI SceneLightPowerSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT power)
+BOOL SceneLightPowerSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT power)
 {
 	BOOL bResult = FALSE;
 
@@ -1967,7 +1967,7 @@ BOOL WINAPI SceneLightPowerSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT power
 	return bResult;
 }
 
-BOOL WINAPI SceneLightPowerGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &power)
+BOOL SceneLightPowerGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &power)
 {
 	BOOL bResult = FALSE;
 
