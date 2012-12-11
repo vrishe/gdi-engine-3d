@@ -32,25 +32,25 @@ extern "C" {
 // Common object interface declaration
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI EngineObjectRelease(HGDIENGINE3DOBJ hGDIEngineObject);
+	BOOL EngineObjectRelease(HGDIENGINE3DOBJ hGDIEngineObject);
 
 // ============================================================================
 // CRenderPool library interface declaration
 
 GDIENGINE3D_USERAPI 
-	HRENDERPOOL WINAPI RenderPoolCreate();
+	HRENDERPOOL RenderPoolCreate();
 
 GDIENGINE3D_USERAPI
-	DWORD WINAPI RenderPoolViewportAdd(HRENDERPOOL hRenderPool, HVIEWPORT hViewport, HCAMERA hCamera, HDC hDCScreen);
+	DWORD RenderPoolViewportAdd(HRENDERPOOL hRenderPool, HVIEWPORT hViewport, HCAMERA hCamera, HDC hDCScreen);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI RenderPoolViewportRemoveByIndex(HRENDERPOOL hRenderPool, UINT uViewportIndex);
+	BOOL RenderPoolViewportRemoveByIndex(HRENDERPOOL hRenderPool, UINT uViewportIndex);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI RenderPoolViewportRemoveByID(HRENDERPOOL hRenderPool, DWORD dwViewportID);
+	BOOL RenderPoolViewportRemoveByID(HRENDERPOOL hRenderPool, DWORD dwViewportID);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI RenderPoolViewportScreenSetByIndex(
+	BOOL RenderPoolViewportScreenSetByIndex(
 		HRENDERPOOL hRenderPool, 
 		UINT uViewportIndex, 
 		HDC hDCNew,
@@ -58,7 +58,7 @@ GDIENGINE3D_USERAPI
 		);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI RenderPoolViewportScreenSetByID(
+	BOOL RenderPoolViewportScreenSetByID(
 		HRENDERPOOL hRenderPool, 
 		DWORD dwViewportID,
 		HDC hDCNew,
@@ -66,224 +66,224 @@ GDIENGINE3D_USERAPI
 		);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI RenderPoolViewportGetCount(HRENDERPOOL hRenderPool, UINT &uVpCount);
+	BOOL RenderPoolViewportGetCount(HRENDERPOOL hRenderPool, UINT &uVpCount);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI RenderPoolRenderWorld(HRENDERPOOL hRenderPool, DWORD &dwResult);
+	BOOL RenderPoolRenderWorld(HRENDERPOOL hRenderPool, DWORD &dwResult);
 
 // ============================================================================
 // CViewport library interface implementation
 
 GDIENGINE3D_USERAPI 
-	//HVIEWPORT WINAPI ViewportCreate(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
-	HVIEWPORT WINAPI ViewportCreate(RENDER_MODE rMode);
+	//HVIEWPORT ViewportCreate(LONG uVpWidth, LONG uVpHeight, RENDER_MODE rMode);
+	HVIEWPORT ViewportCreate(RENDER_MODE rMode);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ViewportSizeSet(HVIEWPORT hViewport, LONG uVpWidth, LONG uVpHeight);
+	BOOL ViewportSizeSet(HVIEWPORT hViewport, LONG uVpWidth, LONG uVpHeight);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ViewportSizeGet(HVIEWPORT hViewport, LONG &uVpWidth, LONG &uVpHeight);
+	BOOL ViewportSizeGet(HVIEWPORT hViewport, LONG &uVpWidth, LONG &uVpHeight);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ViewportRenderModeSet(HVIEWPORT hViewport, RENDER_MODE rMode);
+	BOOL ViewportRenderModeSet(HVIEWPORT hViewport, RENDER_MODE rMode);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ViewportRenderModeGet(HVIEWPORT hViewport, RENDER_MODE &rMode);
+	BOOL ViewportRenderModeGet(HVIEWPORT hViewport, RENDER_MODE &rMode);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ViewportRender(HVIEWPORT hViewport, HSCENE hScene, HCAMERA hCam, HDC hDcScreen);
+	BOOL ViewportRender(HVIEWPORT hViewport, HSCENE hScene, HCAMERA hCam, HDC hDcScreen);
 
 // ============================================================================
 // CCamera library interface implementation
 
 GDIENGINE3D_USERAPI 
-	HCAMERA WINAPI CameraCreate(PROJECTION_TYPE pt, FLOAT hFOV, FLOAT vFOV);
+	HCAMERA CameraCreate(PROJECTION_TYPE pt, FLOAT hFOV, FLOAT vFOV);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraTranslate(HCAMERA hCamera, FLOAT fX, FLOAT fY, FLOAT fZ);
+	BOOL CameraTranslate(HCAMERA hCamera, FLOAT fX, FLOAT fY, FLOAT fZ);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraRotate(HCAMERA hCamera, FLOAT Roll, FLOAT Yaw, FLOAT Pitch);
+	BOOL CameraRotate(HCAMERA hCamera, FLOAT Roll, FLOAT Yaw, FLOAT Pitch);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraNameSet(HCAMERA hCamera, LPTSTR tcsName);
+	BOOL CameraNameSet(HCAMERA hCamera, LPTSTR tcsName);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraNameGet(HCAMERA hCamera, LPTSTR tcsName, UINT &tcsCharCount);
+	BOOL CameraNameGet(HCAMERA hCamera, LPTSTR tcsName, UINT &tcsCharCount);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraFocalDistanceSet(HCAMERA hCamera, FLOAT fd);
+	BOOL CameraFocalDistanceSet(HCAMERA hCamera, FLOAT fd);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraFocalDistanceGet(HCAMERA hCamera, FLOAT &fd);
+	BOOL CameraFocalDistanceGet(HCAMERA hCamera, FLOAT &fd);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraNearClipSet(HCAMERA hCamera, FLOAT fd);
+	BOOL CameraNearClipSet(HCAMERA hCamera, FLOAT fd);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraNearClipGet(HCAMERA hCamera, FLOAT &fd);
+	BOOL CameraNearClipGet(HCAMERA hCamera, FLOAT &fd);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraFarClipSet(HCAMERA hCamera, FLOAT fd);
+	BOOL CameraFarClipSet(HCAMERA hCamera, FLOAT fd);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraFarClipGet(HCAMERA hCamera, FLOAT &fd);
+	BOOL CameraFarClipGet(HCAMERA hCamera, FLOAT &fd);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraHorizontalFOVSet(HCAMERA hCamera, FLOAT fHFov);
+	BOOL CameraHorizontalFOVSet(HCAMERA hCamera, FLOAT fHFov);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraHorizontalFOVGet(HCAMERA hCamera, FLOAT &fHFov);
+	BOOL CameraHorizontalFOVGet(HCAMERA hCamera, FLOAT &fHFov);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraVerticalFOVSet(HCAMERA hCamera, FLOAT fVFov);
+	BOOL CameraVerticalFOVSet(HCAMERA hCamera, FLOAT fVFov);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI CameraVerticalFOVGet(HCAMERA hCamera, FLOAT &fVFov);
+	BOOL CameraVerticalFOVGet(HCAMERA hCamera, FLOAT &fVFov);
 
 // ============================================================================
 // CScene library interface implementation
 
 GDIENGINE3D_USERAPI
-	HSCENE WINAPI SceneCreate(); 
+	HSCENE SceneCreate(); 
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneClear(HSCENE hScene);
+	BOOL SceneClear(HSCENE hScene);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneAmbientColorSet(HSCENE hScene, COLORREF color);
+	BOOL SceneAmbientColorSet(HSCENE hScene, COLORREF color);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneAmbientColorGet(HSCENE hScene, COLORREF &color);
+	BOOL SceneAmbientColorGet(HSCENE hScene, COLORREF &color);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneObjectRemove(HSCENE hScene, SCENE_OBJECT scObject);
+	BOOL SceneObjectRemove(HSCENE hScene, SCENE_OBJECT scObject);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI SceneObjectTranslate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fX, FLOAT fY, FLOAT fZ);
+	BOOL SceneObjectTranslate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT fX, FLOAT fY, FLOAT fZ);
 
 GDIENGINE3D_USERAPI 
-	BOOL WINAPI SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT Roll, FLOAT Yaw, FLOAT Pitch);
+	BOOL SceneObjectRotate(HSCENE hScene, SCENE_OBJECT scObject, FLOAT Roll, FLOAT Yaw, FLOAT Pitch);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneObjectNameSet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsName);
+	BOOL SceneObjectNameSet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsName);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneObjectNameGet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsName, UINT &tcsCharCount);
+	BOOL SceneObjectNameGet(HSCENE hScene, SCENE_OBJECT scObject, LPTSTR tcsName, UINT &tcsCharCount);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneObjectColorSet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF color);
+	BOOL SceneObjectColorSet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF color);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneObjectColorGet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF &color);
+	BOOL SceneObjectColorGet(HSCENE hScene, SCENE_OBJECT scObject, COLORREF &color);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneMeshSelfIlluminationSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT self_illumination);
+	BOOL SceneMeshSelfIlluminationSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT self_illumination);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneMeshSelfIlluminationGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &self_illumination);
+	BOOL SceneMeshSelfIlluminationGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &self_illumination);
 
 GDIENGINE3D_USERAPI
-	SCENE_OBJECT WINAPI SceneSphereCreate(HSCENE hScene, FLOAT radius, FLOAT crop, FLOAT sliceFrom, FLOAT sliceTo, UINT precision, COLORREF color);
+	SCENE_OBJECT SceneSphereCreate(HSCENE hScene, FLOAT radius, FLOAT crop, FLOAT sliceFrom, FLOAT sliceTo, UINT precision, COLORREF color);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneSphereRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT radius);
+	BOOL SceneSphereRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT radius);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneSphereRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &radius);
+	BOOL SceneSphereRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &radius);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneSpherePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT precision);
+	BOOL SceneSpherePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT precision);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneSpherePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &precision);
+	BOOL SceneSpherePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &precision);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneSphereCropSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT crop);
+	BOOL SceneSphereCropSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT crop);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneSphereCropGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &crop);
+	BOOL SceneSphereCropGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &crop);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneSphereSliceFromSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT from);
+	BOOL SceneSphereSliceFromSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT from);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneSphereSliceFromGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &from);
+	BOOL SceneSphereSliceFromGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &from);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneSphereSliceToSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT to);
+	BOOL SceneSphereSliceToSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT to);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneSphereSliceToGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &to);
+	BOOL SceneSphereSliceToGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &to);
 
 GDIENGINE3D_USERAPI
-	SCENE_OBJECT WINAPI ScenePyramidCreate(HSCENE hScene, FLOAT height, FLOAT baseLength, FLOAT baseWidth, FLOAT topLength, FLOAT topWidth, COLORREF color);
+	SCENE_OBJECT ScenePyramidCreate(HSCENE hScene, FLOAT height, FLOAT baseLength, FLOAT baseWidth, FLOAT topLength, FLOAT topWidth, COLORREF color);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ScenePyramidHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height);
+	BOOL ScenePyramidHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ScenePyramidHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height);
+	BOOL ScenePyramidHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ScenePyramidBaseLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseLength);
+	BOOL ScenePyramidBaseLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseLength);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ScenePyramidBaseLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseLength);
+	BOOL ScenePyramidBaseLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseLength);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ScenePyramidBaseWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseWidth);
+	BOOL ScenePyramidBaseWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseWidth);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ScenePyramidBaseWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseWidth);
+	BOOL ScenePyramidBaseWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseWidth);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ScenePyramidTopLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topLength);
+	BOOL ScenePyramidTopLengthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topLength);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ScenePyramidTopLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topLength);
+	BOOL ScenePyramidTopLengthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topLength);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ScenePyramidTopWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topWidth);
+	BOOL ScenePyramidTopWidthSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topWidth);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI ScenePyramidTopWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topWidth);
+	BOOL ScenePyramidTopWidthGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topWidth);
 
 GDIENGINE3D_USERAPI
-	SCENE_OBJECT WINAPI SceneConeCreate(HSCENE hScene, FLOAT height, FLOAT baseRadius, FLOAT topRadius, UINT precision, COLORREF color);
+	SCENE_OBJECT SceneConeCreate(HSCENE hScene, FLOAT height, FLOAT baseRadius, FLOAT topRadius, UINT precision, COLORREF color);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneConeBaseRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseRadius);
+	BOOL SceneConeBaseRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT baseRadius);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneConeBaseRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseRadius);
+	BOOL SceneConeBaseRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &baseRadius);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneConeTopRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topRadius);
+	BOOL SceneConeTopRadiusSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT topRadius);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneConeTopRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topRadius);
+	BOOL SceneConeTopRadiusGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &topRadius);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneConeHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height);
+	BOOL SceneConeHeightSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT height);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneConeHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height);
+	BOOL SceneConeHeightGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &height);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneConePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT precision);
+	BOOL SceneConePrecisionSet(HSCENE hScene, SCENE_OBJECT scObject, UINT precision);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneConePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &precision);
+	BOOL SceneConePrecisionGet(HSCENE hScene, SCENE_OBJECT scObject, UINT &precision);
 
 GDIENGINE3D_USERAPI
-	SCENE_OBJECT WINAPI SceneOmniLightCreate(HSCENE hScene, FLOAT Power, COLORREF color);
+	SCENE_OBJECT SceneOmniLightCreate(HSCENE hScene, FLOAT Power, COLORREF color);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneLightPowerSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT power);
+	BOOL SceneLightPowerSet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT power);
 
 GDIENGINE3D_USERAPI
-	BOOL WINAPI SceneLightPowerGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &power);
+	BOOL SceneLightPowerGet(HSCENE hScene, SCENE_OBJECT scObject, FLOAT &power);
 
 #ifdef __cplusplus
 }

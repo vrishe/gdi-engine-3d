@@ -6,13 +6,12 @@
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN
-#define _USE_MATH_DEFINES
-
 // WinAPI Library Headers:
 #include <Windows.h>
 #include <WinError.h>
 #include <tchar.h>
 
+#define _USE_MATH_DEFINES
 // C Library Headers:
 #include <limits>
 #include <cmath>

@@ -87,6 +87,7 @@ typedef struct tagTHREAD_DATA {
 	LPCAMERA3D		lpCamera;
 	HDC				hDCScreen;
 
+	DWORD			dwThreadId;
 	THREAD			hThread;
 	THREAD_CONTROLS tcEvents;
 } THREAD_DATA, *LPTHREAD_DATA;

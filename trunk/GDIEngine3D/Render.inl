@@ -81,7 +81,7 @@ inline size_t _clsRenderPool::getViewportCount() const { return tdlViewports.siz
 inline size_t _clsRenderPool::getViewportIndex(DWORD dwVpID) const
 {
 	for(size_t i = 0, max = tdlViewports.size(); i < max; i++)
-		if ( GetThreadId(tdlViewports[i]->hThread) == dwVpID ) return i;
+		if ( tdlViewports[i]->dwThreadId == dwVpID ) return i;
 
 	return SIZE_MAX;
 }
@@ -89,7 +89,7 @@ inline size_t _clsRenderPool::getViewportIndex(DWORD dwVpID) const
 inline DWORD _clsRenderPool::getViewportID(size_t uVpIndex) const
 {
 	if (uVpIndex < tdlViewports.size())
-		return GetThreadId(tdlViewports[uVpIndex]->hThread);
+		return tdlViewports[uVpIndex]->dwThreadId;
 
 	return ((DWORD)0U);
 }
