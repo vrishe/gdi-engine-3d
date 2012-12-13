@@ -137,6 +137,10 @@ HCAMERA	  camera   = CameraCreate(PT_CENTRAL, (FLOAT)(M_PI / 2.0), (FLOAT)(M_PI 
 
 HVIEWPORT viewport = ViewportCreate(RM_SHADED);
 
+SCENE_OBJECT test_object_controlled = NULL;
+float yaw_angle   = 0, 
+	  pitch_angle = 0;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
@@ -156,21 +160,56 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SceneObjectTranslate(scene, test_omni2, 90.0F,    .0F, -300.0F);
 			SceneObjectTranslate(scene, test_omni3, 90.0F, 300.0F,     .0F);
 
-			SCENE_OBJECT test_pyramid1 = SceneConeCreate(scene, 1.0F, 1.0F, .5F, 4, RGB(128, 128, 128));
-			SceneObjectTranslate(scene, test_pyramid1, 2.5F, .0F, .0F);
+			//SCENE_OBJECT test_pyramid1 = SceneConeCreate(scene, 1.0F, 1.0F, .5F, 4, RGB(128, 128, 128));
+			//SceneObjectTranslate(scene, test_pyramid1, 2.5F, .0F, .0F);
 			//SceneObjectRotate(scene, test_pyramid1, .0F, (FLOAT)M_PI / 4.0, .0F);
 
 			//SCENE_OBJECT test_sphere1 = SceneSphereCreate(scene, 15.5F, .0F, .0F, .0F, 16, RGB(255, 255, 255));
-			//SCENE_OBJECT test_sphere2 = SceneSphereCreate(scene,   .5F, .0F, .0F, .0F,  6, RGB(  0, 255,   0));
+			SCENE_OBJECT test_sphere2 = SceneSphereCreate(scene,     .5F, .0F, .0F, .0F,  6, RGB(255, 255, 255));
 			//SCENE_OBJECT test_sphere3 = SceneSphereCreate(scene, 50.2F, .0F, .0F, .0F, 25, RGB(255, 255, 255));
 			//SCENE_OBJECT test_sphere4 = SceneSphereCreate(scene, 88.0F, .0F, .0F, .0F, 48, RGB(255, 255, 255));
 			//SceneObjectTranslate(scene, test_sphere1,  90.0F,   .0F,    .0F);
-			///SceneObjectTranslate(scene, test_sphere2,   2.0F, -1.0F,    .0F);
+			SceneObjectTranslate(scene, test_sphere2, 3.0F, .0F,    .0F);
+			SceneObjectRotate(scene, test_sphere2, .0F, (FLOAT)(350.0 * M_PI / 180.0), .0F);
 			//SceneObjectTranslate(scene, test_sphere3, 150.0F, 20.0F,  50.0F);
 			//SceneObjectTranslate(scene, test_sphere4, 250.0F, 40.0F, -70.0F);
-
+			
 			//SceneMeshSelfIlluminationSet(scene, test_sphere2, 1.0F);
+
+			test_object_controlled = test_sphere2;
 		}
+		break;
+
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case VK_SPACE:
+			{
+				RENDER_MODE rMode = RM_WIREFRAME;
+				ViewportRenderModeGet(viewport, rMode); 
+				rMode =  rMode == RM_SHADEDWF ? RM_WIREFRAME : rMode + 1;
+				ViewportRenderModeSet(viewport, rMode);
+			}
+			break;
+		case VK_LEFT:
+		case VK_RIGHT:
+			{
+				float direction = wParam == VK_LEFT ? -1 : 1;
+				yaw_angle += direction * ((FLOAT)M_PI / 180.0);
+			}
+			break;
+		case VK_UP:
+		case VK_DOWN:
+			{
+				float direction = wParam == VK_UP ? -1 : 1;
+				pitch_angle += direction * ((FLOAT)M_PI / 180.0);
+			}
+			break;
+		default:
+			return 1;
+		}
+		SceneObjectRotate(scene, test_object_controlled, .0F, yaw_angle, pitch_angle); 
+		InvalidateRect(hWnd, NULL, false); 
 		break;
 	case WM_COMMAND:
 		wmId    = LOWORD(wParam);

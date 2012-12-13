@@ -171,72 +171,58 @@ void _clsSphere::Triangulate()
 
 		float cropZ	 = radius * (2.0F * cropMult - 1.0F),
 			  vAngle = asin(cropZ / radius),
-			  vDelta = ((float)M_PI_2 - vAngle) / ((float)precision / 2.0F),	
-			  hDelta = abs((isSliced ? (angleTo - angleFrom) : (2.0F * (float)M_PI)) / precision);
+			  vDelta = ((float)M_PI_2 - vAngle) / ((float)(precision / 2)),	
+			  hDelta = abs((isSliced ? (angleTo - angleFrom) : ((float)((2.0F * M_PI) / (double)precision))));
 
-		unsigned int perCircle = isSliced ? precision + 2 : precision;
+		size_t perCircle = isSliced ? precision + 2 : precision;
 		
 		if (abs(cropZ) < radius) vertices.push_back(VECTOR3D(.0f, .0f, cropZ));
-		while ( ((float)M_PI_2 - vAngle) >= .0 )
+		for (size_t v = 0, max_v = precision / 2 + 1; v < max_v; ++v)
 		{
 			float  cropX  = radius * cos(vAngle);
-			size_t vCount = cropX > .0 ? perCircle : 1;
+			size_t vCount = (v != 0 && v != max_v - 1) ? perCircle : 1;
 
-			LPVECTOR3D v = new VECTOR3D[vCount];
+			LPVECTOR3D new_vertices = new VECTOR3D[vCount];
 
 			float  hAngle = angleFrom;
-			size_t max    = isSliced ? vCount - 1 : vCount;
-			for( size_t i = 0; i < max; ++i ) 
+			size_t max_h    = isSliced ? vCount - 1 : vCount;
+			for( size_t h = 0; h < max_h; ++h ) 
 			{
-				v[i].x = cropX * cos(hAngle);
-				v[i].y = cropX * sin(hAngle);
-				v[i].z = cropZ;
+				new_vertices[h].x = cropX * cos(hAngle);
+				new_vertices[h].y = cropX * sin(hAngle);
+				new_vertices[h].z = cropZ;
 
 				hAngle += hDelta;
 			}
-			if ( isSliced ) v[max].z = cropZ;
-			vertices.insert(vertices.end(), v, v + vCount);
+			if ( isSliced ) new_vertices[max_h].z = cropZ;
+			vertices.insert(vertices.end(), new_vertices, new_vertices + vCount);
 			
-			delete[] v;
+			delete[] new_vertices;
 
 			cropZ = radius * sin(vAngle += vDelta); 
 		}
 		if (vertices.empty()) return;
-		vertices.push_back(VECTOR3D(.0f, .0f, radius));
 
-		size_t i = 1, max = vertices.size();
-		while ( i < max )
+		for ( size_t i = 1, max_i = perCircle + 1; i < max_i; ++i )
 		{
-			for ( size_t j = i, m = i + perCircle; j < m; ++j )
+			polygons.push_back(POLY3D(0, (i < max_i - 1 ? i + 1 : 1), i));
+		}
+		for ( size_t i = 1, max_i = vertices.size() - (perCircle + 1); i < max_i; i += perCircle )
+		{
+			for ( size_t j = i, max_j = i + perCircle; j < max_j; ++j )
 			{
-				size_t current	= j >= max ? max - 1 : j,
-					   upward	= ((INT)(current - perCircle)) <= 0 
-											? 0 : (current - perCircle),
-					   forward	= current >= m - 1 ? i : current + 1,
-					   diagonal	= upward == 0 ? 0 : upward + 1;
+				size_t forward  = j < max_j - 1 ? j + 1 : max_j - perCircle,
+					   upward   = j + perCircle, 
+					   diagonal = forward + perCircle;
 
-				if ( forward == max ) 
-				{
-					upward		+= j - i;
-					diagonal	= upward + 1;
-					if ( diagonal == i ) diagonal = i - perCircle;
-					polygons.push_back(POLY3D(diagonal, current, upward));
-				}
-				else
-				{
-					if ( diagonal != 0 )
-					{
-						if ( diagonal == i ) diagonal = i - perCircle;
-						polygons.push_back(POLY3D(current, diagonal, forward));
-						polygons.push_back(POLY3D(upward, diagonal, current));
-					}
-					else
-					{
-						polygons.push_back(POLY3D(upward, forward, current));
-					}
-				}
+				polygons.push_back(POLY3D(j, forward, upward));
+				polygons.push_back(POLY3D(forward, diagonal, upward));
 			}
-			i += perCircle;
+
+		}
+		for ( size_t max_i = vertices.size() - 1, start_i = max_i - perCircle, i = start_i; i < max_i; ++i )
+		{
+			polygons.push_back(POLY3D((i < max_i - 1 ? i + 1 : start_i), max_i, i));
 		}
 
 		flushVertices();

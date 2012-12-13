@@ -333,6 +333,33 @@ BOOL ViewportRenderModeSet(HVIEWPORT hViewport, RENDER_MODE rMode)
 	return bResult;
 }
 
+BOOL ViewportRenderModeGet(HVIEWPORT hViewport, RENDER_MODE &rMode)
+{
+	BOOL bResult = FALSE;
+
+	thread_safety::LockModule(INFINITE);
+
+	LPUNKNOWN Master = NULL;
+
+	BOOL isValid;
+	if (isValid = thread_safety::IsObjectRegistered((size_t)hViewport, typeid(VIEWPORT)))
+	{
+		thread_safety::LockObjectRegistered((size_t)hViewport, Master);
+	}
+
+	thread_safety::UnlockModule();
+
+	if (isValid)
+	{
+		bResult = isValid;
+		rMode = ((LPVIEWPORT)Master)->getRenderMode();
+
+		thread_safety::UnlockObjectRegistered((size_t)hViewport, Master);
+	}
+
+	return bResult;
+}
+
 BOOL ViewportRender(HVIEWPORT hViewport, HSCENE hScene, HCAMERA hCam, HDC hDcScreen)
 {
 	BOOL bResult = FALSE;
